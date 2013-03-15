@@ -12,10 +12,10 @@ where
 - ``lb`` is the vector of lower bounds on the variables
 - ``ub`` is the vector of upper bounds on the variables
 
-A scalar is accepted for the ``b``, ``sense``, ``lb``, and ``ub`` arguments, in which case its value is replicated. ``-Inf`` and ``Inf`` should be treated correctly when given for ``lb`` or ``ub``.
+A scalar is accepted for the ``b``, ``sense``, ``lb``, and ``ub`` arguments, in which case its value is replicated. ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound.
 
 
-A shortened version should be available as 
+A shortened version is available as 
 ```julia
 linprog(c, A, b, sense[, kwargs]) = linprog(c, A, b, sense, 0, Inf[, kwargs])
 ```
@@ -34,9 +34,9 @@ where
 - ``ub`` is the vector of upper bounds on the variables
 
 
-``kwargs`` contains solution parameters as keyword arguments. We'll have to wait and see what the syntax will look like, but this will be in Julia soon enough.
+``kwargs`` contains solution parameters as keyword arguments. This isn't implemented yet, we're waiting for keyword arguments to appear in Julia.
 
-``solution`` should be an instance of some type with the following members
+``solution`` is an instance of
 ```julia
 type LinprogSolution
     status
