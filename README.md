@@ -61,7 +61,7 @@ If ``status`` is "Optimal", the other members have the following values
 
 ``lambda`` - dual multipliers for active linear constraints (equalities are always active)
 
-``colbasis`` - optimal simplex basis statuses for the variables (columns) if available. Possible values are "NonbasicAtLower", "NonbasicAtUpper", "Basic",  "Superbasic"
+``colbasis`` - optimal simplex basis statuses for the variables (columns) if available. Possible values are ``:NonbasicAtLower``, ``:NonbasicAtUpper``, ``:Basic``,  ``:Superbasic``
 
 ``rowbasis`` - optimal simplex basis statuses for the constraints (rows) if available. Same statuses.
 
