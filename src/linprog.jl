@@ -8,8 +8,6 @@ else
     lpsolver = nothing
 end
 
-println(methods(loadproblem))
-println(methods(status))
 
 type LinprogSolution
     status
