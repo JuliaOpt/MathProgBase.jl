@@ -1,10 +1,15 @@
 
+using LinprogSolverInterface
+
 if Pkg.installed("Clp") != nothing
     @eval using Clp
-    lpsolver = Clp
+    lpsolver = Clp.model
 else
     lpsolver = nothing
 end
+
+println(methods(loadproblem))
+println(methods(status))
 
 type LinprogSolution
     status
@@ -32,7 +37,7 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
     if lpsolver == nothing
         error("No LP solver installed. Please run Pkg.add(\"Clp\") and reload MathProgBase")
     end
-    m = lpsolver.model()
+    m = lpsolver()
     nrow,ncol = size(A)
 
     c = expandvec(c, ncol)
@@ -68,15 +73,14 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
         rowub = rowubtmp
     end
 
-    lpsolver.loadproblem(m, A, lb, ub, c, rowlb, rowub)
-    # optimize is masked by Optim's optimize
-    # maybe there's a better way
-    lpsolver.optimize(m)
-    status = lpsolver.status(m)
-    if status == :Optimal
-        return LinprogSolution(status, lpsolver.getobjval(m), lpsolver.getsolution(m), Dict())
+    loadproblem(m, A, lb, ub, c, rowlb, rowub)
+    optimize(m)
+    stat = status(m)
+    if stat == :Optimal
+        # TODO: fill attrs member as documented 
+        return LinprogSolution(stat, getobjval(m), getsolution(m), Dict())
     else
-        return LinprogSolution(status, nothing, [], Dict())
+        return LinprogSolution(stat, nothing, [], Dict())
     end
 end
 
