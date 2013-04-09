@@ -3,11 +3,11 @@ using LinprogSolverInterface
 
 if Pkg.installed("Clp") != nothing
     @eval using Clp
-    lpsolver = Clp.model
+    lpsolver = Clp
 else
     lpsolver = nothing
 end
-
+setlpsolver(s) = (global lpsolver; lpsolver = s)
 
 type LinprogSolution
     status
@@ -35,7 +35,7 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
     if lpsolver == nothing
         error("No LP solver installed. Please run Pkg.add(\"Clp\") and reload MathProgBase")
     end
-    m = lpsolver()
+    m = lpsolver.model()
     nrow,ncol = size(A)
 
     c = expandvec(c, ncol)
@@ -70,7 +70,7 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
         rowlb = rowlbtmp
         rowub = rowubtmp
     end
-
+    
     loadproblem(m, A, lb, ub, c, rowlb, rowub)
     optimize(m)
     stat = status(m)
