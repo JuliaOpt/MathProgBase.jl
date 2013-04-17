@@ -75,8 +75,10 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
     optimize(m)
     stat = status(m)
     if stat == :Optimal
-        # TODO: fill attrs member as documented 
-        return LinprogSolution(stat, getobjval(m), getsolution(m), Dict())
+        attrs = Dict()
+        attrs[:redcost] = getreducedcosts(m)
+        attrs[:lambda] = getconstrduals(m)
+        return LinprogSolution(stat, getobjval(m), getsolution(m), attrs)
     else
         return LinprogSolution(stat, nothing, [], Dict())
     end

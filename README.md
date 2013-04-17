@@ -61,11 +61,11 @@ If ``status`` is "Optimal", the other members have the following values
 
 ``lambda`` - dual multipliers for active linear constraints (equalities are always active)
 
-``colbasis`` - optimal simplex basis statuses for the variables (columns) if available. Possible values are ``:NonbasicAtLower``, ``:NonbasicAtUpper``, ``:Basic``,  ``:Superbasic``
+``colbasis`` - optimal simplex basis statuses for the variables (columns) if available. Possible values are ``:NonbasicAtLower``, ``:NonbasicAtUpper``, ``:Basic``,  ``:Superbasic``. (not yet implemented)
 
-``rowbasis`` - optimal simplex basis statuses for the constraints (rows) if available. Same statuses.
+``rowbasis`` - optimal simplex basis statuses for the constraints (rows) if available. Same statuses. (not yet implemented)
 
 ---
 
-By convention the dual multipliers should have the sign following the interpretation of marginal change in the objective when the corresponding active right-hand side is increased. This corresponds to the standard that reduced costs should be nonnegative when a variable is at a lower bound and nonpositive when a variable is at an upper bound. Different solvers might have different conventions for the ``lambda`` vector, so transformations might be needed.
+By convention the dual multipliers have the sign following the interpretation of marginal change in the objective when the corresponding active right-hand side is increased. This corresponds to the standard that reduced costs should be nonnegative when a variable is at a lower bound and nonpositive when a variable is at an upper bound when minimizing. 
 
