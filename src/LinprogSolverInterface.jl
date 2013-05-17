@@ -24,9 +24,9 @@ export LinprogSolver,
     status,
     getobjval,
     getsolution,
-    getrowsolution,
+    getconstrsolution,
     getreducedcosts,
-    getrowduals,
+    getconstrduals,
     getrawsolver
 
 abstract LinprogSolver
@@ -69,10 +69,10 @@ getobjval(m::LinprogSolver) = error("Not Implemented")
 
 getsolution(m::LinprogSolver) = error("Not Implemented")
 
-getrowsolution(m::LinprogSolver) = error("Not Implemented")
+getconstrsolution(m::LinprogSolver) = error("Not Implemented")
 
 getreducedcosts(m::LinprogSolver) = error("Not Implemented")
-getrowduals(m::LinprogSolver) = error("Not Implemented")
+getconstrduals(m::LinprogSolver) = error("Not Implemented")
 
 getrawsolver(m::LinprogSolver) = error("Not Implemented")
 
