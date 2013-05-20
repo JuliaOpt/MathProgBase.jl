@@ -13,8 +13,8 @@ export LinprogSolver,
     setconstrUB,
     getobj,
     setobj,
-    addcol,
-    addrow,
+    addvar,
+    addconstr,
     updatemodel,
     setsense,
     getsense,
@@ -49,9 +49,9 @@ setconstrUB(m::LinprogSolver, rowub) = error("Not Implemented")
 getobj(m::LinprogSolver) = error("Not Implemented")
 setobj(m::LinprogSolver, obj) = error("Not Implemented")
 
-addcol(m::LinprogSolver, rowidx, rowcoef, collb, colub, objcoef) = error("Not Implemented")
+addvar(m::LinprogSolver, rowidx, rowcoef, collb, colub, objcoef) = error("Not Implemented")
 
-addrow(m::LinprogSolver, colidx, colcoef, rowlb, rowub) = error("Not Implemented")
+addconstr(m::LinprogSolver, colidx, colcoef, rowlb, rowub) = error("Not Implemented")
 
 updatemodel(m::LinprogSolver) = error("Not Implemented")
 
