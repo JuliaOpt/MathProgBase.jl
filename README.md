@@ -1,8 +1,10 @@
-This package provides one-shot functions for linear programming. To use it, you must install an LP solver first with 
-``Pkg.add("Clp")``.
+This package provides one-shot functions for linear and mixed-integer programming. To use it, you must install an external solver.
+
+Supported LP solvers are ``Clp`` and ``Gurobi``. Supported MIP solvers are ``CoinMP`` and ``Gurobi``. To set the solver, call ``MathProgBase.setlpsolver`` or ``MathProgBase.setmipsolver`, for example: ``MathProgBase.setlpsolver(Gurobi)``.
+
 
 ```julia
-solution = linprog(c, A, sense, b, lb, ub[, kwargs])
+solution = linprog(c, A, sense, b, lb, ub; options...)
 ```
 where
 - ``c`` is the objective vector, always in the sense of minimization
@@ -17,13 +19,13 @@ A scalar is accepted for the ``b``, ``sense``, ``lb``, and ``ub`` arguments, in 
 
 A shortened version is available as 
 ```julia
-linprog(c, A, b, sense[, kwargs]) = linprog(c, A, b, sense, 0, Inf[, kwargs])
+linprog(c, A, b, sense; options...) = linprog(c, A, b, sense, 0, Inf; options...)
 ```
 
 Second version based on range constraints:
 
 ```julia
-solution = linprog(c, A, rowlb, rowub, lb, ub[, kwargs])
+solution = linprog(c, A, rowlb, rowub, lb, ub; options...)
 ```
 where
 - ``c`` is the objective vector, always in the sense of minimization
@@ -34,7 +36,7 @@ where
 - ``ub`` is the vector of upper bounds on the variables
 
 
-``kwargs`` contains solution parameters as keyword arguments. This isn't implemented yet, we're waiting for keyword arguments to appear in Julia.
+``options`` contains solution parameters as named arguments. This is only partially implemented; options may be ignored.
 
 ``solution`` is an instance of
 ```julia
@@ -69,3 +71,43 @@ If ``status`` is "Optimal", the other members have the following values
 
 By convention the dual multipliers have the sign following the interpretation of marginal change in the objective when the corresponding active right-hand side is increased. This corresponds to the standard that reduced costs should be nonnegative when a variable is at a lower bound and nonpositive when a variable is at an upper bound when minimizing. 
 
+---
+
+For mixed-integer programming:
+
+```julia
+solution = mixintprog(c, A, sense, b, vartypes, lb, ub; options...)
+```
+where
+- ``c`` is the objective vector, always in the sense of minimization
+- ``A`` is the constraint matrix 
+- ``sense`` is the vector of constraint sense characters: ``'<'``, ``'='``, and ``'>'``. 
+- ``b`` is the right-hand side vector.
+- ``vartypes`` is a ``Vector{Char}`` with ``'I'`` indicating integer variables and ``'C'`` indicating continous variables. Binary variables should be coded as ``'I'`` with lower bounds of 0 and upper bounds of 1.
+- ``lb`` is the vector of lower bounds on the variables
+- ``ub`` is the vector of upper bounds on the variables
+
+``solution`` is an instance of
+```julia
+type MixintprogSolution
+    status
+    objval
+    sol
+    attrs
+end
+```
+where
+``status`` is as above. 
+
+If ``status`` is "Optimal", the other members have the following values
+
+``objval`` - optimal objective value
+
+``sol`` - primal solution vector
+
+``attrs`` - a dictionary to contain other relevant attributes such as:
+
+``objbound`` - Best known lower bound on objective value.
+
+
+Shortened and range-constraint versions are available as well. 

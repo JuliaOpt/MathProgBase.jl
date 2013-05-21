@@ -84,7 +84,7 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
     end
 end
 
-linprog(c,A,rowlb,rowub) = linprog(c,A,rowlb,rowub,0,Inf)
+linprog(c,A,rowlb,rowub; options...) = linprog(c,A,rowlb,rowub,0,Inf; options...)
 
 export linprog
 
