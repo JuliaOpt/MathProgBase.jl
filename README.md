@@ -1,7 +1,9 @@
 This package provides one-shot functions for linear and mixed-integer programming. To use it, you must install an external solver.
 
-Supported LP solvers are ``Clp`` and ``Gurobi``. Supported MIP solvers are ``CoinMP`` and ``Gurobi``. To set the solver, call ``MathProgBase.setlpsolver`` or ``MathProgBase.setmipsolver`, for example: ``MathProgBase.setlpsolver(Gurobi)``.
+Supported LP solvers are ``Clp`` and ``Gurobi``. Supported MIP solvers are ``CoinMP`` and ``Gurobi``. To set the solver, call ``MathProgBase.setlpsolver`` or ``MathProgBase.setmipsolver``, for example: ``MathProgBase.setlpsolver(Gurobi)``.
 
+---
+For linear programming:
 
 ```julia
 solution = linprog(c, A, sense, b, lb, ub; options...)
@@ -50,7 +52,7 @@ end
 where
 ``status`` is a termination status symbol, one of ``:Optimal``, ``:Infeasible``, ``:Unbounded``, ``:UserLimit`` (iteration limit or timeout), ``:Error``, maybe others.
 
-If ``status`` is "Optimal", the other members have the following values
+If ``status`` is ``:Optimal``, the other members have the following values
 
 ``objval`` - optimal objective value
 
@@ -99,7 +101,7 @@ end
 where
 ``status`` is as above. 
 
-If ``status`` is "Optimal", the other members have the following values
+If ``status`` is ``:Optimal``, the other members have the following values
 
 ``objval`` - optimal objective value
 
