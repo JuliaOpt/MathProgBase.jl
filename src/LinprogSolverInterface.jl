@@ -23,11 +23,14 @@ export LinprogSolver,
     optimize,
     status,
     getobjval,
+    getobjbound,
     getsolution,
     getconstrsolution,
     getreducedcosts,
     getconstrduals,
-    getrawsolver
+    getrawsolver,
+    setvartype,
+    getvartype
 
 abstract LinprogSolver
 
@@ -67,6 +70,8 @@ status(m::LinprogSolver) = error("Not Implemented")
 
 getobjval(m::LinprogSolver) = error("Not Implemented")
 
+getobjbound(m::LinprogSolver) = error("Not Implemented")
+
 getsolution(m::LinprogSolver) = error("Not Implemented")
 
 getconstrsolution(m::LinprogSolver) = error("Not Implemented")
@@ -75,5 +80,8 @@ getreducedcosts(m::LinprogSolver) = error("Not Implemented")
 getconstrduals(m::LinprogSolver) = error("Not Implemented")
 
 getrawsolver(m::LinprogSolver) = error("Not Implemented")
+
+setvartype(m::LinprogSolver, vartype) = error("Not Implemented")
+getvartype(m::LinprogSolver) = error("Not Implemented")
 
 end

@@ -1,41 +1,26 @@
 
-using LinprogSolverInterface
-
-if Pkg.installed("Clp") != nothing
-    @eval using Clp
-    lpsolver = Clp
+if Pkg.installed("CoinMP") != nothing
+    @eval using CoinMP
+    mipsolver = CoinMP
 else
-    lpsolver = nothing
+    mipsolver = nothing
 end
-setlpsolver(s) = (global lpsolver; lpsolver = s)
+setmipsolver(s) = (global mipsolver; mipsolver = s)
 
-type LinprogSolution
+type MixintprogSolution
     status
     objval
     sol
     attrs
 end
 
-typealias InputVector{T<:Real} Union(Vector{T},Real)
+typealias CharInputVector Union(Vector{Char},Real)
 
-function expandvec(x,len::Integer)
-    if isa(x,Vector)
-        if length(x) != len
-            error("Input size mismatch. Expected vector of length $len but got $(length(x))")
-        end
-        return x
-    else
-        return fill(x,len)
+function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::CharInputVector, lb::InputVector, ub::InputVector; options...)
+    if mipsolver == nothing
+        error("No MIP solver installed. Please run Pkg.add(\"CoinMP\") and reload MathProgBase")
     end
-end
-
-
-
-function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector; options...)
-    if lpsolver == nothing
-        error("No LP solver installed. Please run Pkg.add(\"Clp\") and reload MathProgBase")
-    end
-    m = lpsolver.model(;options...)
+    m = mipsolver.model(;options...)
     nrow,ncol = size(A)
 
     c = expandvec(c, ncol)
@@ -43,6 +28,7 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
     rowubtmp = expandvec(rowub, nrow)
     lb = expandvec(lb, ncol)
     ub = expandvec(ub, ncol)
+    vartypes = expandvec(vartypes, ncol)
     
     # rowlb is allowed to be vector of senses
     if eltype(rowlbtmp) == Char
@@ -72,20 +58,20 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
     end
     
     loadproblem(m, A, lb, ub, c, rowlb, rowub)
+    setvartype(m, vartypes)
     optimize(m)
     stat = status(m)
     if stat == :Optimal
         attrs = Dict()
-        attrs[:redcost] = getreducedcosts(m)
-        attrs[:lambda] = getconstrduals(m)
-        return LinprogSolution(stat, getobjval(m), getsolution(m), attrs)
+        attrs[:objbound] = getobjbound(m)
+        return MixintprogSolution(stat, getobjval(m), getsolution(m), attrs)
     else
-        return LinprogSolution(stat, nothing, [], Dict())
+        return MixintprogSolution(stat, nothing, [], Dict())
     end
 end
 
-linprog(c,A,rowlb,rowub) = linprog(c,A,rowlb,rowub,0,Inf)
+mixintprog(c,A,rowlb,rowub,varypes) = mixintprog(c,A,rowlb,rowub,vartypes,0,Inf)
 
-export linprog
+export mixintprog
 
 
