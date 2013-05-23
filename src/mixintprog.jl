@@ -1,11 +1,22 @@
 
 if Pkg.installed("CoinMP") != nothing
-    @eval using CoinMP
     mipsolver = CoinMP
+elseif Pkg.installed("GLPKMathProgInterface") != nothing
+    mipsolver = GLPKInterfaceMIP
 else
     mipsolver = nothing
 end
 setmipsolver(s) = (global mipsolver; mipsolver = s)
+function setmipsolver(s::Symbol)
+    global mipsolver
+    if s == :CoinMP
+        mipsolver = CoinMP
+    elseif s == :GLPK
+        mipsolver = GLPKInterfaceMIP
+    else
+        error("Unrecognized MIP solver name $s")
+    end
+end
 
 type MixintprogSolution
     status
@@ -18,7 +29,9 @@ typealias CharInputVector Union(Vector{Char},Real)
 
 function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::CharInputVector, lb::InputVector, ub::InputVector; options...)
     if mipsolver == nothing
-        error("No MIP solver installed. Please run Pkg.add(\"CoinMP\") and reload MathProgBase")
+        error("No MIP solver installed. " *
+              "Please run Pkg.add(\"CoinMP\") or Pkg.add(\"GLPKMathProgInterface\") " *
+              "and reload MathProgBase")
     end
     m = mipsolver.model(;options...)
     nrow,ncol = size(A)
