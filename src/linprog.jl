@@ -1,13 +1,23 @@
 
-using LinprogSolverInterface
-
 if Pkg.installed("Clp") != nothing
-    @eval using Clp
     lpsolver = Clp
+elseif Pkg.installed("GLPKMathProgInterface") != nothing
+    lpsolver = GLPKInterfaceLP
 else
     lpsolver = nothing
 end
 setlpsolver(s) = (global lpsolver; lpsolver = s)
+function setlpsolver(s::Symbol)
+    global lpsolver
+    if s == :Clp
+        lpsolver = Clp
+    elseif s == :GLPK
+        lpsolver = GLPKInterfaceLP
+    else
+        error("Unrecognized LP solver name $s")
+    end
+end
+
 
 type LinprogSolution
     status
@@ -33,7 +43,9 @@ end
 
 function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector; options...)
     if lpsolver == nothing
-        error("No LP solver installed. Please run Pkg.add(\"Clp\") and reload MathProgBase")
+        error("No LP solver installed. " *
+              "Please run Pkg.add(\"Clp\") or Pkg.add(\"GLPKMathProgInterface\") " *
+              "and reload MathProgBase")
     end
     m = lpsolver.model(;options...)
     nrow,ncol = size(A)
