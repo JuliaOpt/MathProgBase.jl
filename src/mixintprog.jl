@@ -1,8 +1,9 @@
-
 if Pkg.installed("CoinMP") != nothing
     mipsolver = CoinMP
 elseif Pkg.installed("GLPKMathProgInterface") != nothing
     mipsolver = GLPKInterfaceMIP
+elseif Pkg.installed("Gurobi") != nothing
+    mipsolver = Gurobi
 else
     mipsolver = nothing
 end
