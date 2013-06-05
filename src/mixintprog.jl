@@ -14,10 +14,14 @@ function setmipsolver(s::Symbol)
         mipsolver = CoinMP
     elseif s == :GLPK
         mipsolver = GLPKInterfaceMIP
+    elseif s == :Gurobi
+        mipsolver = Gurobi
     else
         error("Unrecognized MIP solver name $s")
     end
 end
+
+export setmipsolver
 
 type MixintprogSolution
     status

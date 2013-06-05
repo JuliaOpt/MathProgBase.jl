@@ -14,11 +14,14 @@ function setlpsolver(s::Symbol)
         lpsolver = Clp
     elseif s == :GLPK
         lpsolver = GLPKInterfaceLP
+    elseif s == :Gurobi
+        lpsolver = Gurobi
     else
         error("Unrecognized LP solver name $s")
     end
 end
 
+export setlpsolver
 
 type LinprogSolution
     status
