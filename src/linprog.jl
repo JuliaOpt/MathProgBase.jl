@@ -1,5 +1,5 @@
 if Pkg.installed("Clp") != nothing
-    lpsolver = Clp
+    lpsolver = Clp.ClpSolverInterface
 elseif Pkg.installed("GLPKMathProgInterface") != nothing
     lpsolver = GLPKInterfaceLP
 elseif Pkg.installed("Gurobi") != nothing

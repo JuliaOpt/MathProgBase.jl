@@ -1,6 +1,8 @@
 using Base.Test
 using MathProgBase
 
+#setlpsolver(:Gurobi)
+
 # min -x
 # s.t. 2x + y <= 1.5
 # x,y >= 0
