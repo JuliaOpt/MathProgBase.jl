@@ -11,7 +11,7 @@ setlpsolver(s) = (global lpsolver; lpsolver = s)
 function setlpsolver(s::Symbol)
     global lpsolver
     if s == :Clp
-        lpsolver = Clp
+        lpsolver = Clp.ClpSolverInterface
     elseif s == :GLPK
         lpsolver = GLPKInterfaceLP
     elseif s == :Gurobi
