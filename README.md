@@ -1,6 +1,6 @@
 This package provides one-shot functions for linear and mixed-integer programming. To use it, you must install an external solver.
 
-Supported LP solvers are ``Clp``, ``Gurobi``, and ``GLPK``. Supported MIP solvers are ``CoinMP``, ``Gurobi``, and ``GLPK``. To set the solver, call ``setlpsolver`` or ``setmipsolver``, for example: ``setlpsolver(:Gurobi)`` and ``setmipsolver(:GLPK)``. The corresponding solver packages (of the same name, except for ``GLPKMathProgInterface``) must be installed fist.
+Supported LP solvers are ``Clp``, ``Gurobi``, and ``GLPK``. Supported MIP solvers are ``Cbc``, ``Gurobi``, and ``GLPK``. To set the solver, call ``setlpsolver`` or ``setmipsolver``, for example: ``setlpsolver(:Gurobi)`` and ``setmipsolver(:GLPK)``. The corresponding solver packages (of the same name, except for ``GLPKMathProgInterface``) must be installed fist.
 
 ---
 For linear programming:

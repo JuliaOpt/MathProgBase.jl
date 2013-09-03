@@ -1,5 +1,5 @@
-if Pkg.installed("CoinMP") != nothing
-    mipsolver = CoinMP
+if Pkg.installed("Cbc") != nothing
+    mipsolver = Cbc
 elseif Pkg.installed("GLPKMathProgInterface") != nothing
     mipsolver = GLPKInterfaceMIP
 elseif Pkg.installed("Gurobi") != nothing
@@ -10,8 +10,8 @@ end
 setmipsolver(s) = (global mipsolver; mipsolver = s)
 function setmipsolver(s::Symbol)
     global mipsolver
-    if s == :CoinMP
-        mipsolver = CoinMP
+    if s == :Cbc
+        mipsolver = Cbc
     elseif s == :GLPK
         mipsolver = GLPKInterfaceMIP
     elseif s == :Gurobi
@@ -35,7 +35,7 @@ typealias CharInputVector Union(Vector{Char},Real)
 function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::CharInputVector, lb::InputVector, ub::InputVector; options...)
     if mipsolver == nothing
         error("No MIP solver installed. " *
-              "Please run Pkg.add(\"CoinMP\") or Pkg.add(\"GLPKMathProgInterface\") " *
+              "Please run Pkg.add(\"Cbc\") or Pkg.add(\"GLPKMathProgInterface\") " *
               "and reload MathProgBase")
     end
     m = mipsolver.model(;options...)

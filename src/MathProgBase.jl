@@ -3,8 +3,8 @@ module MathProgBase
     if Pkg.installed("Clp") != nothing
         @eval import Clp
     end
-    if Pkg.installed("CoinMP") != nothing
-        @eval import CoinMP
+    if Pkg.installed("Cbc") != nothing
+        @eval import Cbc
     end
     if Pkg.installed("GLPKMathProgInterface") != nothing
         @eval using GLPKMathProgInterface
