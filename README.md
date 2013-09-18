@@ -21,7 +21,7 @@ A scalar is accepted for the ``b``, ``sense``, ``lb``, and ``ub`` arguments, in 
 
 A shortened version is available as 
 ```julia
-linprog(c, A, b, sense; options...) = linprog(c, A, b, sense, 0, Inf; options...)
+linprog(c, A, sense, b; options...) = linprog(c, A, sense, b, 0, Inf; options...)
 ```
 
 Second version based on range constraints:
