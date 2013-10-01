@@ -1,27 +1,39 @@
-if Pkg.installed("Cbc") != nothing
-    mipsolver = Cbc
-elseif Pkg.installed("GLPKMathProgInterface") != nothing
-    mipsolver = GLPKInterfaceMIP
-elseif Pkg.installed("Gurobi") != nothing
-    mipsolver = Gurobi
-else
-    mipsolver = nothing
+type MIPSolver
+    solvermodule::Module
+    options
 end
-setmipsolver(s) = (global mipsolver; mipsolver = s)
-function setmipsolver(s::Symbol)
-    global mipsolver
+
+function MIPSolver(s::Symbol;options...)
+    local mod
     if s == :Cbc
-        mipsolver = Cbc
+        mod = Cbc
     elseif s == :GLPK
-        mipsolver = GLPKInterfaceMIP
+        mod = GLPKMathProgInterface.GLPKInterfaceMIP
     elseif s == :Gurobi
-        mipsolver = Gurobi
+        mod = Gurobi
     else
         error("Unrecognized MIP solver name $s")
     end
+    return MIPSolver(mod,options)
 end
 
-export setmipsolver
+# This is the default solver order. Free solvers first.
+const defaultmipsolvers = [:Cbc, :GLPK, :Gurobi] 
+# Default MIP Solver
+function MIPSolver()
+    for s in defaultmipsolvers
+        try
+            return MIPSolver(s)
+        catch
+            continue
+        end
+    end
+    error("No recognized MIP solvers installed." *
+          "Please run Pkg.add(\"Cbc\") or Pkg.add(\"GLPKMathProgInterface\") " *
+          "and restart Julia")
+end
+
+export MIPSolver
 
 type MixintprogSolution
     status
@@ -32,13 +44,8 @@ end
 
 typealias CharInputVector Union(Vector{Char},Real)
 
-function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::CharInputVector, lb::InputVector, ub::InputVector; options...)
-    if mipsolver == nothing
-        error("No MIP solver installed. " *
-              "Please run Pkg.add(\"Cbc\") or Pkg.add(\"GLPKMathProgInterface\") " *
-              "and reload MathProgBase")
-    end
-    m = mipsolver.model(;options...)
+function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::CharInputVector, lb::InputVector, ub::InputVector, solver::MIPSolver = MIPSolver())
+    m = solver.solvermodule.model(;solver.options...)
     nrow,ncol = size(A)
 
     c = expandvec(c, ncol)
@@ -88,7 +95,7 @@ function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub
     end
 end
 
-mixintprog(c,A,rowlb,rowub,varypes) = mixintprog(c,A,rowlb,rowub,vartypes,0,Inf)
+mixintprog(c,A,rowlb,rowub,varypes,solver::MIPSolver=MIPSolver()) = mixintprog(c,A,rowlb,rowub,vartypes,0,Inf,solver)
 
 export mixintprog
 

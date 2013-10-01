@@ -1,16 +1,11 @@
 module MathProgBase
 
-    if Pkg.installed("Clp") != nothing
-        @eval import Clp
-    end
-    if Pkg.installed("Cbc") != nothing
-        @eval import Cbc
-    end
-    if Pkg.installed("GLPKMathProgInterface") != nothing
-        @eval using GLPKMathProgInterface
-    end
-    if Pkg.installed("Gurobi") != nothing
-        @eval using Gurobi
+    # import all available solvers 
+    const solvers = [:Clp, :Cbc, :GLPKMathProgInterface, :Gurobi]
+    for s in solvers
+        if Pkg.installed(string(s)) != nothing
+            eval(Expr(:import,s))
+        end
     end
 
     require(joinpath(Pkg.dir("MathProgBase"),"src","LinprogSolverInterface.jl"))

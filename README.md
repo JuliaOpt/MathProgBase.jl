@@ -1,12 +1,12 @@
 This package provides one-shot functions for linear and mixed-integer programming. To use it, you must install an external solver.
 
-Supported LP solvers are ``Clp``, ``Gurobi``, and ``GLPK``. Supported MIP solvers are ``Cbc``, ``Gurobi``, and ``GLPK``. To set the solver, call ``setlpsolver`` or ``setmipsolver``, for example: ``setlpsolver(:Gurobi)`` and ``setmipsolver(:GLPK)``. The corresponding solver packages (of the same name, except for ``GLPKMathProgInterface``) must be installed fist.
+Supported LP solvers are ``Clp``, ``Gurobi``, and ``GLPK``. Supported MIP solvers are ``Cbc``, ``Gurobi``, and ``GLPK``. The corresponding solver packages (of the same name, except for ``GLPKMathProgInterface``) must be installed first. Solvers are chosen by passing solver objects as optional final parameters to any call to ``linprog`` or ``mixintprog``.
 
 ---
 For linear programming:
 
 ```julia
-solution = linprog(c, A, sense, b, lb, ub; options...)
+solution = linprog(c, A, sense, b, lb, ub, solver=LPSolver())
 ```
 where
 - ``c`` is the objective vector, always in the sense of minimization
@@ -21,13 +21,13 @@ A scalar is accepted for the ``b``, ``sense``, ``lb``, and ``ub`` arguments, in 
 
 A shortened version is available as 
 ```julia
-linprog(c, A, sense, b; options...) = linprog(c, A, sense, b, 0, Inf; options...)
+linprog(c, A, sense, b, solver = LPSolver()) = linprog(c, A, sense, b, 0, Inf, solver)
 ```
 
 Second version based on range constraints:
 
 ```julia
-solution = linprog(c, A, rowlb, rowub, lb, ub; options...)
+solution = linprog(c, A, rowlb, rowub, lb, ub, solver=LPSolver())
 ```
 where
 - ``c`` is the objective vector, always in the sense of minimization
@@ -78,7 +78,7 @@ By convention the dual multipliers have the sign following the interpretation of
 For mixed-integer programming:
 
 ```julia
-solution = mixintprog(c, A, sense, b, vartypes, lb, ub; options...)
+solution = mixintprog(c, A, sense, b, vartypes, lb, ub, solver=MIPSolver())
 ```
 where
 - ``c`` is the objective vector, always in the sense of minimization
@@ -112,4 +112,8 @@ If ``status`` is ``:Optimal``, the other members have the following values
 ``objbound`` - Best known lower bound on objective value.
 
 
-Shortened and range-constraint versions are available as well. 
+Shortened and range-constraint versions are available as well.
+
+---
+
+The ``LPSolver`` and ``MIPSolver`` constructors accept the name of the solver as a symbol and an optional list of solver parameters. For example, ``MIPSolver(:Cbc,LogLevel=1)`` will create a solver object that when passed to ``mixintprog`` will solve the problem with Cbc with verbose output. Solver parameters are entirely solver dependent and have not yet been well documented.

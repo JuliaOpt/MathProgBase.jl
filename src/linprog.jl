@@ -1,27 +1,39 @@
-if Pkg.installed("Clp") != nothing
-    lpsolver = Clp.ClpSolverInterface
-elseif Pkg.installed("GLPKMathProgInterface") != nothing
-    lpsolver = GLPKInterfaceLP
-elseif Pkg.installed("Gurobi") != nothing
-    lpsolver = Gurobi
-else
-    lpsolver = nothing
+type LPSolver
+    solvermodule::Module
+    options
 end
-setlpsolver(s) = (global lpsolver; lpsolver = s)
-function setlpsolver(s::Symbol)
-    global lpsolver
+
+function LPSolver(s::Symbol;options...)
+    local mod
     if s == :Clp
-        lpsolver = Clp.ClpSolverInterface
+        mod = Clp.ClpSolverInterface
     elseif s == :GLPK
-        lpsolver = GLPKInterfaceLP
+        mod = GLPKMathProgInterface.GLPKInterfaceLP
     elseif s == :Gurobi
-        lpsolver = Gurobi
+        mod = Gurobi
     else
         error("Unrecognized LP solver name $s")
     end
+    return LPSolver(mod,options)
 end
 
-export setlpsolver
+# This is the default solver order. Free solvers first.
+const defaultlpsolvers = [:Clp, :GLPK, :Gurobi] 
+# Default LP Solver
+function LPSolver()
+    for s in defaultlpsolvers
+        try
+            return LPSolver(s)
+        catch
+            continue
+        end
+    end
+    error("No recognized LP solvers installed." *
+          "Please run Pkg.add(\"Clp\") or Pkg.add(\"GLPKMathProgInterface\") " *
+          "and restart Julia")
+end
+
+export LPSolver
 
 type LinprogSolution
     status
@@ -45,13 +57,8 @@ end
 
 
 
-function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector; options...)
-    if lpsolver == nothing
-        error("No LP solver installed. " *
-              "Please run Pkg.add(\"Clp\") or Pkg.add(\"GLPKMathProgInterface\") " *
-              "and reload MathProgBase")
-    end
-    m = lpsolver.model(;options...)
+function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::LPSolver = LPSolver())
+    m = solver.solvermodule.model(;solver.options...)
     nrow,ncol = size(A)
 
     c = expandvec(c, ncol)
@@ -100,7 +107,7 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
     end
 end
 
-linprog(c,A,rowlb,rowub; options...) = linprog(c,A,rowlb,rowub,0,Inf; options...)
+linprog(c,A,rowlb,rowub, solver::LPSolver = LPSolver()) = linprog(c,A,rowlb,rowub,0,Inf, solver)
 
 export linprog
 
