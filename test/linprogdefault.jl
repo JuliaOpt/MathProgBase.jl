@@ -1,0 +1,3 @@
+require("linprog.jl")
+
+linprogtest()

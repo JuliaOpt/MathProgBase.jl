@@ -1,0 +1,3 @@
+require("mixintprog.jl")
+
+mixintprogtest()
