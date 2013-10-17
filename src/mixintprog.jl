@@ -17,6 +17,8 @@ function MIPSolver(s::Symbol;options...)
     return MIPSolver(mod,options)
 end
 
+model(s::MIPSolver) = s.solvermodule.model(;s.options...)
+
 # This is the default solver order. Free solvers first.
 const defaultmipsolvers = [:Cbc, :GLPK, :Gurobi] 
 # Default MIP Solver

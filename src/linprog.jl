@@ -17,6 +17,9 @@ function LPSolver(s::Symbol;options...)
     return LPSolver(mod,options)
 end
 
+model(s::LPSolver) = s.solvermodule.model(;s.options...)
+export model
+
 # This is the default solver order. Free solvers first.
 const defaultlpsolvers = [:Clp, :GLPK, :Gurobi] 
 # Default LP Solver
