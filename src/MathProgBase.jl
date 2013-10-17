@@ -8,7 +8,7 @@ module MathProgBase
         end
     end
 
-    require(joinpath(Pkg.dir("MathProgBase"),"src","LinprogSolverInterface.jl"))
+    require(joinpath(Pkg.dir("MathProgBase"),"src","MathProgSolverInterface.jl"))
     using LinprogSolverInterface
     include("linprog.jl")
     include("mixintprog.jl")
