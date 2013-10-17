@@ -1,6 +1,8 @@
 module MathProgSolverInterface
 
 export MathProgSolver,
+    SolverNameAndOptions,
+    model,
     loadproblem,
     writeproblem,
     getvarLB,
@@ -34,7 +36,20 @@ export MathProgSolver,
 
 abstract MathProgSolver
 
+# immutable type which we dispatch solvers on 
+abstract SolverNameAndOptions
 
+model(s::SolverNameAndOptions) = error("Not implemented")
+
+immutable MissingSolver <: SolverNameAndOptions
+    solvertype::ASCIIString
+    suggestions::Vector{Symbol}
+end
+
+function model(s::MissingSolver) 
+    pkgnames = join(["\"$(sol)\", " for sol in s.suggestions], ' ')
+    error("No $(s.solvertype) solver detected. Try installing one of the following packages: $pkgnames and restarting Julia")
+end
 
 loadproblem(m::MathProgSolver, filename::String) = error("Not Implemented")
 loadproblem(m::MathProgSolver, A, collb, colub, obj, rowlb, rowub) = error("Not Implemented")

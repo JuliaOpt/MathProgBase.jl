@@ -1,8 +1,8 @@
 using Base.Test
 using MathProgBase
 
-function linprogtest(solver::LPSolver=LPSolver())
-    println("Testing linprog with solver ", string(solver.solvermodule))
+function linprogtest(solver::SolverNameAndOptions=MathProgBase.defaultLPsolver)
+    println("Testing linprog with solver ", string(typeof(solver)))
     # min -x
     # s.t. 2x + y <= 1.5
     # x,y >= 0

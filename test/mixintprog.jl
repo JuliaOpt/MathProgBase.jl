@@ -1,8 +1,8 @@
 using Base.Test
 using MathProgBase
 
-function mixintprogtest(solver::MIPSolver=MIPSolver())
-    println("Testing mixintprog with solver ", string(solver.solvermodule))
+function mixintprogtest(solver::SolverNameAndOptions=MathProgBase.defaultMIPsolver)
+    println("Testing mixintprog with solver ", string(typeof(solver)))
 
     # integer knapsack problem
     sol = mixintprog(-[5,3,2,7,4],Float64[2 8 4 2 5],'<',10,'I',0,1,solver)

@@ -1,8 +1,10 @@
 using Base.Test
 using MathProgBase
-using MathProgBase.LinprogSolverInterface
+using MathProgBase.MathProgSolverInterface
 
-function linprogsolvertest(m::LinprogSolverInterface.LinprogSolver)
+function linprogsolvertest(solver::SolverNameAndOptions)
+
+    m = model(solver)
 
     # Min -x
     # s.t. x + y <= 1

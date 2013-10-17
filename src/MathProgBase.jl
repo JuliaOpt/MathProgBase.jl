@@ -1,15 +1,13 @@
 module MathProgBase
 
-    # import all available solvers 
-    const solvers = [:Clp, :Cbc, :GLPKMathProgInterface, :Gurobi]
-    for s in solvers
-        if Pkg.installed(string(s)) != nothing
-            eval(Expr(:import,s))
-        end
-    end
-
     require(joinpath(Pkg.dir("MathProgBase"),"src","MathProgSolverInterface.jl"))
-    using LinprogSolverInterface
+    using MathProgSolverInterface
+    export SolverNameAndOptions
+
+    include("defaultsolvers.jl")
+    @setdefaultLPsolver
+    @setdefaultMIPsolver
+
     include("linprog.jl")
     include("mixintprog.jl")
 end

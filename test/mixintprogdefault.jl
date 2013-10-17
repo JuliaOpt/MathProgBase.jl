@@ -1,3 +1,0 @@
-require("mixintprog.jl")
-
-mixintprogtest()

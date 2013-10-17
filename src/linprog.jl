@@ -1,42 +1,3 @@
-type LPSolver
-    solvermodule::Module
-    options
-end
-
-function LPSolver(s::Symbol;options...)
-    local mod
-    if s == :Clp
-        mod = Clp.ClpSolverInterface
-    elseif s == :GLPK
-        mod = GLPKMathProgInterface.GLPKInterfaceLP
-    elseif s == :Gurobi
-        mod = Gurobi
-    else
-        error("Unrecognized LP solver name $s")
-    end
-    return LPSolver(mod,options)
-end
-
-model(s::LPSolver) = s.solvermodule.model(;s.options...)
-export model
-
-# This is the default solver order. Free solvers first.
-const defaultlpsolvers = [:Clp, :GLPK, :Gurobi] 
-# Default LP Solver
-function LPSolver()
-    for s in defaultlpsolvers
-        try
-            return LPSolver(s)
-        catch
-            continue
-        end
-    end
-    error("No recognized LP solvers installed." *
-          "Please run Pkg.add(\"Clp\") or Pkg.add(\"GLPKMathProgInterface\") " *
-          "and restart Julia")
-end
-
-export LPSolver
 
 type LinprogSolution
     status
@@ -60,8 +21,8 @@ end
 
 
 
-function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::LPSolver = LPSolver())
-    m = solver.solvermodule.model(;solver.options...)
+function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::SolverNameAndOptions = defaultLPsolver)
+    m = model(solver)
     nrow,ncol = size(A)
 
     c = expandvec(c, ncol)
@@ -110,7 +71,7 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
     end
 end
 
-linprog(c,A,rowlb,rowub, solver::LPSolver = LPSolver()) = linprog(c,A,rowlb,rowub,0,Inf, solver)
+linprog(c,A,rowlb,rowub, solver::SolverNameAndOptions = defaultLPsolver) = linprog(c,A,rowlb,rowub,0,Inf, solver)
 
 export linprog
 
