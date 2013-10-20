@@ -8,7 +8,7 @@ end
 
 typealias CharInputVector Union(Vector{Char},Real)
 
-function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::CharInputVector, lb::InputVector, ub::InputVector, solver::SolverNameAndOptions = defaultMIPsolver)
+function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::CharInputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = defaultMIPsolver)
     m = model(solver)
     nrow,ncol = size(A)
 
@@ -59,7 +59,7 @@ function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub
     end
 end
 
-mixintprog(c,A,rowlb,rowub,varypes,solver::SolverNameAndOptions=defaultMIPsolver()) = mixintprog(c,A,rowlb,rowub,vartypes,0,Inf,solver)
+mixintprog(c,A,rowlb,rowub,varypes,solver::AbstractMathProgSolver=defaultMIPsolver) = mixintprog(c,A,rowlb,rowub,vartypes,0,Inf,solver)
 
 export mixintprog
 

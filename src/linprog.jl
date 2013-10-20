@@ -21,7 +21,7 @@ end
 
 
 
-function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::SolverNameAndOptions = defaultLPsolver)
+function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = defaultLPsolver)
     m = model(solver)
     nrow,ncol = size(A)
 
@@ -71,7 +71,7 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
     end
 end
 
-linprog(c,A,rowlb,rowub, solver::SolverNameAndOptions = defaultLPsolver) = linprog(c,A,rowlb,rowub,0,Inf, solver)
+linprog(c,A,rowlb,rowub, solver::AbstractMathProgSolver = defaultLPsolver) = linprog(c,A,rowlb,rowub,0,Inf, solver)
 
 export linprog
 

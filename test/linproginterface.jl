@@ -2,7 +2,7 @@ using Base.Test
 using MathProgBase
 using MathProgBase.MathProgSolverInterface
 
-function linprogsolvertest(solver::SolverNameAndOptions)
+function linprogsolvertest(solver::AbstractMathProgSolver)
 
     m = model(solver)
 
