@@ -2,7 +2,7 @@
 # macros to generate code to set default solver
 
 macro setdefaultLPsolver()
-    solvers = [(:Clp,:ClpSolver)]
+    solvers = [(:Clp,:ClpSolver), (:GLPKMathProgInterface,:GLPKSolverLP)]
     for (pkgname, solvername) in solvers
         if Pkg.installed(string(pkgname)) != nothing
             importexpr = Expr(:import,pkgname)
@@ -19,7 +19,7 @@ macro setdefaultLPsolver()
 end
 
 macro setdefaultMIPsolver()
-    solvers = [(:Cbc,:CbcSolver)]
+    solvers = [(:Cbc,:CbcSolver), (:GLPKMathProgInterface,:GLPKSolverMIP)]
     for (pkgname, solvername) in solvers
         if Pkg.installed(string(pkgname)) != nothing
             importexpr = Expr(:import,pkgname)
