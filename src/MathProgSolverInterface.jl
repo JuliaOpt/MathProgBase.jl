@@ -2,6 +2,7 @@ module MathProgSolverInterface
 
 export AbstractMathProgModel,
     AbstractMathProgSolver,
+    MissingSolver,
     model,
     loadproblem,
     writeproblem,
