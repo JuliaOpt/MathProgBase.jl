@@ -14,7 +14,7 @@ macro setdefaultLPsolver()
     end
     pkgnames = [pkgname for (pkgname, solvername) in solvers]
     return esc(quote
-        const defaultLPSolver = MissingSolver("LP",$pkgnames)
+        const defaultLPsolver = MissingSolver("LP",$pkgnames)
     end)
 end
 
@@ -31,6 +31,6 @@ macro setdefaultMIPsolver()
     end
     pkgnames = [pkgname for (pkgname, solvername) in solvers]
     return esc(quote
-        const defaultMIPSolver = MissingSolver("MIP",$pkgnames)
+        const defaultMIPsolver = MissingSolver("MIP",$pkgnames)
     end)
 end
