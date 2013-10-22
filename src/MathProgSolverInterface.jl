@@ -4,26 +4,26 @@ export AbstractMathProgModel,
     AbstractMathProgSolver,
     MissingSolver,
     model,
-    loadproblem,
+    loadproblem!,
     writeproblem,
     getvarLB,
-    setvarLB,
+    setvarLB!,
     getvarUB,
-    setvarUB,
+    setvarUB!,
     getconstrLB,
-    setconstrLB,
+    setconstrLB!,
     getconstrUB,
-    setconstrUB,
+    setconstrUB!,
     getobj,
-    setobj,
-    addvar,
-    addconstr,
-    updatemodel,
-    setsense,
+    setobj!,
+    addvar!,
+    addconstr!,
+    updatemodel!,
+    setsense!,
     getsense,
     numvar,
     numconstr,
-    optimize,
+    optimize!,
     status,
     getobjval,
     getobjbound,
@@ -32,7 +32,7 @@ export AbstractMathProgModel,
     getreducedcosts,
     getconstrduals,
     getrawsolver,
-    setvartype,
+    setvartype!,
     getvartype
 
 abstract AbstractMathProgModel
@@ -52,35 +52,35 @@ function model(s::MissingSolver)
     error("No $(s.solvertype) solver detected. Try installing one of the following packages: $pkgnames and restarting Julia")
 end
 
-loadproblem(m::AbstractMathProgModel, filename::String) = error("Not Implemented")
-loadproblem(m::AbstractMathProgModel, A, collb, colub, obj, rowlb, rowub) = error("Not Implemented")
+loadproblem!(m::AbstractMathProgModel, filename::String) = error("Not Implemented")
+loadproblem!(m::AbstractMathProgModel, A, collb, colub, obj, rowlb, rowub) = error("Not Implemented")
 
 writeproblem(m::AbstractMathProgModel, filename::String) = error("Not Implemented")
 
 getvarLB(m::AbstractMathProgModel) = error("Not Implemented")
-setvarLB(m::AbstractMathProgModel, collb) = error("Not Implemented")
+setvarLB!(m::AbstractMathProgModel, collb) = error("Not Implemented")
 getvarUB(m::AbstractMathProgModel) = error("Not Implemented")
-setvarUB(m::AbstractMathProgModel, colub) = error("Not Implemented")
+setvarUB!(m::AbstractMathProgModel, colub) = error("Not Implemented")
 getconstrLB(m::AbstractMathProgModel) = error("Not Implemented")
-setconstrLB(m::AbstractMathProgModel, rowlb) = error("Not Implemented")
+setconstrLB!(m::AbstractMathProgModel, rowlb) = error("Not Implemented")
 getconstrUB(m::AbstractMathProgModel) = error("Not Implemented")
-setconstrUB(m::AbstractMathProgModel, rowub) = error("Not Implemented")
+setconstrUB!(m::AbstractMathProgModel, rowub) = error("Not Implemented")
 getobj(m::AbstractMathProgModel) = error("Not Implemented")
-setobj(m::AbstractMathProgModel, obj) = error("Not Implemented")
+setobj!(m::AbstractMathProgModel, obj) = error("Not Implemented")
 
-addvar(m::AbstractMathProgModel, rowidx, rowcoef, collb, colub, objcoef) = error("Not Implemented")
+addvar!(m::AbstractMathProgModel, rowidx, rowcoef, collb, colub, objcoef) = error("Not Implemented")
 
-addconstr(m::AbstractMathProgModel, colidx, colcoef, rowlb, rowub) = error("Not Implemented")
+addconstr!(m::AbstractMathProgModel, colidx, colcoef, rowlb, rowub) = error("Not Implemented")
 
-updatemodel(m::AbstractMathProgModel) = error("Not Implemented")
+updatemodel!(m::AbstractMathProgModel) = error("Not Implemented")
 
-setsense(m::AbstractMathProgModel,sense) = error("Not Implemented")
+setsense!(m::AbstractMathProgModel,sense) = error("Not Implemented")
 getsense(m::AbstractMathProgModel) = error("Not Implemented")
 
 numvar(m::AbstractMathProgModel) = error("Not Implemented")
 numconstr(m::AbstractMathProgModel) = error("Not Implemented")
 
-optimize(m::AbstractMathProgModel) = error("Not Implemented")
+optimize!(m::AbstractMathProgModel) = error("Not Implemented")
 
 status(m::AbstractMathProgModel) = error("Not Implemented")
 
@@ -97,7 +97,7 @@ getconstrduals(m::AbstractMathProgModel) = error("Not Implemented")
 
 getrawsolver(m::AbstractMathProgModel) = error("Not Implemented")
 
-setvartype(m::AbstractMathProgModel, vartype) = error("Not Implemented")
+setvartype!(m::AbstractMathProgModel, vartype) = error("Not Implemented")
 getvartype(m::AbstractMathProgModel) = error("Not Implemented")
 
 end
