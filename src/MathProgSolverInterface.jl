@@ -53,7 +53,7 @@ function model(s::MissingSolver)
 end
 
 loadproblem!(m::AbstractMathProgModel, filename::String) = error("Not Implemented")
-loadproblem!(m::AbstractMathProgModel, A, collb, colub, obj, rowlb, rowub) = error("Not Implemented")
+loadproblem!(m::AbstractMathProgModel, A, collb, colub, obj, rowlb, rowub, sense) = error("Not Implemented")
 
 writeproblem(m::AbstractMathProgModel, filename::String) = error("Not Implemented")
 
