@@ -9,7 +9,7 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     # Min -x
     # s.t. x + y <= 1
     # x, y >= 0
-    loadproblem(m, [1. 1.], [0.,0.], [Inf, Inf], [-1.,0.], [-Inf],[1.])
+    loadproblem!(m, [1. 1.], [0.,0.], [Inf, Inf], [-1.,0.], [-Inf],[1.], :Min)
     @test numvar(m) == 2
     @test numconstr(m) == 1
     @test getvarLB(m) == [0.,0.]
@@ -20,7 +20,7 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     @test getobj(m) == [-1.,0.]
     @test getsense(m) == :Min
 
-    optimize(m)
+    optimize!(m)
     @test status(m) == :Optimal
     @test_approx_eq getobjval(m) -1
     @test_approx_eq getsolution(m) [1.0, 0.0]
@@ -28,11 +28,11 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     @test_approx_eq getconstrduals(m) [-1.0]
     @test_approx_eq getreducedcosts(m) [0.0, 1.0]
 
-    setsense(m, :Max)
+    setsense!(m, :Max)
     # max x
-    setobj(m, [1.0,0.0])
-    updatemodel(m)
-    optimize(m)
+    setobj!(m, [1.0,0.0])
+    updatemodel!(m)
+    optimize!(m)
 
     @test status(m) == :Optimal
     @test_approx_eq getobjval(m) 1
@@ -45,13 +45,13 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     # max x + 2z
     # s.t. x + y + z <= 1
     # x,y,z >= 0
-    addvar(m, [1], [1.0], 0, Inf, 2.0)
-    updatemodel(m)
+    addvar!(m, [1], [1.0], 0, Inf, 2.0)
+    updatemodel!(m)
 
     @test numvar(m) == 3
     @test numconstr(m) == 1
     
-    optimize(m)
+    optimize!(m)
     
     @test status(m) == :Optimal
     @test_approx_eq getobjval(m) 2
@@ -60,31 +60,31 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     @test_approx_eq getconstrduals(m) [2.0]
     @test_approx_eq getreducedcosts(m) [-1.0, -2.0, 0.0]
 
-    setvarLB(m, [-1.0,0.0,0.0])
-    updatemodel(m)
-    optimize(m)
+    setvarLB!(m, [-1.0,0.0,0.0])
+    updatemodel!(m)
+    optimize!(m)
 
     @test status(m) == :Optimal
     @test_approx_eq getobjval(m) 3
 
     # fix z to zero
-    setvarLB(m, [0.0,0.0,0.0])
-    setvarUB(m, [Inf,Inf,0.0])
-    updatemodel(m)
-    optimize(m)
+    setvarLB!(m, [0.0,0.0,0.0])
+    setvarUB!(m, [Inf,Inf,0.0])
+    updatemodel!(m)
+    optimize!(m)
 
     @test status(m) == :Optimal
     @test_approx_eq getobjval(m) 1
 
-    setconstrUB(m, [2.0])
-    setconstrLB(m, [2.0])
-    updatemodel(m)
-    optimize(m)
+    setconstrUB!(m, [2.0])
+    setconstrLB!(m, [2.0])
+    updatemodel!(m)
+    optimize!(m)
     @test_approx_eq getobjval(m) 2
 
-    setobj(m, [1.0, 2.0, 0.0])
-    updatemodel(m)
-    optimize(m)
+    setobj!(m, [1.0, 2.0, 0.0])
+    updatemodel!(m)
+    optimize!(m)
     @test_approx_eq getobjval(m) 4
     @test_approx_eq getsolution(m) [0.0, 2.0, 0.0]
     
@@ -95,9 +95,9 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     # x,y >= 0, z = 0
 
     # add constrint x - y >= 0
-    addconstr(m, [1,2], [1.0,-1.0], 0.0, Inf)
-    updatemodel(m)
-    optimize(m)
+    addconstr!(m, [1,2], [1.0,-1.0], 0.0, Inf)
+    updatemodel!(m)
+    optimize!(m)
 
     @test status(m) == :Optimal
     @test_approx_eq getobjval(m) 3

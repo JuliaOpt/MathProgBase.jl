@@ -46,9 +46,9 @@ function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub
         rowub = rowubtmp
     end
     
-    loadproblem(m, A, lb, ub, c, rowlb, rowub)
-    setvartype(m, vartypes)
-    optimize(m)
+    loadproblem!(m, A, lb, ub, c, rowlb, rowub, :Min)
+    setvartype!(m, vartypes)
+    optimize!(m)
     stat = status(m)
     if stat == :Optimal
         attrs = Dict()

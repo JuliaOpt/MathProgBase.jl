@@ -58,8 +58,8 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
         rowub = rowubtmp
     end
     
-    loadproblem(m, A, lb, ub, c, rowlb, rowub)
-    optimize(m)
+    loadproblem!(m, A, lb, ub, c, rowlb, rowub, :Min)
+    optimize!(m)
     stat = status(m)
     if stat == :Optimal
         attrs = Dict()
