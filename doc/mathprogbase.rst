@@ -10,20 +10,20 @@ one-shot functions for linear and mixed-integer programming,
 as well as a solver-independent low-level interface for implementing advanced techniques
 that require efficiently solving a sequence of linear programming problems.
 
-To use MathProgBase, an external solver must be installed. See CHOOSING SOLVERS.
+To use MathProgBase, an external solver must be installed. See :ref:`choosing solvers <choosing-solvers>`.
 
 ------------------
 Linear Programming
 ------------------
 
-.. function:: linprog(c, A, sense, b, lb, ub, solver)
+.. function:: linprog(c, A, sense, b, l, u, solver)
 
 Solves the linear programming problem:
 
 .. math::
     \min_{x}\, &c^Tx\\
     s.t.     &a_i^Tx \text{ sense}_i \, b_i \forall\,\, i\\
-             &lb \leq x \leq ub\\
+             &l \leq x \leq u\\
 
 where:
 
@@ -31,11 +31,11 @@ where:
 *    ``A`` is the constraint matrix, with rows :math:`a_i`
 *    ``sense`` is a vector of constraint sense characters ``'<'``, ``'='``, and ``'>'``
 *    ``b`` is the right-hand side vector
-*    ``lb`` is the vector of lower bounds on the variables
-*    ``ub`` is the vector of upper bounds on the variables, and
-*    ``solver`` is an *optional* parameter specifying the desired solver, see CHOOSING SOLVERS. If this parameter is not provided, the default solver is used.
+*    ``l`` is the vector of lower bounds on the variables
+*    ``u`` is the vector of upper bounds on the variables, and
+*    ``solver`` is an *optional* parameter specifying the desired solver, see :ref:`choosing solvers <choosing-solvers>`. If this parameter is not provided, the default solver is used.
  
-A scalar is accepted for the ``b``, ``sense``, ``lb``, and ``ub`` arguments, in which case its value is replicated. The values ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound.
+A scalar is accepted for the ``b``, ``sense``, ``l``, and ``u`` arguments, in which case its value is replicated. The values ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound.
 
 .. note::
     Linear programming solvers extensively exploit the sparsity of the constraint matrix ``A``. While both dense and sparse matrices are acceped, for large-scale problems sparse matrices should be provided if permitted by the problem structure.  
@@ -63,6 +63,8 @@ If ``status`` is ``:Optimal``, the other members have the following values:
 
   - ``redcost`` -- dual multipliers for active variable bounds (zero if inactive)
   - ``lambda`` -- dual multipliers for active linear constraints (equalities are always active)
+
+..
   - ``colbasis`` -- optimal simplex basis statuses for the variables (columns) if available. Possible values are ``:NonbasicAtLower``, ``:NonbasicAtUpper``, ``:Basic``, and ``:Superbasic`` (not yet implemented by any solvers)
   - ``rowbasis`` -- optimal simplex basis statuses for the constraints (rows) if available (not yet implemented by any solvers)
 
@@ -85,31 +87,31 @@ by::
         println("Error: solution status $(sol.status)")
     end
 
-.. function:: linprog(c, A, l, u, lb, ub, solver)
+.. function:: linprog(c, A, lb, ub, l, u, solver)
 
 This variant allows one to specify two-sided linear constraints (also known as range constraints)
 to solve the linear programming problem:
 
 .. math::
     \min_{x}\, &c^Tx\\
-    s.t.     &l \leq Ax \leq u\\
-             &lb \leq x \leq ub\\
+    s.t.     &lb \leq Ax \leq ub\\
+             &l \leq x \leq u\\
 
 where:
 
 *    ``c`` is the objective vector, always in the sense of minimization
 *    ``A`` is the constraint matrix
-*    ``l`` is the vector of row lower bounds
-*    ``u`` is the vector of row upper bounds
-*    ``lb`` is the vector of lower bounds on the variables
-*    ``ub`` is the vector of upper bounds on the variables, and
-*    ``solver`` is an *optional* parameter specifying the desired solver, see CHOOSING SOLVERS. If this parameter is not provided, the default solver is used.
+*    ``lb`` is the vector of row lower bounds
+*    ``ub`` is the vector of row upper bounds
+*    ``l`` is the vector of lower bounds on the variables
+*    ``u`` is the vector of upper bounds on the variables, and
+*    ``solver`` is an *optional* parameter specifying the desired solver, see :ref:`choosing solvers <choosing-solvers>`. If this parameter is not provided, the default solver is used.
  
 A scalar is accepted for the ``l``, ``u``, ``lb``, and ``ub`` arguments, in which case its value is replicated. The values ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound. Equality constraints are specified by setting the row lower and upper bounds to the same value.
 
 A shortened version is defined as::
 
-    linprog(c, A, l, u, solver) = linprog(c, A, l, u, 0, Inf, solver)
+    linprog(c, A, lb, ub, solver) = linprog(c, A, lb, ub, 0, Inf, solver)
 
 
 -------------------------
@@ -158,3 +160,191 @@ with the code::
     
     mixintprog(-[5.,3.,2.,7.,4.],[2. 8. 4. 2. 5.],'<',10,'I',0,1)
 
+
+-------------------
+Low-level interface
+-------------------
+
+The ``linprog`` and ``mixintprog`` functions are written on top of a solver-independent low-level interface called ``MathProgSolverInterface``, which individual solvers implement. The concept is similar to that of `OSI <https://projects.coin-or.org/Osi>`_, a C++ library which provides a generic virtual base class for interacting with linear programming solvers. Julia, however, does not quite have virtual classes or interfaces. Instead, multiple dispatch is used with abstract types. The API is designed to support problem modification as needed to solve a sequence of linear programming problems efficiently; linear programming solvers are expected to hot-start the solution process after modifications such as additional constraints or variables. For mixed-integer programming, hot-starting is usually impractical.
+
+The ``MathProgSolverInterface`` exports two abstract types: ``AbstractMathProgModel``, which represents an instance of an optimization problem, and ``AbstractMathProgSolver``, which represents a solver (with particular solution options), from which an ``AbstractMathProgModel`` is generated.
+
+.. function:: model(s::AbstractMathProgSolver)
+
+    Returns an instance of an ``AbstractMathProgModel`` using the given solver.
+
+.. function:: loadproblem!(m::AbstractMathProgModel, filename::String)
+
+    Loads problem data from the given file. Supported file types are solver-dependent.
+
+.. function:: loadproblem!(m::AbstractMathProgModel, A, l, u, c, lb, ub, sense)
+
+Loads the provided problem data to set up the linear programming problem:
+
+.. math::
+    \min_{x}\, &c^Tx\\
+    s.t.     &lb \leq Ax \leq ub\\
+             &l \leq x \leq u\\
+
+``sense`` specifies the direction of the optimization problem, and must be either ``:Min`` or ``:Max``.
+
+Both sparse and dense matrices are accepted for ``A``. ``Inf`` and ``-Inf`` indicate that 
+there is no corresponding upper or lower bound. Equal lower and upper bounds are used
+to indicate equality constraints.
+
+.. function:: writeproblem(m::AbstractMathProgModel, filename::String)
+    
+    Writes the current problem data to the given file. Supported file types are solver-dependent.
+
+
+
+.. function:: getvarLB(m::AbstractMathProgModel)
+   
+    Returns a vector containing the lower bounds :math:`l` on the variables.
+
+.. function:: setvarLB!(m::AbstractMathProgModel, l)
+   
+    Sets the lower bounds on the variables.
+
+.. function:: getvarUB(m::AbstractMathProgModel)
+   
+    Returns a vector containing the upper bounds :math:`u` on the variables.
+
+.. function:: setvarUB!(m::AbstractMathProgModel, u)
+   
+    Sets the upper bounds on the variables.
+
+
+
+.. function:: getconstrLB(m::AbstractMathProgModel)
+   
+    Returns a vector containing the lower bounds :math:`lb` on the constraints.
+
+.. function:: setconstrLB!(m::AbstractMathProgModel, lb)
+   
+    Sets the lower bounds on the constraints.
+
+.. function:: getconstrUB(m::AbstractMathProgModel)
+   
+    Returns a vector containing the upper bounds :math:`ub` on the constraints.
+
+.. function:: setvarUB!(m::AbstractMathProgModel, ub)
+   
+    Sets the upper bounds on the constraints.
+
+.. function:: getobj(m::AbstractMathProgModel)
+   
+    Returns a vector containing the objective coefficients :math:`c`.
+
+.. function:: setobj!(m::AbstractMathProgModel, c)
+   
+    Sets the objective coefficients.
+
+
+
+.. function:: addvar!(m::AbstractMathProgModel, constridx, constrcoef, l, u, objcoef)
+
+    Adds a new variable to the model, with lower bound ``l`` (``-Inf`` if none), 
+    upper bound ``u`` (``Inf`` if none), and
+    objective coefficient ``objcoef``. Constraint coefficients for this new variable
+    are specified in a sparse format: the ``constrcoef`` vector contains the nonzero
+    coefficients, and the ``constridx`` vector contains the indices of the corresponding
+    constraints.
+
+.. function:: addconstr!(m::AbstractMathProgModel, varidx, coef, lb, ub)
+
+    Adds a new constraint to the model, with lower bound ``lb`` (``-Inf`` if none)
+    and upper bound ``ub`` (``Inf`` if none). Coefficients for this new constraint
+    are specified in a sparse format: the ``coef`` vector contains the nonzero
+    coefficients, and the ``varidx`` vector contains the indices of the corresponding
+    variables.
+
+
+
+.. function:: updatemodel!(m::AbstractMathProgModel)
+
+    Commits recent changes to the model. Only required by some solvers (e.g. Gurobi).
+
+.. function:: setsense!(m::AbstractMathProgModel, sense)
+
+    Sets the optimization sense of the model. Accepted values are ``:Min`` and ``:Max``.
+
+.. function:: getsense(m::AbstractMathProgModel)
+
+    Returns the optimization sense of the model.
+
+.. function:: numvar(m::AbstractMathProgModel)
+
+    Returns the number of variables in the model.
+
+.. function:: numconstr(m::AbstractMathProgModel)
+
+    Returns the number of constraints in the model.
+
+.. function:: optimize!(m::AbstractMathProgModel)
+
+    Solves the optimization problem.
+
+.. function:: status(m::AbstractMathProgModel)
+
+    Returns the termination status after solving. Possible values include ``:Optimal``,
+    ``:Infeasible``, ``:Unbounded``, ``:UserLimit`` (iteration limit or timeout), and ``:Error``.
+    Solvers may return other statuses, for example, when presolve indicates that the model is
+    either infeasible or unbounded, but did not determine which.
+
+.. function:: getobjval(m::AbstractMathProgModel)
+
+    Returns the objective value of the solution found by the solver.
+
+.. function:: getobjbound(m::AbstractMathProgModel)
+
+    Returns the best known bound on the optimal objective value.
+    This is used, for example, when a branch-and-bound method
+    is stopped before finishing.
+
+.. function:: getsolution(m::AbstractMathProgModel)
+
+    Returns the solution vector found by the solver.
+
+.. function:: getconstrsolution(m::AbstractMathProgModel)
+
+    Returns a vector containing the values of the constraints
+    at the solution. This is the vector :math:`Ax`.
+
+.. function:: getreducedcosts(m::AbstractMathProgModel)
+
+    Returns the dual solution vector corresponding to the variable bounds,
+    known as the reduced costs. Not available when integer variables are present.
+
+.. function:: getconstrduals(m::AbstractMathProgModel)
+
+    Returns the dual solution vector corresponding to the constraints.
+    Not available when integer variables are present.
+
+.. function:: getrawsolver(m::AbstractMathProgModel)
+
+    Returns an object that may be used to access a solver-specific API for this model.
+
+.. function:: setvartype!(m::AbstractMathProgModel, v::Vector{Char})
+
+    Sets the types of the variables to those indicated by the vector ``v``. Valid
+    types are ``'I'`` for integer and ``'C'`` for continuous. Binary variables
+    should be indicated by ``'I'`` with lower bound 0 and upper bound 1.
+
+.. function:: getvartype(m::AbstractMathProgModel)
+
+    Returns a vector indicating the types of each variable, with values described above.
+
+
+.. _choosing-solvers:
+
+----------------
+Choosing solvers
+----------------
+
+Solvers and solver-specific parameters are specified by ``AbstractMathProgSolver`` objects, which are provided by particular solver packages. For example, the ``Clp`` package exports a ``ClpSolver`` object, which can be passed to ``linprog`` as follows::
+
+    using Clp
+    linprog([-1,0],[2 1],'<',1.5, ClpSolver())
+
+Options are passed as keyword arguments, for example, ``ClpSolver(LogLevel=1)``. See the `Clp <https://github.com/mlubin/Clp.jl>`_, `Cbc <https://github.com/mlubin/Cbc.jl>`_, `GLPKMathProgInterface <https://github.com/JuliaOpt/GLPKMathProgInterface.jl>`_, and `Gurobi <https://github.com/JuliaOpt/Gurobi.jl>`_ packages for more information.
