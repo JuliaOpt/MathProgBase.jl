@@ -70,6 +70,8 @@ setobj!(m::AbstractMathProgModel, obj) = error("Not Implemented")
 
 addvar!(m::AbstractMathProgModel, rowidx, rowcoef, collb, colub, objcoef) = error("Not Implemented")
 
+addvar!(m::AbstractMathProgModel, collb, colub, objcoef) = addvar!(m, [], [], collb, colub, objcoef)
+
 addconstr!(m::AbstractMathProgModel, colidx, colcoef, rowlb, rowub) = error("Not Implemented")
 
 updatemodel!(m::AbstractMathProgModel) = error("Not Implemented")

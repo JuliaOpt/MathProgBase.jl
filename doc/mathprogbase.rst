@@ -251,6 +251,14 @@ to indicate equality constraints.
     coefficients, and the ``constridx`` vector contains the indices of the corresponding
     constraints.
 
+.. function:: addvar!(m::AbstractMathProgModel, l, u, objcoef)
+
+    Adds a new variable to the model, with lower bound ``l`` (``-Inf`` if none), 
+    upper bound ``u`` (``Inf`` if none), and
+    objective coefficient ``objcoef``. This is equivalent to calling the 
+    above method with empty arrays for the constraint coefficients.
+    
+
 .. function:: addconstr!(m::AbstractMathProgModel, varidx, coef, lb, ub)
 
     Adds a new constraint to the model, with lower bound ``lb`` (``-Inf`` if none)
