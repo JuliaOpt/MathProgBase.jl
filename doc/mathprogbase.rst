@@ -228,7 +228,7 @@ to indicate equality constraints.
    
     Returns a vector containing the upper bounds :math:`ub` on the constraints.
 
-.. function:: setvarUB!(m::AbstractMathProgModel, ub)
+.. function:: setconstrUB!(m::AbstractMathProgModel, ub)
    
     Sets the upper bounds on the constraints.
 
