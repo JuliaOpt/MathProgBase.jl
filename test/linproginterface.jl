@@ -35,7 +35,6 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     optimize!(m)
 
     @test status(m) == :Optimal
-    println(getobjval(m))
     @test_approx_eq getobjval(m) 1
     @test_approx_eq getsolution(m) [1.0, 0.0]
     @test_approx_eq getconstrsolution(m) [1.0]
@@ -92,12 +91,13 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     
     # we now have:
     # max x+2y
-    # s.t. x + y + z <= 2
+    # s.t. x + y + z == 2
     # x,y >= 0, z = 0
 
-    # add constrint x - y >= 0
+    # add constraint x - y >= 0
     addconstr!(m, [1,2], [1.0,-1.0], 0.0, Inf)
     updatemodel!(m)
+    write_problem(m.inner, "out.lp")
     optimize!(m)
 
     @test status(m) == :Optimal
@@ -122,9 +122,9 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     @test numvar(m) == 2
     @test numconstr(m) == 1
     @test getvarLB(m) == [0.,0.]
-    @test getvarUB(m)[1] > 1e30
-    @test getvarUB(m)[2] > 1e30
-    @test getconstrLB(m)[1] < -1e30
+    @test getvarUB(m)[1] >= 1e20
+    @test getvarUB(m)[2] >= 1e20
+    @test getconstrLB(m)[1] <= -1e20
     @test getconstrUB(m)[1] == 1.0
     @test getobj(m) == [-1.,0.]
     @test getsense(m) == :Min
