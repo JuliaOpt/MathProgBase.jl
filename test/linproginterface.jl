@@ -13,8 +13,8 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     @test numvar(m) == 2
     @test numconstr(m) == 1
     @test getvarLB(m) == [0.,0.]
-    @test getvarUB(m)[1] > 1e30
-    @test getvarUB(m)[2] > 1e30
+    @test getvarUB(m)[1] >= 1e20
+    @test getvarUB(m)[2] >= 1e20
     @test getconstrLB(m)[1] < -1e30
     @test getconstrUB(m)[1] == 1.0
     @test getobj(m) == [-1.,0.]
@@ -35,6 +35,7 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     optimize!(m)
 
     @test status(m) == :Optimal
+    println(getobjval(m))
     @test_approx_eq getobjval(m) 1
     @test_approx_eq getsolution(m) [1.0, 0.0]
     @test_approx_eq getconstrsolution(m) [1.0]
