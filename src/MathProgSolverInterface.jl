@@ -33,7 +33,8 @@ export AbstractMathProgModel,
     getconstrduals,
     getrawsolver,
     setvartype!,
-    getvartype
+    getvartype,
+    setwarmstart!
 
 abstract AbstractMathProgModel
 
@@ -101,5 +102,7 @@ getrawsolver(m::AbstractMathProgModel) = error("Not Implemented")
 
 setvartype!(m::AbstractMathProgModel, vartype) = error("Not Implemented")
 getvartype(m::AbstractMathProgModel) = error("Not Implemented")
+
+setwarmstart!(m::AbstractMathProgModel, v) = error("Not Implemented")
 
 end

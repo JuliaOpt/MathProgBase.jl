@@ -343,6 +343,11 @@ to indicate equality constraints.
 
     Returns a vector indicating the types of each variable, with values described above.
 
+.. function:: setwarmstart!(m::AbstractMathProbModel)
+
+    Provide an initial solution to the MIP solver. To leave values undefined, set them
+    to ``NaN``.
+
 
 .. _choosing-solvers:
 
