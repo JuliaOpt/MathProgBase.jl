@@ -97,7 +97,6 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     # add constraint x - y >= 0
     addconstr!(m, [1,2], [1.0,-1.0], 0.0, Inf)
     updatemodel!(m)
-    write_problem(m.inner, "out.lp")
     optimize!(m)
 
     @test status(m) == :Optimal
