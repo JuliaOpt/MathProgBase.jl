@@ -105,4 +105,6 @@ getvartype(m::AbstractMathProgModel) = error("Not Implemented")
 
 setwarmstart!(m::AbstractMathProgModel, v) = error("Not Implemented")
 
+include("MathProgSolverCallbacksInterface.jl")
+
 end
