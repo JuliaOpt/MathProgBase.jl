@@ -1,4 +1,17 @@
 
+export MathProgCallbackData,
+    setlazycallback!,
+    setcutcallback!,
+    setheuristiccallback!,
+    cbgetmipsolution,
+    cbgetlpsolution,
+    cbgetobj,
+    cbgetbestbound,
+    cbgetexplorednodes,
+    cbgetstate,
+    cbaddsolution!,
+    cbaddcut!,
+    cbaddlazy!
 
 abstract MathProgCallbackData
 
@@ -12,6 +25,7 @@ setheuristiccallback!(m::AbstractMathProgModel,f) = error("Not implemented")
 
 cbgetmipsolution(d::MathProgCallbackData) = error("Not Implemented")
 cbgetlpsolution(d::MathProgCallbackData) = error("Not Implemented")
+# best feasible objective value
 cbgetobj(d::MathProgCallbackData) = error("Not Implemented")
 cbgetbestbound(d::MathProgCallbackData) = error("Not implemented")
 cbgetexplorednodes(d::MathProgCallbackData) = error("Not implemented")
