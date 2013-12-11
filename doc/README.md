@@ -16,6 +16,10 @@ On ubuntu, you'll need the following packages installed:
     texlive
     texlive-latex-extra
 
+You will also need to install the [JuliaDoc](https://github.com/JuliaLang/JuliaDoc) Python package; this can be done via
+
+    pip install git+git://github.com/JuliaLang/JuliaDoc.git#egg=JuliaDoc
+
 Then run
 
     $ make helpdb.jl
