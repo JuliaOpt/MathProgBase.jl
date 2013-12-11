@@ -373,19 +373,21 @@ MathProgBase supports a standardized and abstracted way to implement common MIP 
 *    Cut callbacks (only cuts off non-integer feasible solutions)
 *    Heuristic callbacks (proposes heuristically constructed integer feasible solutions at MIP nodes)
 
+A more detailed description of the three types of supported callbacks can be found in the JuMP documentation [here](https://jump.readthedocs.org/en/release-0.1/jump.html#solver-callbacks).
+
 The ``MathProgSolverCallbacksInterface`` imports an abstract type ``MathProgCallbackData`` which represents the data needed to implement the callback.
 
 .. function:: setlazycallback!(m::AbstractMathProgModel,f)
 
-   Adds lazy constraint callback ``f`` to the model.
+   Adds lazy constraint callback ``f`` to the model. Function ``f`` takes as argument only a ``MathProgCallbackData`` object.
    
 .. function:: setcutcallback!(m::AbstractMathProgModel,f)
 
-   Adds cut callback ``f`` to the model.
+   Adds cut callback ``f`` to the model. Function ``f`` takes as argument only a ``MathProgCallbackData`` object.
    
 .. function:: setheuristiccallback!(m::AbstractMathProgModel,f)
 
-   Adds heuristic callback ``f`` to the model.
+   Adds heuristic callback ``f`` to the model. Function ``f`` takes as argument only a ``MathProgCallbackData`` object.
    
 .. function:: cbgetmipsolution(d::MathProgCallbackData)
 
