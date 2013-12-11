@@ -373,7 +373,7 @@ MathProgBase supports a standardized and abstracted way to implement common MIP 
 *    Cut callbacks (only cuts off non-integer feasible solutions)
 *    Heuristic callbacks (proposes heuristically constructed integer feasible solutions at MIP nodes)
 
-A more detailed description of the three types of supported callbacks can be found in the JuMP documentation [here](https://jump.readthedocs.org/en/release-0.1/jump.html#solver-callbacks).
+A more detailed description of the three types of supported callbacks can be found in the JuMP documentation `here <https://jump.readthedocs.org/en/release-0.1/jump.html#solver-callbacks>`_.
 
 The ``MathProgSolverCallbacksInterface`` imports an abstract type ``MathProgCallbackData`` which represents the data needed to implement the callback.
 
