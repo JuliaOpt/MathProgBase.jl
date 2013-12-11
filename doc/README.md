@@ -1,7 +1,7 @@
-Ipopt.jl Documentation README
+MathProgBase.jl Documentation README
 ================================
 
-Ipopt.jl's documentation is written in reStructuredText, a good reference for which
+MathProgBase.jl's documentation is written in reStructuredText, a good reference for which
 is the [Documenting Python](http://docs.python.org/devguide/documenting.html)
 chapter of the Python Developer's Guide.
 
