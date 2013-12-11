@@ -363,3 +363,38 @@ Solvers and solver-specific parameters are specified by ``AbstractMathProgSolver
 Options are passed as keyword arguments, for example, ``ClpSolver(LogLevel=1)``. See the `Clp <https://github.com/mlubin/Clp.jl>`_, `Cbc <https://github.com/mlubin/Cbc.jl>`_, `GLPKMathProgInterface <https://github.com/JuliaOpt/GLPKMathProgInterface.jl>`_, and `Gurobi <https://github.com/JuliaOpt/Gurobi.jl>`_ packages for more information.
 
 If no solver is specified, a default is chosen. See ``src/defaultsolvers.jl`` for the list of default solvers.
+
+-------------
+MIP Callbacks
+-------------
+MathProgBase supports a standardized and abstracted way to implement common MIP callbacks on the model. Currently there is support for adding:
+*  Lazy constraints (only added to model if violated by integer feasible solution)
+*  Cut callbacks (only cuts off non-integer feasible solutions)
+*  Heuristic callbacks (proposes heuristically constructed integer feasible solutions at MIP nodes)
+The ``MathProgSolverCallbacksInterface`` imports an abstract type ``MathProgCallbackData`` which represents the data needed to implement to the callback
+.. function:: setlazycallback!(m::AbstractMathProgModel,f)
+   Adds lazy constraint callback to the model.
+.. function:: setcutcallback!(m::AbstractMathProgModel,f)
+   Adds cut callback to the model.
+.. function:: setheuristiccallback!(m::AbstractMathProgModel,f)
+   Adds heuristic callback to the model.
+.. function:: cbgetmipsolution(d::MathProgCallbackData)
+   Grabs current best integer-feasible solution to the model.
+.. function:: cbgetlpsolution(d::MathProgCallbackData)
+   Grabs current best linear relaxation solution to the model.
+.. function:: cbgetobj(d::MathProgCallbackData)
+   Grabs objective value for 
+.. function:: cbgetbestbound(d::MathProgCallbackData) 
+   Grabs best bound from an integer feasible solution.
+.. function:: cbgetexplorednodes(d::MathProgCallbackData)
+   Returns number of nodes that have been previously explored.
+
+.. function:: cbgetstate(d::MathProgCallbackData)
+   Returns current location in solve process: ``:MIPNode`` if at node in branch-and-cut tree, ``:MIPSol`` at an integer feasible solution, and ``:Other`` otherwise.
+
+.. function:: cbaddsolution!(d::MathProgCallbackData,x)
+   Adds feasible solution to model.
+.. function:: cbaddcut!(d::MathProgCallbackData,varidx,varcoef,sense,rhs) 
+   Adds cut to model.
+.. function:: cbaddlazy!(d::MathProgCallbackData,varidx,varcoef,sense,rhs)
+   Adds lazy constraint to model.
