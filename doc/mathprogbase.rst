@@ -375,7 +375,7 @@ MathProgBase supports a standardized and abstracted way to implement common MIP 
 
 A more detailed description of the three types of supported callbacks can be found in the JuMP documentation `here <https://jump.readthedocs.org/en/release-0.1/jump.html#solver-callbacks>`_.
 
-The ``MathProgSolverCallbacksInterface`` imports an abstract type ``MathProgCallbackData`` which represents the data needed to implement the callback.
+The ``MathProgSolverInterface`` exports an abstract type ``MathProgCallbackData`` which represents the solver-specific data needed to implement the callback.
 
 .. function:: setlazycallback!(m::AbstractMathProgModel,f)
 
@@ -389,13 +389,13 @@ The ``MathProgSolverCallbacksInterface`` imports an abstract type ``MathProgCall
 
    Adds heuristic callback ``f`` to the model. Function ``f`` takes as argument only a ``MathProgCallbackData`` object.
    
-.. function:: cbgetmipsolution(d::MathProgCallbackData)
+.. function:: cbgetmipsolution(d::MathProgCallbackData[, output])
 
-   Grabs current best integer-feasible solution to the model.
+   Grabs current best integer-feasible solution to the model. The optional second arugment specifies an output vector.
    
-.. function:: cbgetlpsolution(d::MathProgCallbackData)
+.. function:: cbgetlpsolution(d::MathProgCallbackData[, output])
 
-   Grabs current best linear relaxation solution to the model.
+   Grabs current best linear relaxation solution to the model. The optional second argument specifies an output vector.
    
 .. function:: cbgetobj(d::MathProgCallbackData)
 

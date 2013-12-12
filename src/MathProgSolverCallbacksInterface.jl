@@ -24,7 +24,9 @@ setcutcallback!(m::AbstractMathProgModel,f) = error("Not implemented")
 setheuristiccallback!(m::AbstractMathProgModel,f) = error("Not implemented")
 
 cbgetmipsolution(d::MathProgCallbackData) = error("Not Implemented")
+cbgetmipsolution(d::MathProgCallbackData,output) = error("Not Implemented")
 cbgetlpsolution(d::MathProgCallbackData) = error("Not Implemented")
+cbgetlpsolution(d::MathProgCallbackData,output) = error("Not Implemented")
 # best feasible objective value
 cbgetobj(d::MathProgCallbackData) = error("Not Implemented")
 cbgetbestbound(d::MathProgCallbackData) = error("Not implemented")
