@@ -419,9 +419,9 @@ The ``MathProgSolverInterface`` exports an abstract type ``MathProgCallbackData`
    
 .. function:: cbaddcut!(d::MathProgCallbackData,varidx,varcoef,sense,rhs) 
 
-   Adds cut to model, as specified by a sparse representation identical to ``addconstr!``.
+   Adds cut to model. The coefficient values are represented sparsely, with (one-indexed) indices in ``varidx`` and values in ``varcoef``. The constraint sense ``sense`` is a character taking value ``<``, ``>``, or ``=``, and the right-hand side value is ``rhs``.
    
 .. function:: cbaddlazy!(d::MathProgCallbackData,varidx,varcoef,sense,rhs)
 
-   Adds lazy constraint to model, as specified by a sparse representation identical to ``addconstr!``.
+   Adds lazy constraint to model. The coefficient values are represented sparsely, with (one-indexed) indices in ``varidx`` and values in ``varcoef``. The constraint sense ``sense`` is a character taking value ``<``, ``>``, or ``=``, and the right-hand side value is ``rhs``.
    
