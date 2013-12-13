@@ -369,9 +369,9 @@ MIP Callbacks
 -------------
 MathProgBase supports a standardized and abstracted way to implement common MIP callbacks on the model. Currently there is support for adding:
 
-*    Lazy constraints (only added to model if violated by integer feasible solution)
+*    Lazy constraints (only added to model if violated by integer-feasible solution)
 *    Cut callbacks (only cuts off non-integer feasible solutions)
-*    Heuristic callbacks (proposes heuristically constructed integer feasible solutions at MIP nodes)
+*    Heuristic callbacks (proposes heuristically constructed integer-feasible solutions at MIP nodes)
 
 A more detailed description of the three types of supported callbacks can be found in the JuMP documentation `here <https://jump.readthedocs.org/en/latest/jump.html#solver-callbacks>`_.
 
@@ -403,15 +403,15 @@ The ``MathProgSolverInterface`` exports an abstract type ``MathProgCallbackData`
    
 .. function:: cbgetbestbound(d::MathProgCallbackData) 
 
-   Grabs best bound from an integer feasible solution.
+   Grabs best bound for objective function found so far (lower bound when minimizing, upper bound when maximizing).
    
 .. function:: cbgetexplorednodes(d::MathProgCallbackData)
 
-   Returns number of nodes that have been previously explored.
+   Returns number of nodes that have been explored so far in the solve process.
 
 .. function:: cbgetstate(d::MathProgCallbackData)
 
-   Returns current location in solve process: ``:MIPNode`` if at node in branch-and-cut tree, ``:MIPSol`` at an integer feasible solution, and ``:Other`` otherwise.
+   Returns current location in solve process: ``:MIPNode`` if at node in branch-and-cut tree, ``:MIPSol`` at an integer-feasible solution, and ``:Other`` otherwise.
 
 .. function:: cbaddsolution!(d::MathProgCallbackData,x)
 
