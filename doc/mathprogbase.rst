@@ -38,7 +38,7 @@ where:
 A scalar is accepted for the ``b``, ``sense``, ``l``, and ``u`` arguments, in which case its value is replicated. The values ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound.
 
 .. note::
-    Linear programming solvers extensively exploit the sparsity of the constraint matrix ``A``. While both dense and sparse matrices are acceped, for large-scale problems sparse matrices should be provided if permitted by the problem structure.  
+    Linear programming solvers extensively exploit the sparsity of the constraint matrix ``A``. While both dense and sparse matrices are accepted, for large-scale problems sparse matrices should be provided if permitted by the problem structure.  
 
 A shortened version is defined as::
 
@@ -348,6 +348,14 @@ to indicate equality constraints.
     Provide an initial solution ``v`` to the MIP solver. To leave values undefined, set them
     to ``NaN``.
 
+.. function:: setquadobj!(m::AbstractMathProgModel,rowidx,colidx,quadval)
+
+    Adds a quadratic term :math:`\frac{1}{2}x^TQx` to the objective, replacing any existing quadratic terms. Note the implicit :math:`\frac{1}{2}` scaling factor. The matrix :math:`Q` must be symmetric positive semidefinite (when minimizing). Entries of :math:`Q` should be provided in sparse triplet format in any order. Duplicate terms are accepted and will be summed together. Off-diagonal entries will be mirrored; if entries for both ``(i,j)`` and ``(j,i)`` are provided, these are considered duplicate terms.
+
+.. function:: addquadconstr!(m::AbstractMathProgModel, linearidx, linearval, quadrowidx, quadcolidx, quadval, sense, rhs)
+
+    Adds the quadratic constraint :math:`s^Tx + \frac{1}{2}x^TQx \,\, sense \, rhs` to the model. The ``linearidx`` and ``linearval`` arrays specify the sparse vector ``s``. The quadratic term is specified as in ``setquadobj!``. Sense must be ``'<'`` or ``'>'``, and :math:`Q` must be positive semidefinite or negative semidefinite, respectively. If supported by the solver, ``addquadconstr!`` may also be used to specify second-order cone (SOCP) and rotated second-order cone constraints. These should be of the form :math:`x^Tx -y^2 \le 0` or :math:`x^Tx -yz \le 0`, where :math:`y` and :math:`z` are restricted to be non-negative (in particular, :math:`Q` can have at most one off-diagonal term).
+
 
 .. _choosing-solvers:
 
@@ -391,7 +399,7 @@ The ``MathProgSolverInterface`` exports an abstract type ``MathProgCallbackData`
    
 .. function:: cbgetmipsolution(d::MathProgCallbackData[, output])
 
-   Grabs current best integer-feasible solution to the model. The optional second arugment specifies an output vector.
+   Grabs current best integer-feasible solution to the model. The optional second argument specifies an output vector.
    
 .. function:: cbgetlpsolution(d::MathProgCallbackData[, output])
 
