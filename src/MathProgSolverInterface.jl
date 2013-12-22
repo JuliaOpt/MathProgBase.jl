@@ -34,6 +34,8 @@ export AbstractMathProgModel,
     getrawsolver,
     setvartype!,
     getvartype,
+    getinfeasibilityray,
+    getunboundedray,
     setwarmstart!
 
 abstract AbstractMathProgModel
@@ -97,6 +99,9 @@ getconstrsolution(m::AbstractMathProgModel) = error("Not Implemented")
 
 getreducedcosts(m::AbstractMathProgModel) = error("Not Implemented")
 getconstrduals(m::AbstractMathProgModel) = error("Not Implemented")
+
+getinfeasibilityray(m::AbstractMathProgModel) = error("Not Implemented")
+getunboundedray(m::AbstractMathProgModel) = error("Not Implemented")
 
 getrawsolver(m::AbstractMathProgModel) = error("Not Implemented")
 
