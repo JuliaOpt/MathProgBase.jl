@@ -25,12 +25,25 @@ function linprogtest(solver=MathProgBase.defaultLPsolver; objtol = 1e-7, primalt
     sol = linprog([1,0],[2 1],'<',-1,solver)
     @test sol.status == :Infeasible
 
+    r = sol.attrs[:infeasibilityray][1] 
+    @test_approx_eq r/abs(r) -1.0
+
     # test unbounded problem:
     # min -x-y
     # s.t. -x+2y <= 0
     # x,y >= 0
     sol = linprog([-1,-1],[-1 2],'<',[0],solver)
     @test sol.status == :Unbounded
+
+    # unbounded problem with unique ray:
+    # min -x-y
+    # s.t. x-y == 0
+    # x,y >= 0
+    sol = linprog([-1,-1],[1 -1],'=',0,solver)
+    @test sol.status == :Unbounded
+    @test sol.attrs[:unboundedray][1] > 1e-7
+    @test_approx_eq sol.attrs[:unboundedray][1] sol.attrs[:unboundedray][2]
+
 
     println("Passed")
 end

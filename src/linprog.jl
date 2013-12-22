@@ -66,6 +66,18 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
         attrs[:redcost] = getreducedcosts(m)
         attrs[:lambda] = getconstrduals(m)
         return LinprogSolution(stat, getobjval(m), getsolution(m), attrs)
+    elseif stat == :Infeasible
+        attrs = Dict()
+        try
+            attrs[:infeasibilityray] = getinfeasibilityray(m)
+        end
+        return LinprogSolution(stat, nothing, [], attrs)
+    elseif stat == :Unbounded
+        attrs = Dict()
+        try
+            attrs[:unboundedray] = getunboundedray(m)
+        end
+        return LinprogSolution(stat, nothing, [], attrs)
     else
         return LinprogSolution(stat, nothing, [], Dict())
     end
