@@ -5,7 +5,7 @@ export setquadobj!,
 setquadobj!(m::AbstractMathProgModel,rowidx,colidx,quadval) = error("Not implemented")
 setquadobj!(m::AbstractMathProgModel,Q::Matrix{Float64}) = setquadobj!(m,sparse(Q))
 function setquadobj!(m::AbstractMathProgModel,Q::SparseMatrixCSC{Float64})
-  if issym(Q) || istril(Q)
+  if issym(Q) || istriu(Q)
     nnz_q = nnz(Q)
     qr = Array(Cint, nnz_q)
     qc = Array(Cint, nnz_q)

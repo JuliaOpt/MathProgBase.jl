@@ -1,5 +1,6 @@
 using Base.Test
 using MathProgBase
+using MathProgBase.MathProgSolverInterface
 
 function quadprogtest(solver=MathProgBase.defaultQPsolver)
     println("Testing quadprog with solver ", string(typeof(solver)))
