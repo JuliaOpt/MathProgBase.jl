@@ -363,9 +363,13 @@ to indicate equality constraints.
     Provide an initial solution ``v`` to the MIP solver. To leave values undefined, set them
     to ``NaN``.
 
+.. function:: setquadobj!(m::AbstractMathProgModel,Q)
+
+    Adds a quadratic term :math:`\frac{1}{2}x^TQx` to the objective, replacing any existing quadratic terms. Note the implicit :math:`\frac{1}{2}` scaling factor. The argument ``Q`` must be either a symmetric positive semidefinite matrix or the upper triangular portion of a symmetric positive semidefinite matrix (when minimizing). Sparse (CSC) or dense representations are accepted.
+
 .. function:: setquadobj!(m::AbstractMathProgModel,rowidx,colidx,quadval)
 
-    Adds a quadratic term :math:`\frac{1}{2}x^TQx` to the objective, replacing any existing quadratic terms. Note the implicit :math:`\frac{1}{2}` scaling factor. The matrix :math:`Q` must be symmetric positive semidefinite (when minimizing). Entries of :math:`Q` should be provided in sparse triplet format in any order. Duplicate terms are accepted and will be summed together. Off-diagonal entries will be mirrored; if entries for both ``(i,j)`` and ``(j,i)`` are provided, these are considered duplicate terms.
+    Adds a quadratic term :math:`\frac{1}{2}x^TQx` to the objective, replacing any existing quadratic terms. Note the implicit :math:`\frac{1}{2}` scaling factor. The matrix :math:`Q` must be symmetric positive semidefinite (when minimizing). Here the entries of :math:`Q` should be provided in sparse triplet format in any order. Duplicate terms are accepted and will be summed together. Off-diagonal entries will be mirrored; if entries for both ``(i,j)`` and ``(j,i)`` are provided, these are considered duplicate terms.
 
 .. function:: addquadconstr!(m::AbstractMathProgModel, linearidx, linearval, quadrowidx, quadcolidx, quadval, sense, rhs)
 
