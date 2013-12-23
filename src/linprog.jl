@@ -70,12 +70,16 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
         attrs = Dict()
         try
             attrs[:infeasibilityray] = getinfeasibilityray(m)
+        catch
+            error("Infeasibility ray is unavailable; consider turning solver presolve off")
         end
         return LinprogSolution(stat, nothing, [], attrs)
     elseif stat == :Unbounded
         attrs = Dict()
         try
             attrs[:unboundedray] = getunboundedray(m)
+        catch
+            error("Unbounded ray is unavailable; consider turning solver presolve off")
         end
         return LinprogSolution(stat, nothing, [], attrs)
     else
