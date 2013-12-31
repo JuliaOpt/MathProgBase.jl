@@ -36,7 +36,7 @@ macro setdefaultMIPsolver()
 end
 
 macro setdefaultQPsolver()
-    solvers = [(:CPLEXLink,:CplexSolver), (:Gurobi, :GurobiSolver)]
+    solvers = [(:Gurobi, :GurobiSolver), (:CPLEXLink,:CplexSolver)]
     for (pkgname, solvername) in solvers
         if Pkg.installed(string(pkgname)) != nothing
             importexpr = Expr(:import,pkgname)

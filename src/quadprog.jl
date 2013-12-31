@@ -45,6 +45,7 @@ function quadprog(c::InputVector, Q::AbstractMatrix, A::AbstractMatrix, rowlb::I
     
     loadproblem!(m, A, lb, ub, c, rowlb, rowub, :Min)
     setquadobj!(m, Q)
+    writeproblem(m, "out.lp")
     optimize!(m)
     stat = status(m)
     if stat == :Optimal

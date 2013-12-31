@@ -23,8 +23,6 @@ function quadprogtest(solver=MathProgBase.defaultQPsolver)
     @test stat == :Optimal
     @test_approx_eq_eps getobjval(m) 130/70 1e-6
     @test_approx_eq_eps norm(getsolution(m) - [0.5714285714285715,0.4285714285714285,0.8571428571428572]) 0.0 1e-6
- 
-
 
     println("Done")
 end

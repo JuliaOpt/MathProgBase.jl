@@ -1,9 +1,21 @@
 
 export setquadobj!,
+       setquadobjterms!,
        addquadconstr!
-    
+
+function setquadobjterms!(m::AbstractMathProgModel, rowidx, colidx, quadval)
+    (n = length(rowidx)) == length(colidx) == length(quadval) || error("Inconsistent input dimensions")
+    nquadval = copy(quadval)
+    for i in 1:length(rowidx)
+        if rowidx[i] == colidx[i] # if on diagonal...
+            nquadval[i] *= 2
+        end
+    end
+    setquadobj!(m, rowidx, colidx, nquadval)
+end
+
 setquadobj!(m::AbstractMathProgModel,rowidx,colidx,quadval) = error("Not implemented")
-setquadobj!(m::AbstractMathProgModel,Q::Matrix{Float64}) = setquadobj!(m,sparse(Q))
+setquadobj!(m::AbstractMathProgModel,Q::Matrix) = setquadobj!(m,sparse(float(Q)))
 function setquadobj!(m::AbstractMathProgModel,Q::SparseMatrixCSC{Float64})
   if issym(Q) || istriu(Q)
     nnz_q = nnz(Q)
