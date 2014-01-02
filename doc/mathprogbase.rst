@@ -369,7 +369,11 @@ to indicate equality constraints.
 
 .. function:: setquadobj!(m::AbstractMathProgModel,rowidx,colidx,quadval)
 
-    Adds a quadratic term :math:`\frac{1}{2}x^TQx` to the objective, replacing any existing quadratic terms. Note the implicit :math:`\frac{1}{2}` scaling factor. The matrix :math:`Q` must be symmetric positive semidefinite (when minimizing). Here the entries of :math:`Q` should be provided in sparse triplet form; e.g. entry indexed by ``k`` will fill ``quadval[k]`` in the ``(rowidx[k],colidx[k])`` entry of matrix ``Q``. Duplicate index sets ``(i,j)`` are accepted and will be summed together. Off-diagonal entries will be mirrored, so either the upper triangular or lower triangular entries of ``Q`` should be provided. If entries for both ``(i,j)`` and ``(j,i)`` are provided, these are considered duplicate terms. For example, ``setquadobj!(m, [1,1,2,2], [1,2,1,2], [3,1,1,1])`` and ``setquadobj!(m, [1,1,2], [1,2,2], [3,2,1])`` are both are valid descriptions for the matrix :math:`Q = \begin{pmatrix} 3 & 2 \\ 2 & 1 \end{pmatrix}`. 
+    Adds a quadratic term :math:`\frac{1}{2}x^TQx` to the objective, replacing any existing quadratic terms. Note the implicit :math:`\frac{1}{2}` scaling factor. The matrix :math:`Q` must be symmetric positive semidefinite (when minimizing). Here the entries of :math:`Q` should be provided in sparse triplet form; e.g. entry indexed by ``k`` will fill ``quadval[k]`` in the ``(rowidx[k],colidx[k])`` entry of matrix ``Q``. Duplicate index sets ``(i,j)`` are accepted and will be summed together. Off-diagonal entries will be mirrored, so either the upper triangular or lower triangular entries of ``Q`` should be provided. If entries for both ``(i,j)`` and ``(j,i)`` are provided, these are considered duplicate terms. For example, ``setquadobj!(m, [1,1,2,2], [1,2,1,2], [3,1,1,1])`` and ``setquadobj!(m, [1,1,2], [1,2,2], [3,2,1])`` are both are valid descriptions for the matrix :math:`Q = \begin{pmatrix} 3 & 2 \\ 2 & 1 \end{pmatrix}`.
+
+.. function:: setquadobjterms!(m::AbstractMathProgModel,rowidx,colidx,quadval)
+
+    Provides an alternative "terms"-based interface to ``setquadobj!``. A list of quadratic terms is specified instead of the matrix ``Q``. For example, the objective :math:`x_1^2 + 2x_1x_2` is specified by ``setquadobjterms!(m,[1,1],[1,2],[1.0,2.0])``. Duplicate terms are summed together. Note: this method does not need to be implemented by solvers.
 
 .. function:: addquadconstr!(m::AbstractMathProgModel, linearidx, linearval, quadrowidx, quadcolidx, quadval, sense, rhs)
 
