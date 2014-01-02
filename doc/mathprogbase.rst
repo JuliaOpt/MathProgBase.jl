@@ -443,7 +443,7 @@ to indicate equality constraints.
 
 .. function:: addquadconstr!(m::AbstractMathProgModel, linearidx, linearval, quadrowidx, quadcolidx, quadval, sense, rhs)
 
-    Adds the quadratic constraint :math:`s^Tx + \frac{1}{2}x^TQx \,\, sense \, rhs` to the model. The ``linearidx`` and ``linearval`` arrays specify the sparse vector ``s``. The quadratic term is specified as in ``setquadobj!``. Sense must be ``'<'`` or ``'>'``, and :math:`Q` must be positive semidefinite or negative semidefinite, respectively. If supported by the solver, ``addquadconstr!`` may also be used to specify second-order cone (SOCP) and rotated second-order cone constraints. These should be of the form :math:`x^Tx -y^2 \le 0` or :math:`x^Tx -yz \le 0`, where :math:`y` and :math:`z` are restricted to be non-negative (in particular, :math:`Q` can have at most one off-diagonal term).
+    Adds the quadratic constraint :math:`s^Tx + \sum_{i,j} q_{i,j}x_ix_j \,\, sense \, rhs` to the model. The ``linearidx`` and ``linearval`` arrays specify the sparse vector ``s``. The quadratic terms are specified as in ``setquadobjterms!`` in the "terms" format. Sense must be ``'<'`` or ``'>'``, and :math:`Q` must be positive semidefinite or negative semidefinite, respectively. If supported by the solver, ``addquadconstr!`` may also be used to specify second-order cone (SOCP) and rotated second-order cone constraints. These should be of the form :math:`x^Tx -y^2 \le 0` or :math:`x^Tx -yz \le 0`, where :math:`y` and :math:`z` are restricted to be non-negative (in particular, :math:`Q` can have at most one off-diagonal term).
 
 
 .. _choosing-solvers:
