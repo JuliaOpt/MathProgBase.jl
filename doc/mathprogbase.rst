@@ -214,14 +214,14 @@ We can solve the three-dimensional QP (see ``test/quadprog.jl``):
 
 .. math::
     \min_{x,y,z}\, &x^2+y^2+z^2+xy+yz\\
-    s.t.         &x + 2y + 3z \leq 4\\
-                 &x + y \leq 1
+    s.t.         &x + 2y + 3z \geq 4\\
+                 &x + y \geq 1
 
 by::
 
     using MathProgBase
     
-    sol = quadprog([0., 0., 0.],[2. 1. 0.; 1. 2. 1.; 0. 1. 2.],[1. 2. 3.; 1. 1. 0.],[4., 1.],Inf,-Inf,Inf)
+    sol = quadprog([0., 0., 0.],[2. 1. 0.; 1. 2. 1.; 0. 1. 2.],[1. 2. 3.; 1. 1. 0.],'>',[4., 1.],-Inf,Inf)
     if sol.status == :Optimal
         println("Optimal objective value is $(sol.objval)")
         println("Optimal solution vector is: [$(sol.sol[1]), $(sol.sol[2]), $(sol.sol[3])]")
