@@ -10,6 +10,7 @@ function quadprogtest(solver=MathProgBase.defaultQPsolver)
     @test_approx_eq_eps sol.objval 130/70 1e-6
     @test_approx_eq_eps norm(sol.sol[1:3] - [0.5714285714285715,0.4285714285714285,0.8571428571428572]) 0.0 1e-6
 
+    let
     m = model(solver)
     loadproblem!(m, [1. 2. 3.; 1. 1. 0.],[-Inf,-Inf,-Inf],[Inf,Inf,Inf],[0.,0.,0.],[4., 1.],[Inf,Inf], :Min)
 
@@ -23,6 +24,18 @@ function quadprogtest(solver=MathProgBase.defaultQPsolver)
     @test stat == :Optimal
     @test_approx_eq_eps getobjval(m) 130/70 1e-6
     @test_approx_eq_eps norm(getsolution(m) - [0.5714285714285715,0.4285714285714285,0.8571428571428572]) 0.0 1e-6
+    end
 
+    let
+    m = model(solver)
+    loadproblem!(m, [-1. 1.; 1. 1.], [0.,0.], [Inf,Inf], [1.,1.], [0.,0.], [Inf,Inf], :Max)
+    addquadconstr!(m, [2], [1.], [1], [1], [1.], '<', 2)
+    writeproblem(m, "out.lp")
+    optimize!(m)
+    stat = status(m)
+    @test stat == :Optimal
+    @test_approx_eq_eps getobjval(m) 2.25 1e-6
+    @test_approx_eq_eps norm(getsolution(m) - [0.5,1.75]) 0.0 1e-3
+    end
     println("Done")
 end
