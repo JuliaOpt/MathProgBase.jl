@@ -30,7 +30,6 @@ function quadprogtest(solver=MathProgBase.defaultQPsolver)
     m = model(solver)
     loadproblem!(m, [-1. 1.; 1. 1.], [0.,0.], [Inf,Inf], [1.,1.], [0.,0.], [Inf,Inf], :Max)
     addquadconstr!(m, [2], [1.], [1], [1], [1.], '<', 2)
-    writeproblem(m, "out.lp")
     optimize!(m)
     stat = status(m)
     @test stat == :Optimal
