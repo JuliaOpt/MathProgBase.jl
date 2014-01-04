@@ -70,12 +70,16 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
         attrs = Dict()
         try
             attrs[:infeasibilityray] = getinfeasibilityray(m)
+        catch
+            warn("Problem is infeasible, but infeasibility ray (\"Farkas proof\") is unavailable; check that the proper solver options are set.")
         end
         return LinprogSolution(stat, nothing, [], attrs)
     elseif stat == :Unbounded
         attrs = Dict()
         try
             attrs[:unboundedray] = getunboundedray(m)
+        catch
+            warn("Problem is unbounded, but unbounded ray is unavailable; check that the proper solver options are set.")
         end
         return LinprogSolution(stat, nothing, [], attrs)
     else

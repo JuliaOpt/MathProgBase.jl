@@ -38,7 +38,7 @@ where:
 A scalar is accepted for the ``b``, ``sense``, ``l``, and ``u`` arguments, in which case its value is replicated. The values ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound.
 
 .. note::
-    Linear programming solvers extensively exploit the sparsity of the constraint matrix ``A``. While both dense and sparse matrices are acceped, for large-scale problems sparse matrices should be provided if permitted by the problem structure.  
+    Linear programming solvers extensively exploit the sparsity of the constraint matrix ``A``. While both dense and sparse matrices are accepted, for large-scale problems sparse matrices should be provided if permitted by the problem structure.  
 
 A shortened version is defined as::
 
@@ -162,6 +162,72 @@ with the code::
     
     mixintprog(-[5.,3.,2.,7.,4.],[2. 8. 4. 2. 5.],'<',10,'I',0,1)
 
+---------------------
+Quadratic Programming
+---------------------
+
+.. function:: quadprog(c, Q, A, sense, b, l, u, solver)
+
+Solves the quadratic programming problem:
+
+.. math::
+    \min_{x}\, &\frac{1}{2}x^TQx + c^Tx\\
+    s.t.     &a_i^Tx \text{ sense}_i \, b_i \forall\,\, i\\
+             &l \leq x \leq u\\
+
+where:
+
+*    ``c`` is the objective vector, always in the sense of minimization
+*    ``Q`` is the Hessian matrix of the objective
+*    ``A`` is the constraint matrix, with rows :math:`a_i`
+*    ``sense`` is a vector of constraint sense characters ``'<'``, ``'='``, and ``'>'``
+*    ``b`` is the right-hand side vector
+*    ``l`` is the vector of lower bounds on the variables
+*    ``u`` is the vector of upper bounds on the variables, and
+*    ``solver`` is an *optional* parameter specifying the desired solver, see :ref:`choosing solvers <choosing-solvers>`. If this parameter is not provided, the default solver is used.
+ 
+A scalar is accepted for the ``b``, ``sense``, ``l``, and ``u`` arguments, in which case its value is replicated. The values ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound.
+
+.. note::
+    Quadratic programming solvers extensively exploit the sparsity of the Hessian matrix ``Q`` and the constraint matrix ``A``. While both dense and sparse matrices are accepted, for large-scale problems sparse matrices should be provided if permitted by the problem structure.  
+
+The ``quadprog`` function returns an instance of the type::
+    
+    type QuadprogSolution
+        status
+        objval
+        sol
+        attrs
+    end
+
+where ``status`` is a termination status symbol, one of ``:Optimal``, ``:Infeasible``, ``:Unbounded``, ``:UserLimit`` (iteration limit or timeout), ``:Error`` (and maybe others).
+
+If ``status`` is ``:Optimal``, the other members have the following values:
+
+* ``objval`` -- optimal objective value
+* ``sol`` -- primal solution vector
+* ``attrs`` -- a dictionary that may contain other relevant attributes (not currently used).
+
+Analogous shortened and range-constraint versions are available as well.
+
+We can solve the three-dimensional QP (see ``test/quadprog.jl``):
+
+.. math::
+    \min_{x,y,z}\, &x^2+y^2+z^2+xy+yz\\
+    s.t.         &x + 2y + 3z \geq 4\\
+                 &x + y \geq 1
+
+by::
+
+    using MathProgBase
+    
+    sol = quadprog([0., 0., 0.],[2. 1. 0.; 1. 2. 1.; 0. 1. 2.],[1. 2. 3.; 1. 1. 0.],'>',[4., 1.],-Inf,Inf)
+    if sol.status == :Optimal
+        println("Optimal objective value is $(sol.objval)")
+        println("Optimal solution vector is: [$(sol.sol[1]), $(sol.sol[2]), $(sol.sol[3])]")
+    else
+        println("Error: solution status $(sol.status)")
+    end
 
 -------------------
 Low-level interface
@@ -363,6 +429,22 @@ to indicate equality constraints.
     Provide an initial solution ``v`` to the MIP solver. To leave values undefined, set them
     to ``NaN``.
 
+.. function:: setquadobj!(m::AbstractMathProgModel,Q)
+
+    Adds a quadratic term :math:`\frac{1}{2}x^TQx` to the objective, replacing any existing quadratic terms. Note the implicit :math:`\frac{1}{2}` scaling factor. The argument ``Q`` must be either a symmetric positive semidefinite matrix or the upper triangular portion of a symmetric positive semidefinite matrix (when minimizing). Sparse (CSC) or dense representations are accepted.
+
+.. function:: setquadobj!(m::AbstractMathProgModel,rowidx,colidx,quadval)
+
+    Adds a quadratic term :math:`\frac{1}{2}x^TQx` to the objective, replacing any existing quadratic terms. Note the implicit :math:`\frac{1}{2}` scaling factor. The matrix :math:`Q` must be symmetric positive semidefinite (when minimizing). Here the entries of :math:`Q` should be provided in sparse triplet form; e.g. entry indexed by ``k`` will fill ``quadval[k]`` in the ``(rowidx[k],colidx[k])`` entry of matrix ``Q``. Duplicate index sets ``(i,j)`` are accepted and will be summed together. Off-diagonal entries will be mirrored, so either the upper triangular or lower triangular entries of ``Q`` should be provided. If entries for both ``(i,j)`` and ``(j,i)`` are provided, these are considered duplicate terms. For example, ``setquadobj!(m, [1,1,2,2], [1,2,1,2], [3,1,1,1])`` and ``setquadobj!(m, [1,1,2], [1,2,2], [3,2,1])`` are both are valid descriptions for the matrix :math:`Q = \begin{pmatrix} 3 & 2 \\ 2 & 1 \end{pmatrix}`.
+
+.. function:: setquadobjterms!(m::AbstractMathProgModel,rowidx,colidx,quadval)
+
+    Provides an alternative "terms"-based interface to ``setquadobj!``. A list of quadratic terms is specified instead of the matrix ``Q``. For example, the objective :math:`x_1^2 + 2x_1x_2` is specified by ``setquadobjterms!(m,[1,1],[1,2],[1.0,2.0])``. Duplicate terms are summed together. Note: this method does not need to be implemented by solvers.
+
+.. function:: addquadconstr!(m::AbstractMathProgModel, linearidx, linearval, quadrowidx, quadcolidx, quadval, sense, rhs)
+
+    Adds the quadratic constraint :math:`s^Tx + \sum_{i,j} q_{i,j}x_ix_j \,\, sense \, rhs` to the model. The ``linearidx`` and ``linearval`` arrays specify the sparse vector ``s``. The quadratic terms are specified as in ``setquadobjterms!`` in the "terms" format. Sense must be ``'<'`` or ``'>'``, and :math:`Q` must be positive semidefinite or negative semidefinite, respectively. If supported by the solver, ``addquadconstr!`` may also be used to specify second-order cone (SOCP) and rotated second-order cone constraints. These should be of the form :math:`x^Tx -y^2 \le 0` or :math:`x^Tx -yz \le 0`, where :math:`y` and :math:`z` are restricted to be non-negative (in particular, :math:`Q` can have at most one off-diagonal term).
+
 
 .. _choosing-solvers:
 
@@ -406,7 +488,7 @@ The ``MathProgSolverInterface`` exports an abstract type ``MathProgCallbackData`
    
 .. function:: cbgetmipsolution(d::MathProgCallbackData[, output])
 
-   Grabs current best integer-feasible solution to the model. The optional second arugment specifies an output vector.
+   Grabs current best integer-feasible solution to the model. The optional second argument specifies an output vector.
    
 .. function:: cbgetlpsolution(d::MathProgCallbackData[, output])
 

@@ -7,7 +7,9 @@ module MathProgBase
     include("defaultsolvers.jl")
     @setdefaultLPsolver
     @setdefaultMIPsolver
+    @setdefaultQPsolver
 
     include("linprog.jl")
     include("mixintprog.jl")
+    include("quadprog.jl")
 end
