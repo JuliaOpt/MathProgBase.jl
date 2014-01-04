@@ -38,3 +38,24 @@ function quadprogtest(solver=MathProgBase.defaultQPsolver)
     end
     println("Done")
 end
+
+function socptest(solver=MathProgBase.defaultQPsolver)
+    println("Testing SOCP interface with solver ", string(typeof(solver)))
+    
+    # min t
+    # s.t. x + y >= 1
+    #      x^2 + y^2 <= t^2
+    #      t >= 0
+    m = model(solver)
+    loadproblem!(m, [ 1.0 1.0 0.0 ], [-Inf,-Inf,0.0], [Inf,Inf,Inf], [0.0,0.0,1.0], [1.0],[Inf], :Min)
+    addquadconstr!(m, [], [], [1,2,3], [1,2,3], [1.0,1.0,-1.0],'<',0.0)
+    optimize!(m)
+    stat = status(m)
+
+    @test stat == :Optimal
+    @test_approx_eq_eps getobjval(m) sqrt(1/2) 1e-6
+    @test_approx_eq_eps norm(getsolution(m) - [0.5,0.5,sqrt(1/2)]) 0.0 1e-3
+    println("Done")
+
+
+end
