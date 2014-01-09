@@ -16,6 +16,7 @@ export AbstractMathProgModel,
     setconstrUB!,
     getobj,
     setobj!,
+    getconstrmatrix,
     addvar!,
     addconstr!,
     updatemodel!,
@@ -70,6 +71,7 @@ getconstrUB(m::AbstractMathProgModel) = error("Not Implemented")
 setconstrUB!(m::AbstractMathProgModel, rowub) = error("Not Implemented")
 getobj(m::AbstractMathProgModel) = error("Not Implemented")
 setobj!(m::AbstractMathProgModel, obj) = error("Not Implemented")
+getconstrmatrix(m::AbstractMathProgModel) = error("Not Implemented")
 
 addvar!(m::AbstractMathProgModel, rowidx, rowcoef, collb, colub, objcoef) = error("Not Implemented")
 

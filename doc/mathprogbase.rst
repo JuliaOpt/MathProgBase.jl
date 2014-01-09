@@ -308,7 +308,10 @@ to indicate equality constraints.
    
     Sets the objective coefficients.
 
+.. function:: getconstrmatrix(m::AbstractMathProgModel)
 
+    Returns the full constraint matrix :math:`A`, typically as a 
+    ``SparseMatrixCSC``.
 
 .. function:: addvar!(m::AbstractMathProgModel, constridx, constrcoef, l, u, objcoef)
 
