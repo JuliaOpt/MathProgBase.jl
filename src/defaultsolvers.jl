@@ -2,7 +2,11 @@
 # macros to generate code to set default solver
 
 macro setdefaultLPsolver()
-    solvers = [(:Clp,:ClpSolver),(:GLPKMathProgInterface,:GLPKSolverLP), (:Gurobi,:GurobiSolver), (:CPLEXLink,:CplexSolver)]
+    solvers = [(:Clp,:ClpSolver),
+               (:GLPKMathProgInterface,:GLPKSolverLP),
+               (:Gurobi,:GurobiSolver),
+               (:CPLEXLink,:CplexSolver),
+               (:Mosek,:MosekSolver)]
     for (pkgname, solvername) in solvers
         if Pkg.installed(string(pkgname)) != nothing
             importexpr = Expr(:import,pkgname)
@@ -19,7 +23,11 @@ macro setdefaultLPsolver()
 end
 
 macro setdefaultMIPsolver()
-    solvers = [(:Cbc,:CbcSolver),(:GLPKMathProgInterface,:GLPKSolverMIP), (:Gurobi, :GurobiSolver), (:CPLEXLink,:CplexSolver)]
+    solvers = [(:Cbc,:CbcSolver),
+               (:GLPKMathProgInterface,:GLPKSolverMIP),
+               (:Gurobi, :GurobiSolver),
+               (:CPLEXLink,:CplexSolver),
+               (:Mosek,:MosekSolver)]
     for (pkgname, solvername) in solvers
         if Pkg.installed(string(pkgname)) != nothing
             importexpr = Expr(:import,pkgname)
@@ -36,7 +44,9 @@ macro setdefaultMIPsolver()
 end
 
 macro setdefaultQPsolver()
-    solvers = [(:Gurobi, :GurobiSolver), (:CPLEXLink,:CplexSolver)]
+    solvers = [(:Gurobi, :GurobiSolver),
+               (:CPLEXLink,:CplexSolver),
+               (:Mosek,:MosekSolver)]
     for (pkgname, solvername) in solvers
         if Pkg.installed(string(pkgname)) != nothing
             importexpr = Expr(:import,pkgname)
