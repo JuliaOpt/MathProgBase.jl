@@ -45,7 +45,7 @@ end
 
 macro setdefaultQPsolver()
     solvers = [(:Gurobi, :GurobiSolver),
-               (:CPLEXLink,:CplexSolver),
+               (:CPLEX,:CplexSolver),
                (:Mosek,:MosekSolver)]
     for (pkgname, solvername) in solvers
         if Pkg.installed(string(pkgname)) != nothing
