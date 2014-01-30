@@ -5,7 +5,7 @@ macro setdefaultLPsolver()
     solvers = [(:Clp,:ClpSolver),
                (:GLPKMathProgInterface,:GLPKSolverLP),
                (:Gurobi,:GurobiSolver),
-               (:CPLEXLink,:CplexSolver),
+               (:CPLEX,:CplexSolver),
                (:Mosek,:MosekSolver)]
     for (pkgname, solvername) in solvers
         if Pkg.installed(string(pkgname)) != nothing
@@ -26,7 +26,7 @@ macro setdefaultMIPsolver()
     solvers = [(:Cbc,:CbcSolver),
                (:GLPKMathProgInterface,:GLPKSolverMIP),
                (:Gurobi, :GurobiSolver),
-               (:CPLEXLink,:CplexSolver),
+               (:CPLEX,:CplexSolver),
                (:Mosek,:MosekSolver)]
     for (pkgname, solvername) in solvers
         if Pkg.installed(string(pkgname)) != nothing
