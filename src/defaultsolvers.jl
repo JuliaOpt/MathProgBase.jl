@@ -1,14 +1,3 @@
-macro packageImport(pkgname)
-    return Expr(:import,pkgname)
-end
-
-macro setDefault(pkgname, solvername)
-    :(const defaultLPsolver = ($(pkgname).$(solvername))())
-end
-
-macro setMissing(typ,pkgnames)
-    :(MissingSolver($(string(typ)),$pkgnames))
-end
 
 # macros to generate code to set default solver
 
