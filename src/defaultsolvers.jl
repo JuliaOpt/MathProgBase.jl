@@ -1,7 +1,18 @@
+macro packageImport(pkgname)
+    return Expr(:import,pkgname)
+end
+
+macro setDefault(pkgname, solvername)
+    :(const defaultLPsolver = ($(pkgname).$(solvername))())
+end
+
+macro setMissing(typ,pkgnames)
+    :(MissingSolver($(string(typ)),$pkgnames))
+end
 
 # macros to generate code to set default solver
 
-macro setdefaultLPsolver()
+function setdefaultLPsolver()
     solvers = [(:Clp,:ClpSolver),
                (:GLPKMathProgInterface,:GLPKSolverLP),
                (:Gurobi,:GurobiSolver),
@@ -9,55 +20,52 @@ macro setdefaultLPsolver()
                (:Mosek,:MosekSolver)]
     for (pkgname, solvername) in solvers
         if Pkg.installed(string(pkgname)) != nothing
-            importexpr = Expr(:import,pkgname)
-            return esc(quote 
-                $importexpr
-                const defaultLPsolver = ($(pkgname).$(solvername))()
-            end)
+            # try 
+                eval(Expr(:import,pkgname))
+                eval( :(const defaultLPsolver = ($(pkgname).$(solvername))()) )
+                return nothing
+            # end
         end
     end
     pkgnames = [pkgname for (pkgname, solvername) in solvers]
-    return esc(quote
-        const defaultLPsolver = MissingSolver("LP",$pkgnames)
-    end)
+    const defaultLPsolver = @setMissing("LP",pkgnames)
+    nothing
 end
 
-macro setdefaultMIPsolver()
-    solvers = [(:Cbc,:CbcSolver),
-               (:GLPKMathProgInterface,:GLPKSolverMIP),
-               (:Gurobi, :GurobiSolver),
+function setdefaultMIPsolver()
+    solvers = [(:Clp,:ClpSolver),
+               (:GLPKMathProgInterface,:GLPKSolverLP),
+               (:Gurobi,:GurobiSolver),
                (:CPLEX,:CplexSolver),
                (:Mosek,:MosekSolver)]
     for (pkgname, solvername) in solvers
         if Pkg.installed(string(pkgname)) != nothing
-            importexpr = Expr(:import,pkgname)
-            return esc(quote 
-                $importexpr
-                const defaultMIPsolver = ($(pkgname).$(solvername))()
-            end)
+            try 
+                eval(Expr(:import,pkgname))
+                eval( :(const defaultMIPsolver = ($(pkgname).$(solvername))()) )
+                return nothing
+            end
         end
     end
     pkgnames = [pkgname for (pkgname, solvername) in solvers]
-    return esc(quote
-        const defaultMIPsolver = MissingSolver("MIP",$pkgnames)
-    end)
+    const defaultLPsolver = @setMissing("MIP",pkgnames)
+    nothing
 end
 
-macro setdefaultQPsolver()
-    solvers = [(:Gurobi, :GurobiSolver),
+function setdefaultQPsolver()
+    solvers = [(:Gurobi,:GurobiSolver),
                (:CPLEX,:CplexSolver),
                (:Mosek,:MosekSolver)]
     for (pkgname, solvername) in solvers
         if Pkg.installed(string(pkgname)) != nothing
-            importexpr = Expr(:import,pkgname)
-            return esc(quote 
-                $importexpr
-                const defaultQPsolver = ($(pkgname).$(solvername))()
-            end)
+            try 
+                eval(Expr(:import,pkgname))
+                eval( :(const defaultQPsolver = ($(pkgname).$(solvername))()) )
+                return nothing
+            end
         end
     end
     pkgnames = [pkgname for (pkgname, solvername) in solvers]
-    return esc(quote
-        const defaultQPsolver = MissingSolver("QP",$pkgnames)
-    end)
+    const defaultLPsolver = @setMissing("QP",pkgnames)
+    nothing
 end
