@@ -1,4 +1,6 @@
-
+macro setMissing(typ,pkgnames)
+    :(MissingSolver($(string(typ)),$pkgnames))
+end
 # macros to generate code to set default solver
 
 function setdefaultLPsolver()
