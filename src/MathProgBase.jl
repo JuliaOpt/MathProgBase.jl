@@ -5,9 +5,9 @@ module MathProgBase
     export SolverNameAndOptions
 
     include("defaultsolvers.jl")
-    @setdefaultLPsolver
-    @setdefaultMIPsolver
-    @setdefaultQPsolver
+    setdefaultLPsolver()
+    setdefaultMIPsolver()
+    setdefaultQPsolver()
 
     include("linprog.jl")
     include("mixintprog.jl")
