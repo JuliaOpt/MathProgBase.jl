@@ -1,29 +1,4 @@
-macro setMissing(typ,pkgnames)
-    :(MissingSolver($(string(typ)),$pkgnames))
-end
-# macros to generate code to set default solver
-
 function setdefaultLPsolver()
-    solvers = [(:Clp,:ClpSolver),
-               (:GLPKMathProgInterface,:GLPKSolverLP),
-               (:Gurobi,:GurobiSolver),
-               (:CPLEX,:CplexSolver),
-               (:Mosek,:MosekSolver)]
-    for (pkgname, solvername) in solvers
-        if Pkg.installed(string(pkgname)) != nothing
-            # try 
-                eval(Expr(:import,pkgname))
-                eval( :(const defaultLPsolver = ($(pkgname).$(solvername))()) )
-                return nothing
-            # end
-        end
-    end
-    pkgnames = [pkgname for (pkgname, solvername) in solvers]
-    const defaultLPsolver = @setMissing("LP",pkgnames)
-    nothing
-end
-
-function setdefaultMIPsolver()
     solvers = [(:Clp,:ClpSolver),
                (:GLPKMathProgInterface,:GLPKSolverLP),
                (:Gurobi,:GurobiSolver),
@@ -33,14 +8,36 @@ function setdefaultMIPsolver()
         if Pkg.installed(string(pkgname)) != nothing
             try 
                 eval(Expr(:import,pkgname))
-                eval( :(const defaultMIPsolver = ($(pkgname).$(solvername))()) )
-                return nothing
+                eval( :(const defaultLPsolver = ($(pkgname).$(solvername))()) )
+                return
+            catch
+                warn("Package $pkgname is installed but couldn't be loaded")
             end
         end
     end
     pkgnames = [pkgname for (pkgname, solvername) in solvers]
-    const defaultLPsolver = @setMissing("MIP",pkgnames)
-    nothing
+    eval(:(const defaultLPsolver = MissingSolver("LP",$pkgnames)))
+end
+
+function setdefaultMIPsolver()
+    solvers = [(:Cbc,:CbcSolver),
+               (:GLPKMathProgInterface,:GLPKSolverMIP),
+               (:Gurobi,:GurobiSolver),
+               (:CPLEX,:CplexSolver),
+               (:Mosek,:MosekSolver)]
+    for (pkgname, solvername) in solvers
+        if Pkg.installed(string(pkgname)) != nothing
+            try 
+                eval(Expr(:import,pkgname))
+                eval( :(const defaultMIPsolver = ($(pkgname).$(solvername))()) )
+                return
+            catch
+                warn("Package $pkgname is installed but couldn't be loaded")
+            end
+        end
+    end
+    pkgnames = [pkgname for (pkgname, solvername) in solvers]
+    eval(:(const defaultMIPsolver = MissingSolver("MIP",$pkgnames)))
 end
 
 function setdefaultQPsolver()
@@ -52,11 +49,12 @@ function setdefaultQPsolver()
             try 
                 eval(Expr(:import,pkgname))
                 eval( :(const defaultQPsolver = ($(pkgname).$(solvername))()) )
-                return nothing
+                return
+            catch
+                warn("Package $pkgname is installed but couldn't be loaded")
             end
         end
     end
     pkgnames = [pkgname for (pkgname, solvername) in solvers]
-    const defaultLPsolver = @setMissing("QP",pkgnames)
-    nothing
+    eval(:(const defaultQPsolver = MissingSolver("QP",$pkgnames)))
 end
