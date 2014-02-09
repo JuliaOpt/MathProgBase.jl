@@ -436,7 +436,7 @@ to indicate equality constraints.
     
     Adds a special ordered set (SOS) constraint of type 1. Of the variables indexed by ``idx``, at most one can be nonzero. The ``weight`` argument induces the ordering of the variables; as such, they should be unique values.
 
-.. function:: addsos1(m::AbstractMathProgModel, idx, weight)
+.. function:: addsos2(m::AbstractMathProgModel, idx, weight)
     
     Adds a special ordered set (SOS) constraint of type 2. Of the variables indexed by ``idx``, at most two can be nonzero, and if two are nonzero, they must be adjacent in the set. The ``weight`` argument induces the ordering of the variables; as such, they should be unique values.
 
