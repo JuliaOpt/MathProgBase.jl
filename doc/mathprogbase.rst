@@ -432,6 +432,14 @@ to indicate equality constraints.
     Provide an initial solution ``v`` to the MIP solver. To leave values undefined, set them
     to ``NaN``.
 
+.. function:: addsos1(m::AbstractMathProgModel, idx, weight)
+    
+    Adds a special ordered set (SOS) constraint of type 1. Of the variables indexed by ``idx``, at most one can be nonzero. The ``weight`` argument induces the ordering of the variables; as such, they should be unique values.
+
+.. function:: addsos1(m::AbstractMathProgModel, idx, weight)
+    
+    Adds a special ordered set (SOS) constraint of type 2. Of the variables indexed by ``idx``, at most two can be nonzero, and if two are nonzero, they must be adjacent in the set. The ``weight`` argument induces the ordering of the variables; as such, they should be unique values.
+
 .. function:: setquadobj!(m::AbstractMathProgModel,Q)
 
     Adds a quadratic term :math:`\frac{1}{2}x^TQx` to the objective, replacing any existing quadratic terms. Note the implicit :math:`\frac{1}{2}` scaling factor. The argument ``Q`` must be either a symmetric positive semidefinite matrix or the upper triangular portion of a symmetric positive semidefinite matrix (when minimizing). Sparse (CSC) or dense representations are accepted.

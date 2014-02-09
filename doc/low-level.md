@@ -188,6 +188,3 @@ What's missing:
 - Add multiple constraints/variables. Remove constraints/variables.
 - Setting/getting simplex basis (if applicable)
 - Standard subset of parameters (Timeout, output level, iteration limit, MIP gap, etc.)
-- SOS constraints for integer problems
-- Quadratic objectives
-
