@@ -112,6 +112,10 @@ getvartype(m::AbstractMathProgModel) = error("Not Implemented")
 
 setwarmstart!(m::AbstractMathProgModel, v) = error("Not Implemented")
 
+addsos1!(m::AbstractMathProgModel, idx, weight) = error("Not Implemented")
+
+addsos2!(m::AbstractMathProgModel, idx, weight) = error("Not Implemented")
+
 include("MathProgSolverCallbacksInterface.jl")
 include("MathProgSolverQCQPInterface.jl")
 
