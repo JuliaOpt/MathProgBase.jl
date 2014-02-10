@@ -37,7 +37,9 @@ export AbstractMathProgModel,
     getvartype,
     getinfeasibilityray,
     getunboundedray,
-    setwarmstart!
+    setwarmstart!,
+    addsos1!,
+    addsos2!
 
 abstract AbstractMathProgModel
 
