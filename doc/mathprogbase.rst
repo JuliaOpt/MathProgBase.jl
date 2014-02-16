@@ -513,10 +513,6 @@ The ``MathProgSolverInterface`` exports an abstract type ``MathProgCallbackData`
 
    Returns current location in solve process: ``:MIPNode`` if at node in branch-and-cut tree, ``:MIPSol`` at an integer-feasible solution, and ``:Other`` otherwise.
 
-.. function:: cbaddsolution!(d::MathProgCallbackData,x)
-
-   Adds feasible solution ``x`` to model.
-   
 .. function:: cbaddcut!(d::MathProgCallbackData,varidx,varcoef,sense,rhs) 
 
    Adds cut to model. The coefficient values are represented sparsely, with (one-indexed) indices in ``varidx`` and values in ``varcoef``. The constraint sense ``sense`` is a character taking value ``<``, ``>``, or ``=``, and the right-hand side value is ``rhs``.
@@ -524,4 +520,11 @@ The ``MathProgSolverInterface`` exports an abstract type ``MathProgCallbackData`
 .. function:: cbaddlazy!(d::MathProgCallbackData,varidx,varcoef,sense,rhs)
 
    Adds lazy constraint to model. The coefficient values are represented sparsely, with (one-indexed) indices in ``varidx`` and values in ``varcoef``. The constraint sense ``sense`` is a character taking value ``<``, ``>``, or ``=``, and the right-hand side value is ``rhs``.
-   
+
+.. function:: cbaddsolution!(d::MathProgCallbackData)
+
+   Submit a (possibly partially defined) heuristic solution for the model.
+
+.. function:: cbsetsolutionvalue!(d::MathProgCallbackData,varidx,value)
+
+   Sets the value of a variable with (one-based) index ``varidx`` to ``value`` in the current partial solution being constructed by a user heuristic.
