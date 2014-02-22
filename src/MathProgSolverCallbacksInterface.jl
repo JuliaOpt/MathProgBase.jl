@@ -9,9 +9,11 @@ export MathProgCallbackData,
     cbgetbestbound,
     cbgetexplorednodes,
     cbgetstate,
-    cbaddsolution!,
     cbaddcut!,
-    cbaddlazy!
+    cbaddlazy!,
+    cbaddsolution!,
+    cbsetsolutionvalue!
+
 
 abstract MathProgCallbackData
 
@@ -35,7 +37,7 @@ cbgetexplorednodes(d::MathProgCallbackData) = error("Not implemented")
 # returns :MIPNode :MIPSol :Other
 cbgetstate(d::MathProgCallbackData) = error("Not implemented")
 
-cbaddsolution!(d::MathProgCallbackData,x) = error("Not implemented")
 cbaddcut!(d::MathProgCallbackData,varidx,varcoef,sense,rhs) = error("Not implemented")
 cbaddlazy!(d::MathProgCallbackData,varidx,varcoef,sense,rhs) = error("Not implemented")
-
+cbaddsolution!(d::MathProgCallbackData) = error("Not implemented")
+cbsetsolutionvalue!(d::MathProgCallbackData,varidx,value) = error("Not implemented")
