@@ -523,7 +523,7 @@ The ``MathProgSolverInterface`` exports an abstract type ``MathProgCallbackData`
 
 .. function:: cbaddsolution!(d::MathProgCallbackData)
 
-   Submit a (possibly partially defined) heuristic solution for the model.
+   Submit a (possibly partially defined) heuristic solution for the model. Should reset the solution stored in ``d`` to the original state at the start of callback.
 
 .. function:: cbsetsolutionvalue!(d::MathProgCallbackData,varidx,value)
 
