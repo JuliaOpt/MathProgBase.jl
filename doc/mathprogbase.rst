@@ -434,7 +434,7 @@ to indicate equality constraints.
 
 .. function:: addsos1!(m::AbstractMathProgModel, idx, weight)
     
-    Adds a special ordered set (SOS) constraint of type 1. Of the variables indexed by ``idx``, at most one can be nonzero. The ``weight`` argument induces the ordering of the variables; as such, they should be unique values. A typical SOS1 constraint might look like ``y=\sum_i w_i x_i``, where ``x_i \in \{0,1\}`` are binary variables and the ``w_i`` are weights. See `here <http://lpsolve.sourceforge.net/5.5/SOS.htm>`_ for a description of SOS constraints and their potential uses.
+    Adds a special ordered set (SOS) constraint of type 1. Of the variables indexed by ``idx``, at most one can be nonzero. The ``weight`` argument induces the ordering of the variables; as such, they should be unique values. A typical SOS1 constraint might look like :math:`y=\sum_i w_i x_i`, where :math:`x_i \in \{0,1\}` are binary variables and the :math:`w_i` are weights. See `here <http://lpsolve.sourceforge.net/5.5/SOS.htm>`_ for a description of SOS constraints and their potential uses.
 
 .. function:: addsos2!(m::AbstractMathProgModel, idx, weight)
     
