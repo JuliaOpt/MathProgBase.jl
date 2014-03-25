@@ -1,14 +1,15 @@
-export addSDPvar!,
-       addSDPmatrix!,
-       addSDPconstr!,
-       setSDPobj!,
-       getSDPvarsolution
+export addsdpvar!,
+       addsdpmatrix!,
+       addsdpconstr!,
+       setsdpobj!,
+       getsdpsolution
 
-addSDPvar!(m::AbstractMathProgModel, dim) = error("Not implemented")
-addSDPmatrix!(m::AbstractMathProgModel, mat) = error("Not implemented")
+addsdpvar!(m::AbstractMathProgModel, dim) = error("Not implemented")
+addsdpmatrix!(m::AbstractMathProgModel, mat) = error("Not implemented")
 
-addSDPconstr!(m::AbstractMathProgModel, matvaridx, matcoefidx, scalidx, scalcoef, lb, ub) = error("Not implemented")
+addsdpconstr!(m::AbstractMathProgModel, matvaridx, matcoefidx, scalidx, scalcoef, lb, ub) = error("Not implemented")
 
-setSDPobj!(m::AbstractMathProgModel, matvaridx, matcoefidx) = error("Not implemented")
+setsdpobj!(m::AbstractMathProgModel, matvaridx, matcoefidx) = error("Not implemented")
 
-getSDPvarsolution(m::AbstractMathProgModel, idx) = error("Not implemented")
+getsdpsolution(m::AbstractMathProgModel, idx) = error("Not implemented")
+getsdpdual(m::AbstractMathProgModel) = errror("Not implemented")
