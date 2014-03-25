@@ -120,5 +120,6 @@ addsos2!(m::AbstractMathProgModel, idx, weight) = error("Not Implemented")
 
 include("MathProgSolverCallbacksInterface.jl")
 include("MathProgSolverQCQPInterface.jl")
+include("MathProgSolverSDPInterface.jl")
 
 end
