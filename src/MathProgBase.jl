@@ -8,6 +8,7 @@ module MathProgBase
     setdefaultLPsolver()
     setdefaultMIPsolver()
     setdefaultQPsolver()
+    setdefaultSDPsolver()
 
     include("linprog.jl")
     include("mixintprog.jl")

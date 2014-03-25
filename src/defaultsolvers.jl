@@ -58,3 +58,20 @@ function setdefaultQPsolver()
     pkgnames = [pkgname for (pkgname, solvername) in solvers]
     eval(:(const defaultQPsolver = MissingSolver("QP",$pkgnames)))
 end
+
+function setdefaultSDPsolver()
+    solvers = [(:Mosek,:MosekSolver)]
+    for (pkgname, solvername) in solvers
+        if Pkg.installed(string(pkgname)) != nothing
+            try 
+                eval(Expr(:import,pkgname))
+                eval( :(const defaultSDPsolver = ($(pkgname).$(solvername))()) )
+                return
+            catch
+                warn("Package $pkgname is installed but couldn't be loaded")
+            end
+        end
+    end
+    pkgnames = [pkgname for (pkgname, solvername) in solvers]
+    eval(:(const defaultSDPsolver = MissingSolver("SDP",$pkgnames)))
+end
