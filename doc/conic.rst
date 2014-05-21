@@ -40,11 +40,12 @@ The recognized cones are:
 Not all solvers are expected to support all types of cones. However, when a simple transformation to a supported cone is available, for example, from ``:NonPos`` to ``:NonNeg`` or from ``:SOCRotated`` to ``:SOC``, solvers *should* perform this transformation in order to allow users the extra flexibility in modeling.
 
 
-.. function:: loadconicproblem!(m::AbstractMathProgModel, A, b, cones)
+.. function:: loadconicproblem!(m::AbstractMathProgModel, c, A, b, cones)
    
-    Load the conic problem in primal form into the model. The parameter ``A``
-    is the constraint matrix (typically sparse), the vector ``b`` contains the
-    right-hand side values, and ``cones`` is an ordered
+    Load the conic problem in primal form into the model. The parameter ``c``
+    is the objective vector, the parameter ``A``
+    is the constraint matrix (typically sparse), the parameter ``b``
+    is the vector of right-hand side values, and ``cones`` is an ordered
     list of ``(Symbol,dimension)`` tuples, where ``Symbol`` is one of the above
     recognized cones and ``dimension`` is the number of variables in the cone.
     The order of the list must correspond to the order of the variables
@@ -58,4 +59,6 @@ Not all solvers are expected to support all types of cones. However, when a simp
 .. function:: getconicdual(m::AbstractMathProgModel)
 
     If the solve was successful, returns the optimal dual solution vectors :math:`(y,s)` as a tuple.
+
+The solution vector, optimal objective value, termination status, etc. should be accessible from the standard methods, e.g., ``getsolution``, ``getobjval``, ``status``, respectively.
     
