@@ -8,7 +8,7 @@ We describe extensions to the ``MathProgSolverInterface`` for conic problems.
 
 The design of this interface is inspired by the `CBLIB format <http://cblib.zib.de/format.pdf>`_ and the `MOSEK modeling manual <http://docs.mosek.com/generic/modeling-letter.pdf>`_. 
 
-We the following primal problem to be in canonical conic form:
+We consider the following primal problem to be in canonical conic form:
 
 .. math::
     \min_{x}\, &c^Tx\\
