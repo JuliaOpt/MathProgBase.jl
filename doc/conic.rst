@@ -55,10 +55,6 @@ Not all solvers are expected to support all types of cones. However, when a simp
     in column-major form (lower triangle) or equivalently row-major form
     (upper triangle).
 
-.. function:: getconicsolution(m::AbstractMathProgModel)
-
-    If the solve was successful, returns the optimal solution vector :math:`x`.
-
 .. function:: getconicdual(m::AbstractMathProgModel)
 
     If the solve was successful, returns the optimal dual solution vectors :math:`(y,s)` as a tuple.
