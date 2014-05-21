@@ -4,10 +4,6 @@ module MathProgBase
     using MathProgSolverInterface
 
     include("defaultsolvers.jl")
-    setdefaultLPsolver()
-    setdefaultMIPsolver()
-    setdefaultQPsolver()
-    setdefaultSDPsolver()
 
     include("linprog.jl")
     include("mixintprog.jl")
