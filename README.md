@@ -7,4 +7,4 @@ Supported LP solvers are ``Clp``, ``Gurobi``, and ``GLPK``. Supported MIP solver
 
 The interface is fully documented **[here]**.
 
-[here]: http://mathprogbasejl.readthedocs.org/en/latest/mathprogbase.html
+[here]: http://mathprogbasejl.readthedocs.org/en/latest
