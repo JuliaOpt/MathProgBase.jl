@@ -37,7 +37,7 @@ for solvertype in ["LP", "MIP", "QP", "SDP"]
 
     @eval begin function MathProgSolverInterface.model(s::$typename)
         for (pkgname, solvername) in $solvers
-            if Pkg.installed(string(pkgname)) != nothing
+            if isdir(Pkg.dir((string(pkgname))))
                 try
                     eval(Expr(:import,pkgname))
                 catch
