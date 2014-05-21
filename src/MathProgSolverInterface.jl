@@ -48,16 +48,6 @@ abstract AbstractMathProgSolver
 
 model(s::AbstractMathProgSolver) = error("Not implemented")
 
-immutable MissingSolver <: AbstractMathProgSolver
-    solvertype::ASCIIString
-    suggestions::Vector{Symbol}
-end
-
-function model(s::MissingSolver) 
-    pkgnames = join(["\"$(sol)\", " for sol in s.suggestions], ' ')
-    error("No $(s.solvertype) solver detected. Try installing one of the following packages: $pkgnames and restarting Julia")
-end
-
 loadproblem!(m::AbstractMathProgModel, filename::String) = error("Not Implemented")
 loadproblem!(m::AbstractMathProgModel, A, collb, colub, obj, rowlb, rowub, sense) = error("Not Implemented")
 
