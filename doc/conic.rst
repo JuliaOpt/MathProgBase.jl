@@ -31,7 +31,7 @@ The recognized cones are:
 - ``:Zero``, all components must be zero
 - ``:NonNeg``, the nonnegative orthant :math:`\{ x \in \mathbb{R}^n : x_i \geq 0, i = 1,\ldots,n \}`
 - ``:NonPos``, the nonpositive orthant :math:`\{ x \in \mathbb{R}^n : x_i \leq 0, i = 1,\ldots,n \}` 
-- ``:SOC``, the second-order (Lorenz) cone :math:`\{(p,x) \in \mathbb{R} \times \mathbb{R}^{n-1} : ||x||_2^2 \leq p^2, p \geq 0\}`
+- ``:SOC``, the second-order (Lorentz) cone :math:`\{(p,x) \in \mathbb{R} \times \mathbb{R}^{n-1} : ||x||_2^2 \leq p^2, p \geq 0\}`
 - ``:SOCRotated``, the rotated second-order cone :math:`\{(p,q,x) \in \mathbb{R} \times \mathbb{R} \times \mathbb{R}^{n-2} : ||x||_2^2 \leq 2pq, p \geq 0, q \geq 0\}` 
 - ``:SDP``, the cone of symmetric positive semidefinite matrices :math:`\{ X \in \mathbb{R}^{n\times n} : X \succeq 0\}`
 - ``:ExpPrimal``, the exponential cone :math:`\{ (x,y,z) \in \mathbb{R}^3 : y > 0, y e^{x/z} \leq z \}`
