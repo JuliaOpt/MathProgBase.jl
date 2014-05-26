@@ -62,7 +62,7 @@ The abstract type ``AbstractNLPEvaluator`` is used by solvers for accessing the 
     lists features requested by the solver. These may include ``:Grad`` for gradients
     of :math:`f`, ``:Jac`` for explicit Jacobians of :math:`g`, ``:JacVec`` for
     Jacobian-vector products, ``:HessVec`` for Hessian-vector
-    and Hessian-of-Lagrangian-vector products, ``:Hess`` for full Hessians and
+    and Hessian-of-Lagrangian-vector products, ``:Hess`` for explicit Hessians and
     Hessian-of-Lagrangians, and ``:ExprGraph`` for expression graphs.
 
 .. function:: features_available(d::AbstractNLPEvaluator)
@@ -89,7 +89,7 @@ The abstract type ``AbstractNLPEvaluator`` is used by solvers for accessing the 
     Returns the sparsity structure of the Jacobian matrix :math:`J_g(x) = \left[ \begin{array}{c} \nabla g_1(x) \\ \nabla g_2(x) \\ \vdots \\ \nabla g_m(x) \end{array}\right]` where :math:`g_i` is the :math:`i\text{th}` component of :math:`g`. The sparsity structure
     is assumed to be independent of the point :math:`x`. Returns a tuple ``(I,J)``
     where ``I`` contains the row indices and ``J`` contains the column indices of each
-    structurally nonzero element. These indices may not be sorted and can contain
+    structurally nonzero element. These indices are not required to be sorted and can contain
     duplicates, in which case the solver should combine the corresponding elements by
     adding them together.
 
@@ -98,7 +98,7 @@ The abstract type ``AbstractNLPEvaluator`` is used by solvers for accessing the 
     Returns the sparsity structure of the Hessian-of-the-Lagrangian matrix 
     :math:`\nabla^2 f + \sum_{i=1}^m \nabla^2 g_i` as a tuple ``(I,J)``
     where ``I`` contains the row indices and ``J`` contains the column indices of each
-    structurally nonzero element. These indices may not be sorted and can contain
+    structurally nonzero element. These indices are not required to be sorted and can contain
     duplicates, in which case the solver should combine the corresponding elements by
     adding them together. Any mix of lower and upper-triangular indices is valid.
     Elements ``(i,j)`` and ``(j,i)``, if both present, should be treated as duplicates.
