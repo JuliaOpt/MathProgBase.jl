@@ -60,7 +60,8 @@ The abstract type ``AbstractNLPEvaluator`` is used by solvers for accessing the 
 
     Must be called before any other methods. The vector ``requested_features``
     lists features requested by the solver. These may include ``:Grad`` for gradients
-    of :math:`f` and Jacobians of :math:`g`, ``:HessVec`` for Hessian-vector
+    of :math:`f`, ``:Jac`` for explicit Jacobians of :math:`g`, ``:JacVec`` for
+    Jacobian-vector products, ``:HessVec`` for Hessian-vector
     and Hessian-of-Lagrangian-vector products, ``:Hess`` for full Hessians and
     Hessian-of-Lagrangians, and ``:ExprGraph`` for expression graphs.
 
@@ -108,6 +109,16 @@ The abstract type ``AbstractNLPEvaluator`` is used by solvers for accessing the 
     The result is stored in the vector ``J`` in the same order as the indices returned
     by ``jac_structure``.
 
+.. function:: eval_jac_prod(d::AbstractNLPEvaluator, y, x, w)
+
+    Computes the Jacobian-vector product :math:`J_g(x)w`,
+    storing the result in the vector ``y``.
+
+.. function:: eval_jac_prod_t(d::AbstractNLPEvaluator, y, x, w)
+
+    Computes the Jacobian-transpose-vector product :math:`J_g(x)^Tw`,
+    storing the result in the vector ``y``.
+
 .. function:: eval_hesslag_prod(d::AbstractNLPEvaluator, h, x, v, σ, μ)
 
     Given scalar weight ``σ`` and vector of constraint weights ``μ``, 
@@ -122,6 +133,21 @@ The abstract type ``AbstractNLPEvaluator`` is used by solvers for accessing the 
     :math:`\sigma\nabla^2 f(x) + \sum_{i=1}^m \mu_i \nabla^2 g_i(x)`, 
     storing the result in the vector ``H`` in the same order as the indices
     returned by ``hesslag_structure``.
+
+.. function:: isobjlinear(d::AbstractNLPEvaluator)
+
+    ``true`` if the objective function is known to be linear,
+    ``false`` otherwise.
+
+.. function:: isobjquadratic(d::AbstractNLPEvaluator)
+
+    ``true`` if the objective function is known to be quadratic (convex or nonconvex),
+    ``false`` otherwise.
+
+.. function:: isconstrlinear(d::AbstractNLPEvaluator, i)
+
+    ``true`` if the :math:`i\text{th}` constraint is known to be linear,
+    ``false`` otherwise.
 
 .. function:: obj_expr(d::AbstractNLPEvaluator)
 
