@@ -45,16 +45,19 @@ Not all solvers are expected to support all types of cones. However, when a simp
     Load the conic problem in primal form into the model. The parameter ``c``
     is the objective vector, the parameter ``A``
     is the constraint matrix (typically sparse), the parameter ``b``
-    is the vector of right-hand side values, and ``cones`` is an ordered
-    list of ``(Symbol,dimension)`` tuples, where ``Symbol`` is one of the above
-    recognized cones and ``dimension`` is the number of variables in the cone.
-    The order of the list must correspond to the order of the variables
+    is the vector of right-hand side values, and ``cones`` is a
+    list of ``(Symbol,vars)`` tuples, where ``Symbol`` is one of the above
+    recognized cones and ``vars`` is a list of indices of variables
+    which belong to this cone (may be given as a ``Range``). All variables
+    must be listed in exactly one cone,
+    and the indices given must correspond to the order of the columns in
     in the constraint matrix ``A``.
-    For the semidefinite cone, the ``dimension`` should be specified as a
-    tuple ``(n,n)`` which corresponds to :math:`\frac{n(n+1)}{2}` variables
-    in the model, the entries of the symmetric :math:`n \times n` matrix
-    in column-major form (lower triangle) or equivalently row-major form
-    (upper triangle).
+    Cones may be listed in any order, and cones of the same class may appear
+    multiple times.
+    For the semidefinite cone, the number of variables present must be a square
+    integer :math:`n` corresponding to a :math:`\sqrt{n}\times \sqrt{n}`
+    matrix; variables should be listed in column-major, or by symmetry,
+    row-major order.
 
 .. function:: getconicdual(m::AbstractMathProgModel)
 
