@@ -46,6 +46,8 @@ abstract AbstractMathProgModel
 # immutable type which we dispatch solvers on 
 abstract AbstractMathProgSolver
 
+# create dummy method to define function so that we can attach methods in other modules
+
 for func in [:model, :loadproblem!, :writeproblem,
              :getvarLB, :setvarLB!, :getvarUB, :setvarUB!,
              :getconstrLB, :setconstrLB!, :getconstrUB, :setconstrUB!, 
