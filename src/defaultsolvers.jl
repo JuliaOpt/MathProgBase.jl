@@ -2,20 +2,20 @@
 # for each supported problem class.
 
 const LPsolvers = [(:Clp,:ClpSolver),
-               (:GLPKMathProgInterface,:GLPKSolverLP),
-               (:Gurobi,:GurobiSolver),
-               (:CPLEX,:CplexSolver),
-               (:Mosek,:MosekSolver)]
+                   (:GLPKMathProgInterface,:GLPKSolverLP),
+                   (:Gurobi,:GurobiSolver),
+                   (:CPLEX,:CplexSolver),
+                   (:Mosek,:MosekSolver)]
 
 const MIPsolvers = [(:Cbc,:CbcSolver),
-               (:GLPKMathProgInterface,:GLPKSolverMIP),
-               (:Gurobi,:GurobiSolver),
-               (:CPLEX,:CplexSolver),
-               (:Mosek,:MosekSolver)]
-
+                    (:GLPKMathProgInterface,:GLPKSolverMIP),
+                    (:Gurobi,:GurobiSolver),
+                    (:CPLEX,:CplexSolver),
+                    (:Mosek,:MosekSolver)]
+     
 const QPsolvers = [(:Gurobi,:GurobiSolver),
-               (:CPLEX,:CplexSolver),
-               (:Mosek,:MosekSolver)]
+                   (:CPLEX,:CplexSolver),
+                   (:Mosek,:MosekSolver)]
 
 const SDPsolvers = [(:Mosek,:MosekSolver)]
 

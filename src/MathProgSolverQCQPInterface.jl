@@ -3,6 +3,10 @@ export setquadobj!,
        setquadobjterms!,
        addquadconstr!
 
+for func in [:setquadobj!, :setquadobjterms!, :addquadconstr!]
+    @eval $(func)() = throw(MethodError($(func),()))
+end
+
 function setquadobjterms!(m::AbstractMathProgModel, rowidx, colidx, quadval)
     (n = length(rowidx)) == length(colidx) == length(quadval) || error("Inconsistent input dimensions")
     nquadval = copy(quadval)
@@ -14,7 +18,6 @@ function setquadobjterms!(m::AbstractMathProgModel, rowidx, colidx, quadval)
     setquadobj!(m, rowidx, colidx, nquadval)
 end
 
-setquadobj!(m::AbstractMathProgModel,rowidx,colidx,quadval) = error("Not implemented")
 setquadobj!(m::AbstractMathProgModel,Q::Matrix) = setquadobj!(m,sparse(float(Q)))
 function setquadobj!(m::AbstractMathProgModel,Q::SparseMatrixCSC{Float64})
   if issym(Q) || istriu(Q)
@@ -43,5 +46,3 @@ function setquadobj!(m::AbstractMathProgModel,Q::SparseMatrixCSC{Float64})
     error("Quadratic cost coefficient matrix Q is not symmetric or upper triangular")
   end
 end
-
-addquadconstr!(m::AbstractMathProgModel, linearidx, linearval, quadrowidx, quadcolidx, quadval, sense, rhs) = error("Not implemented")
