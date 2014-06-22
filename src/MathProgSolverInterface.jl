@@ -69,6 +69,9 @@ for func in [:model, :loadproblem!, :writeproblem,
     @eval $(func)() = throw(MethodError($(func),()))
 end
 
+# default addvar!, not adding to any existing constraints
+addvar!(m::AbstractMathProgModel, collb, colub, objcoef) = addvar!(m, [], [], collb, colub, objcoef)
+
 include("MathProgSolverCallbacksInterface.jl")
 include("MathProgSolverQCQPInterface.jl")
 include("MathProgSolverSDPInterface.jl")
