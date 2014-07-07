@@ -39,7 +39,8 @@ export AbstractMathProgModel,
     getunboundedray,
     setwarmstart!,
     addsos1!,
-    addsos2!
+    addsos2!,
+    getbasis
 
 abstract AbstractMathProgModel
 
@@ -65,7 +66,8 @@ for func in [:model, :loadproblem!, :writeproblem,
              :getvartype, :setvartype!, 
              :getinfeasibilityray, :getunboundedray,
              :setwarmstart!,
-             :addsos1!, :addsos2!]
+             :addsos1!, :addsos2!,
+             :getbasis]
     @eval $(func)() = throw(MethodError($(func),()))
 end
 

@@ -175,6 +175,15 @@ to indicate equality constraints.
     Note that for some solvers, one must specify additional options for this
     ray to be computed.
 
+.. function:: getbasis(m::AbstractMathProgModel)
+
+    Returns the basis set for the optimal solution in the form ``(cbasis,rbasis)``. 
+    The vector ``cbasis`` indexes the columns of the constraint matrix, while 
+    ``rbasis`` indexes the slack variables for the rows. The entries take value 0 if
+    the element is basic, -1 if it is nonbasic at a lower bound, and 1 if it is 
+    nonbasic at upper bound. Note that this function may not work if the optimization 
+    algorithm is not able to provide basis information.
+
 .. function:: getunboundedray(m::AbstractMathProgModel)
 
     Returns an unbounded ray of the problem, i.e., an objective-improving direction 
