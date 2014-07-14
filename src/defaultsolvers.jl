@@ -19,11 +19,13 @@ const QPsolvers = [(:Gurobi,:GurobiSolver),
 
 const SDPsolvers = [(:Mosek,:MosekSolver)]
 
+const NLPsolvers = [(:Ipopt,:IpoptSolver)]
+
 using Base.Meta
 
 # Don't load packages for default solvers until needed.
 # This reduces the startup time for MathProgBase.
-for solvertype in ["LP", "MIP", "QP", "SDP"]
+for solvertype in ["LP", "MIP", "QP", "SDP", "NLP"]
     typename = symbol("Default"*solvertype*"Solver")
     @eval begin
         type $typename <: MathProgSolverInterface.AbstractMathProgSolver

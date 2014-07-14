@@ -77,5 +77,6 @@ addvar!(m::AbstractMathProgModel, collb, colub, objcoef) = addvar!(m, [], [], co
 include("MathProgSolverCallbacksInterface.jl")
 include("MathProgSolverQCQPInterface.jl")
 include("MathProgSolverSDPInterface.jl")
+include("MathProgSolverNonlinearInterface.jl")
 
 end
