@@ -112,3 +112,77 @@ function nlptest(solver=MathProgBase.defaultNLPsolver)
     @test_approx_eq_eps MathProgSolverInterface.getobjval(m) 17.014017145179164 1e-5
 
 end
+
+# a test for convex nonlinear solvers
+
+type QCQP <: MathProgSolverInterface.AbstractNLPEvaluator
+end
+
+# min x - y
+# st  x + x^2 + x*y + y^2 <= 1
+#     -2 <= x, y <= 2
+# solution: x+y = -1/3
+# optimal objective -1-4/sqrt(3)
+
+function MathProgSolverInterface.initialize(d::QCQP, requested_features::Vector{Symbol})
+    for feat in requested_features
+        if !(feat in [:Grad, :Jac, :Hess])
+            error("Unsupported feature $feat")
+            # TODO: implement Jac-vec and Hess-vec products
+            # for solvers that need them
+        end
+    end
+end
+
+MathProgSolverInterface.features_available(d::QCQP) = [:Grad, :Jac, :Hess]
+
+MathProgSolverInterface.eval_f(d::QCQP, x) = x[1]-x[2]
+
+function MathProgSolverInterface.eval_g(d::QCQP, g, x)
+    g[1] = x[1] + x[1]^2 + x[1]*x[2] + x[2]^2
+end
+
+function MathProgSolverInterface.eval_grad_f(d::QCQP, grad_f, x)
+    grad_f[1] = 1
+    grad_f[2] = -1
+end
+
+MathProgSolverInterface.jac_structure(d::QCQP) = [1,1],[1,2]
+# lower triangle only
+MathProgSolverInterface.hesslag_structure(d::QCQP) = [1,2,2],[1,1,2]
+
+
+function MathProgSolverInterface.eval_jac_g(d::QCQP, J, x)
+    J[1] = 1 + 2x[1] + x[2]
+    J[2] = x[1]+2x[2]
+end
+
+function MathProgSolverInterface.eval_hesslag(d::QCQP, H, x, σ, μ)
+    # Again, only lower left triangle
+    # Objective, linear
+
+    # First constraint
+    H[1] = 2μ[1] # d/dx^2
+    H[2] = μ[1]  # d/dxdy
+    H[3] = 2μ[1] # d/dy^2
+
+end
+
+function convexnlptest(solver=MathProgBase.defaultNLPsolver)
+
+    m = MathProgSolverInterface.model(solver)
+    l = [-2,-2]
+    u = [2,2]
+    lb = [-Inf]
+    ub = [1.0]
+    MathProgSolverInterface.loadnonlinearproblem!(m, 2, 1, l, u, lb, ub, :Min, QCQP())
+
+    MathProgSolverInterface.optimize!(m)
+    stat = MathProgSolverInterface.status(m)
+
+    @test stat == :Optimal
+    x = MathProgSolverInterface.getsolution(m)
+    @test_approx_eq_eps (x[1]+x[2]) -1/3 1e-3
+    @test_approx_eq_eps MathProgSolverInterface.getobjval(m) -1-4/sqrt(3) 1e-5
+
+end
