@@ -78,5 +78,6 @@ include("MathProgSolverCallbacksInterface.jl")
 include("MathProgSolverQCQPInterface.jl")
 include("MathProgSolverSDPInterface.jl")
 include("MathProgSolverNonlinearInterface.jl")
+include("MathProgSolverConicInterface.jl")
 
 end
