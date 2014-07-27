@@ -1,10 +1,7 @@
-
-export setquadobj!,
-       setquadobjterms!,
-       addquadconstr!
-
-for func in [:setquadobj!, :setquadobjterms!, :addquadconstr!]
+funcs = [:setquadobj!, :setquadobjterms!, :addquadconstr!]
+for func in funcs
     @eval $(func)() = throw(MethodError($(func),()))
+    eval(Expr(:export, func))
 end
 
 function setquadobjterms!(m::AbstractMathProgModel, rowidx, colidx, quadval)

@@ -1,9 +1,5 @@
-
-
-export AbstractNLPEvaluator
-
-
 abstract AbstractNLPEvaluator
+export AbstractNLPEvaluator
 
 # methods for AbstractNLPEvaluator
 for func in [:initialize,

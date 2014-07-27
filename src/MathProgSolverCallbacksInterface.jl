@@ -1,37 +1,23 @@
-
-export MathProgCallbackData,
-    setlazycallback!,
-    setcutcallback!,
-    setheuristiccallback!,
-    cbgetmipsolution,
-    cbgetlpsolution,
-    cbgetobj,
-    cbgetbestbound,
-    cbgetexplorednodes,
-    cbgetstate,
-    cbaddcut!,
-    cbaddlazy!,
-    cbaddsolution!,
-    cbsetsolutionvalue!
-
-
 abstract MathProgCallbackData
+export MathProgCallbackData
 
 # callback has signature:
 # function callback(d::MathProgCallbackData)
 
-for func in [:setlazycallback!,
-             :setcutcallback!,
-             :setheuristiccallback!,
-             :cbgetmipsolution,
-             :cbgetlpsolution,
-             :cbgetobj,
-             :cbgetbestbound,
-             :cbgetexplorednodes,
-             :cbgetstate,
-             :cbaddcut!,
-             :cbaddlazy!,
-             :cbaddsolution!,
-             :cbsetsolutionvalue!]
+funcs = [:setlazycallback!,
+         :setcutcallback!,
+         :setheuristiccallback!,
+         :cbgetmipsolution,
+         :cbgetlpsolution,
+         :cbgetobj,
+         :cbgetbestbound,
+         :cbgetexplorednodes,
+         :cbgetstate,
+         :cbaddcut!,
+         :cbaddlazy!,
+         :cbaddsolution!,
+         :cbsetsolutionvalue!]
+for func in funcs
     @eval $(func)() = throw(MethodError($(func),()))
+    eval(Expr(:export, func))
 end
