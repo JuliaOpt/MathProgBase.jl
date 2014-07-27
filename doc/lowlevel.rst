@@ -211,7 +211,8 @@ to indicate equality constraints.
 .. function:: setwarmstart!(m::AbstractMathProgModel, v)
 
     Provide an initial solution ``v`` to the MIP solver. To leave values undefined, set them
-    to ``NaN``.
+    to ``NaN``. Solvers should ignore provided solutions that are infeasible or
+    cannot be completed to a feasible solution.
 
 .. function:: addsos1!(m::AbstractMathProgModel, idx, weight)
     
