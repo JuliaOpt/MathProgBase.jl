@@ -186,3 +186,71 @@ function convexnlptest(solver=MathProgBase.defaultNLPsolver)
     @test_approx_eq_eps MathProgSolverInterface.getobjval(m) -1-4/sqrt(3) 1e-5
 
 end
+
+
+# a test for unconstrained nonlinear solvers
+
+type Rosenbrock <: MathProgSolverInterface.AbstractNLPEvaluator
+end
+
+# min (1-x)^2 + 100*(y-x^2)^2
+# solution: (x,y) = (1,1)
+# optimal objective 0
+
+function MathProgSolverInterface.initialize(d::Rosenbrock, requested_features::Vector{Symbol})
+    for feat in requested_features
+        if !(feat in [:Grad, :Jac, :Hess])
+            error("Unsupported feature $feat")
+            # TODO: implement Jac-vec and Hess-vec products
+            # for solvers that need them
+        end
+    end
+end
+
+MathProgSolverInterface.features_available(d::Rosenbrock) = [:Grad, :Jac, :Hess]
+
+MathProgSolverInterface.eval_f(d::Rosenbrock, x) = (1-x[1])^2 + 100*(x[2]-x[1]^2)^2
+
+MathProgSolverInterface.eval_g(d::Rosenbrock, g, x) = nothing
+
+function MathProgSolverInterface.eval_grad_f(d::Rosenbrock, grad_f, x)
+    grad_f[1] = -2*(1-x[1]) - 400*x[1]*(x[2]-x[1]^2)
+    grad_f[2] = 200*(x[2]-x[1]^2)
+end
+
+MathProgSolverInterface.jac_structure(d::Rosenbrock) = [],[]
+MathProgSolverInterface.hesslag_structure(d::Rosenbrock) = [1,2,2],[1,1,2]
+
+
+MathProgSolverInterface.eval_jac_g(d::Rosenbrock, J, x) = nothing
+
+
+function MathProgSolverInterface.eval_hesslag(d::Rosenbrock, H, x, σ, μ)
+    # Again, only lower left triangle
+    
+    H[1] = σ*(2+100*(8x[1]^2-4*(x[2]-x[1]^2))) # d/dx^2
+    H[2] = -σ*400*x[1]  # d/dxdy
+    H[3] = σ*200 # d/dy^2
+
+end
+
+function rosenbrocktest(solver=MathProgBase.defaultNLPsolver)
+
+    m = MathProgSolverInterface.model(solver)
+    l = [-Inf,-Inf]
+    u = [Inf,Inf]
+    lb = Float64[]
+    ub = Float64[]
+    MathProgSolverInterface.loadnonlinearproblem!(m, 2, 0, l, u, lb, ub, :Min, Rosenbrock())
+
+    MathProgSolverInterface.setwarmstart!(m,[10.0,10.0])
+    MathProgSolverInterface.optimize!(m)
+    stat = MathProgSolverInterface.status(m)
+
+    @test stat == :Optimal
+    x = MathProgSolverInterface.getsolution(m)
+    @test_approx_eq_eps x[1] 1.0 1e-5
+    @test_approx_eq_eps x[2] 1.0 1e-5
+    @test_approx_eq_eps MathProgSolverInterface.getobjval(m) 0.0 1e-5
+
+end
