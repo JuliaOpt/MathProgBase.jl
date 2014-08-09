@@ -21,6 +21,8 @@ const SDPsolvers = [(:Mosek,:MosekSolver)]
 
 const NLPsolvers = [(:Ipopt,:IpoptSolver)]
 
+const conicsolvers = [(:ECOS,:ECOSSolver)]
+
 using Base.Meta
 
 # Don't load packages for default solvers until needed.
