@@ -43,7 +43,7 @@ function loadineqconicproblem!(m::AbstractMathProgModel, c, A, b, G, h, cones)
     end
     num_ineq_constraints = length(nonneg_indices)
     lp_A = vcat(A, G[nonneg_indices,:])
-    rowlb = vcat(b, zeros(num_ineq_constraints,1))
+    rowlb = vcat(b, fill(-Inf, (num_ineq_constraints, 1)))
     rowub = vcat(b, h[nonneg_indices])
     obj = c
     collb = fill(-Inf, num_vars)
