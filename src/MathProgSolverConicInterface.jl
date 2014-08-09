@@ -7,12 +7,12 @@ end
 
 function loadconicproblem!(m::AbstractMathProgModel, c, A, b, cones)
     num_vars = length(c)
-    nonneg_indices = Range[]
+    nonneg_indices = Int[]
     for (cone,idx) in cones
         if cone == :free
             continue
         elseif cone == :NonNeg
-            push!(nonneg_indices, idx)
+            append!(nonneg_indices, idx)
         else
             error("Solver $m does not support cone $cone")
             # TODO: allow :Zero cone
@@ -20,7 +20,7 @@ function loadconicproblem!(m::AbstractMathProgModel, c, A, b, cones)
     end
     num_ineq_constraints = length(nonneg_indices)
     rowlb = b
-    collb = b
+    rowub = b
     obj = c
     collb = fill(-Inf, num_vars)
     collb[nonneg_indices] = 0
@@ -30,12 +30,12 @@ end
 
 function loadineqconicproblem!(m::AbstractMathProgModel, c, A, b, G, h, cones)
     num_vars = length(c)
-    nonneg_indices = Range[]
+    nonneg_indices = Int[]
     for (cone,idx) in cones
         if cone == :free
             continue
         elseif cone == :NonNeg
-            push!(nonneg_indices, idx)
+            append!(nonneg_indices, idx)
         else
             error("Solver $m does not support cone $cone")
             # TODO: allow :Zero cone
@@ -44,7 +44,7 @@ function loadineqconicproblem!(m::AbstractMathProgModel, c, A, b, G, h, cones)
     num_ineq_constraints = length(nonneg_indices)
     lp_A = vcat(A, G[nonneg_indices,:])
     rowlb = vcat(b, zeros(num_ineq_constraints,1))
-    collb = vcat(b, h[nonneg_indices])
+    rowub = vcat(b, h[nonneg_indices])
     obj = c
     collb = fill(-Inf, num_vars)
     colub = fill(Inf, num_vars)
