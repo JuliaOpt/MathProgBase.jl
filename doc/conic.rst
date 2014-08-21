@@ -64,7 +64,7 @@ Not all solvers are expected to support all types of cones. However, when a simp
 
 .. function:: getconicdual(m::AbstractMathProgModel)
 
-    If the solve was successful, returns the optimal dual solution vector :math:`y` as a tuple.
+    If the solve was successful, returns the optimal dual solution vector :math:`y`.
 
 The solution vector, optimal objective value, termination status, etc. should be accessible from the standard methods, e.g., ``getsolution``, ``getobjval``, ``status``, respectively.
     
