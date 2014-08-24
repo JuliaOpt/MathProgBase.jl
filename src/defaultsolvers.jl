@@ -28,7 +28,7 @@ using Base.Meta
 for solvertype in ["LP", "MIP", "QP", "SDP", "NLP"]
     typename = symbol("Default"*solvertype*"Solver")
     @eval begin
-        type $typename <: MathProgSolverInterface.AbstractMathProgSolver
+        type $typename <: SolverInterface.AbstractMathProgSolver
         end
     end
     defaultname = symbol("default"*solvertype*"solver")
@@ -37,7 +37,7 @@ for solvertype in ["LP", "MIP", "QP", "SDP", "NLP"]
     solvers = symbol(solvertype*"solvers")
 
 
-    @eval begin function MathProgSolverInterface.model(s::$typename)
+    @eval begin function SolverInterface.model(s::$typename)
         for (pkgname, solvername) in $solvers
             if isdir(Pkg.dir((string(pkgname))))
                 try

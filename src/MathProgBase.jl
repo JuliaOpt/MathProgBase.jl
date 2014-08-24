@@ -1,11 +1,15 @@
 module MathProgBase
 
-    require(joinpath(Pkg.dir("MathProgBase"),"src","MathProgSolverInterface.jl"))
-    using MathProgSolverInterface
+require(joinpath(Pkg.dir("MathProgBase"),"src","SolverInterface","SolverInterface.jl"))
+using SolverInterface
 
-    include("defaultsolvers.jl")
+# deprecated name
+const MathProgSolverInterface = SolverInterface
 
-    include("linprog.jl")
-    include("mixintprog.jl")
-    include("quadprog.jl")
+include("defaultsolvers.jl")
+
+require(joinpath(Pkg.dir("MathProgBase"),"src","HighLevelInterface","HighLevelInterface.jl"))
+using HighLevelInterface
+export linprog, mixintprog, quadprog
+
 end

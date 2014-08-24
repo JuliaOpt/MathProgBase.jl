@@ -142,7 +142,8 @@ to indicate equality constraints.
 
 .. function:: getobjval(m::AbstractMathProgModel)
 
-    Returns the objective value of the solution found by the solver.
+    Returns the objective value of the solution found by the solver. For MIPs, this may be the
+    objective value for the best feasible solution if optimality is not proven.
 
 .. function:: getobjbound(m::AbstractMathProgModel)
 
@@ -193,6 +194,28 @@ to indicate equality constraints.
     in which one may travel an infinite distance without violating any constraints.
     Note that for some solvers, one must specify additional options for this
     ray to be computed.
+
+.. function:: getsolvetime(m::AbstractMathProgModel)
+
+    Returns the total elapsed solver time during the optimization process.
+
+.. function:: getsimplexiter(m::AbstractMathProgModel)
+
+    Returns the cumulative number of simplex iterations during the optimization process.
+    In particular, for a MIP it returns the total simplex iterations for all nodes.
+
+.. function:: getbarrieriter(m::AbstractMathProgModel)
+
+    Returns the cumulative number of barrier iterations during the optimization process.
+
+.. function:: getnodecount(m::AbstractMathProgModel)
+
+    Returns the total number of nodes explored during the MIP optimization process.
+
+.. function:: getmipgap(m::AbstractMathProgModel)
+
+    Returns the final MIP gap as optimization terminated. That is, it returns the
+    difference between the best integer objective and the best bound.
 
 .. function:: getrawsolver(m::AbstractMathProgModel)
 
