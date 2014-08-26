@@ -197,7 +197,7 @@ to indicate equality constraints.
 
 .. function:: getsolvetime(m::AbstractMathProgModel)
 
-    Returns the total elapsed solver time during the optimization process.
+    Returns the total elapsed solution time as reported by the solver.
 
 .. function:: getsimplexiter(m::AbstractMathProgModel)
 
@@ -210,12 +210,13 @@ to indicate equality constraints.
 
 .. function:: getnodecount(m::AbstractMathProgModel)
 
-    Returns the total number of nodes explored during the MIP optimization process.
+    Returns the total number of branch-and-bound nodes explored during the MIP optimization process.
 
-.. function:: getmipgap(m::AbstractMathProgModel)
+.. function:: getobjgap(m::AbstractMathProgModel)
 
-    Returns the final MIP gap as optimization terminated. That is, it returns the
-    difference between the best integer objective and the best bound.
+    Returns the final relative optimality gap as optimization terminated. That is, it returns 
+    :math:`\frac{b-f}{|f|}`, where :math:`b` is the best bound and :math:`f` is the best 
+    feasible objective value.
 
 .. function:: getrawsolver(m::AbstractMathProgModel)
 
