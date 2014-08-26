@@ -215,7 +215,7 @@ to indicate equality constraints.
 .. function:: getobjgap(m::AbstractMathProgModel)
 
     Returns the final relative optimality gap as optimization terminated. That is, it returns 
-    :math:`\frac{b-f}{|f|}`, where :math:`b` is the best bound and :math:`f` is the best 
+    :math:`\frac{|b-f|}{|f|}`, where :math:`b` is the best bound and :math:`f` is the best 
     feasible objective value.
 
 .. function:: getrawsolver(m::AbstractMathProgModel)
