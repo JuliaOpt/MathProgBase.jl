@@ -142,8 +142,8 @@ to indicate equality constraints.
 
 .. function:: getobjval(m::AbstractMathProgModel)
 
-    Returns the objective value of the solution found by the solver. For MIPs, this may be the
-    objective value for the best feasible solution if optimality is not proven.
+    Returns the objective value of the solution found by the solver. In particular, this may be 
+    the objective value for the best feasible solution if optimality is not attained or proven.
 
 .. function:: getobjbound(m::AbstractMathProgModel)
 
