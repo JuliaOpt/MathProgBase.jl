@@ -198,11 +198,11 @@ to indicate equality constraints.
 
     Returns an object that may be used to access a solver-specific API for this model.
 
-.. function:: setvartype!(m::AbstractMathProgModel, v::Vector{Char})
+.. function:: setvartype!(m::AbstractMathProgModel, v::Vector{Symbol})
 
     Sets the types of the variables to those indicated by the vector ``v``. Valid 
     types are ``:Int`` for integer, ``:Cont`` for continuous, ``:Bin`` for binary, 
-    ``:SemiCont`` for semi-continuous, and ``:SemiInt`` for semi-integer.
+    ``:SemiCont`` for `semicontinuous <http://orinanobworld.blogspot.com/2011/03/semicontinuous-variables.html>`_, and ``:SemiInt`` for `semi-integer <http://www.gams.com/mccarl/mccarlhtml/semi-integer_variables.htm>`_.
 
 .. function:: getvartype(m::AbstractMathProgModel)
 

@@ -36,6 +36,15 @@ end
 # default addvar!, not adding to any existing constraints
 addvar!(m::AbstractMathProgModel, collb, colub, objcoef) = addvar!(m, [], [], collb, colub, objcoef)
 
+const depr_varmap = [
+   'C' => :Cont,
+   'I' => :Int
+]
+function setvartype!(m::AbstractMathProgModel, v)
+   warn("setvartype!(::AbstractMathProgModel, ::Vector{Char}) is deprecated; use setvartype(::AbstractMathProgModel, ::Vector{Symbol}) instead")
+   setvartype!(m, map(x->depr_varmap[x], v))
+end
+
 include("MathProgSolverCallbacksInterface.jl")
 include("MathProgSolverQCQPInterface.jl")
 include("MathProgSolverSDPInterface.jl")
