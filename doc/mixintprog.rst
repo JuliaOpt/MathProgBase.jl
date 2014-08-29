@@ -7,7 +7,8 @@ Mixed-integer Programming
 Solves the same optimization problem as ``linprog`` above, except variables
 are additionally constrained to take only integer values if the corresponding
 entry in the ``varypes`` vector is the symbol ``:Int``. Continuous
-variables are indicated by the value ``:Cont``, and binary variables should be specified by ``:Bin``.
+variables are indicated by the value ``:Cont``, binary variables should be specified by ``:Bin``, 
+semicontinuous by ``:SemiCont``, and semi-integer by ``:SemiInt``.
 
 A scalar is accepted for the ``sense``, ``b``, ``vartypes``, ``lb``, and ``ub`` arguments, in which case its value is replicated. The values ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound. 
 

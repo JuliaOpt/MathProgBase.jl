@@ -6,9 +6,9 @@ type MixintprogSolution
     attrs
 end
 
-typealias CharInputVector Union(Vector{Char},Real)
+typealias SymbolInputVector Union(Vector{Symbol},Symbol)
 
-function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::CharInputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = defaultMIPsolver)
+function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::SymbolInputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = defaultMIPsolver)
     m = model(solver)
     nrow,ncol = size(A)
 
