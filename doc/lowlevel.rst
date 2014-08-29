@@ -200,9 +200,9 @@ to indicate equality constraints.
 
 .. function:: setvartype!(m::AbstractMathProgModel, v::Vector{Char})
 
-    Sets the types of the variables to those indicated by the vector ``v``. Valid
-    types are ``'I'`` for integer and ``'C'`` for continuous. Binary variables
-    should be indicated by ``'I'`` with lower bound 0 and upper bound 1.
+    Sets the types of the variables to those indicated by the vector ``v``. Valid 
+    types are ``:Int`` for integer, ``:Cont`` for continuous, ``:Bin`` for binary, 
+    ``:SemiCont`` for semi-continuous, and ``:SemiInt`` for semi-integer.
 
 .. function:: getvartype(m::AbstractMathProgModel)
 
