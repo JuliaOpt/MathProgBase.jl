@@ -1,45 +1,84 @@
+warn("The MathProgSolverInterface.jl file is DEPRECATED in favor of the SolverInterface/ directory. Do not point your packages directly to this file.")
+
 module MathProgSolverInterface
-
-abstract AbstractMathProgModel
-export AbstractMathProgModel
-
-# immutable type which we dispatch solvers on 
-abstract AbstractMathProgSolver
-export AbstractMathProgSolver
-
-# create dummy method to define function so that we can attach methods in other modules
-
-funcs = [:model, :loadproblem!, :writeproblem,
-         :getvarLB, :setvarLB!, :getvarUB, :setvarUB!,
-         :getconstrLB, :setconstrLB!, :getconstrUB, :setconstrUB!, 
-         :getobj, :setobj!, 
-         :getconstrmatrix,
-         :addvar!, :addconstr!,
-         :updatemodel!, 
-         :setsense!, :getsense,
-         :numvar, :numconstr,
-         :optimize!, :status,
-         :getobjval, :getobjbound, 
-         :getsolution, :getconstrsolution, 
-         :getreducedcosts, :getconstrduals,
-         :getrawsolver,
-         :getvartype, :setvartype!, 
-         :getinfeasibilityray, :getunboundedray,
-         :setwarmstart!,
-         :addsos1!, :addsos2!,
-         :getbasis]
-for func in funcs
-    @eval $(func)() = throw(MethodError($(func),()))
-    eval(Expr(:export, func))
-end
-
-# default addvar!, not adding to any existing constraints
-addvar!(m::AbstractMathProgModel, collb, colub, objcoef) = addvar!(m, [], [], collb, colub, objcoef)
-
-include("MathProgSolverCallbacksInterface.jl")
-include("MathProgSolverQCQPInterface.jl")
-include("MathProgSolverSDPInterface.jl")
-include("MathProgSolverNonlinearInterface.jl")
-include("MathProgSolverConicInterface.jl")
-
+   require(joinpath(Pkg.dir("MathProgBase"),"src","SolverInterface","SolverInterface.jl"))
+   importall SolverInterface
+   export AbstractMathProgModel,
+          AbstractMathProgSolver,
+          MathProgCallbackData,
+          setlazycallback!,
+          setcutcallback!,
+          setheuristiccallback!,
+          cbgetmipsolution,
+          cbgetlpsolution,
+          cbgetobj,
+          cbgetbestbound,
+          cbgetexplorednodes,
+          cbgetstate,
+          cbaddcut!,
+          cbaddlazy!,
+          cbaddsolution!,
+          cbsetsolutionvalue!,
+          loadconicproblem,
+          getconicdual,
+          getvarLB,
+          getvarUB,
+          getconstrLB,
+          getconstrUB,
+          getobj,
+          getconstrmatrix,
+          getsense,
+          numvar,
+          numconstr,
+          status,
+          getobjval,
+          getsolution,
+          getconstrsolution,
+          getreducedcosts,
+          getconstrduals,
+          getrawsolver,
+          getvartype,
+          getinfeasibilityray,
+          getunboundedray,
+          getsolvetime,
+          getsimplexiter,
+          getbarrieriter,
+          getnodecount,
+          getmipgap,
+          getobjbound,
+          initialize,
+          features_available,
+          eval_f,
+          eval_g,
+          eval_grad_f,
+          jac_structure,
+          hesslag_structure,
+          eval_jac_g,
+          eval_jac_prod,
+          eval_jac_prod_t,
+          eval_hesslag_prod,
+          eval_hesslag,
+          isobjlinear,
+          isobjquadratic,
+          isconstrlinear,
+          setquadobj!,
+          setquadobjterms!,
+          addquadconstr! ,
+          addsdpvar!,
+          addsdpmatrix!,
+          addsdpconstr!,
+          setsdpobj!,
+          getsdpsolution,
+          setvarLB!,
+          setvarUB!,
+          setconstrLB!,
+          setconstrUB!,
+          setobj!,
+          addvar!,
+          addconstr!,
+          setsense!,
+          setvartype!,
+          setwarmstart!,
+          addsos1!,
+          addsos2!
 end

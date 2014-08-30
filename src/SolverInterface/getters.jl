@@ -1,0 +1,27 @@
+@define_interface begin
+    getvarLB
+    getvarUB
+    getconstrLB
+    getconstrUB
+    getobj
+    getconstrmatrix
+    getsense
+    numvar
+    numconstr
+    status
+    getobjval
+    getsolution
+    getconstrsolution
+    getreducedcosts
+    getconstrduals
+    getrawsolver
+    getvartype
+    getinfeasibilityray
+    getunboundedray
+    getsolvetime
+    getsimplexiter
+    getbarrieriter
+    getnodecount
+    getmipgap
+    getobjbound
+end

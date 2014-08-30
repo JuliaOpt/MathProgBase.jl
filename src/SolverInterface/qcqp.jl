@@ -1,7 +1,7 @@
-funcs = [:setquadobj!, :setquadobjterms!, :addquadconstr!]
-for func in funcs
-    @eval $(func)() = throw(MethodError($(func),()))
-    eval(Expr(:export, func))
+@define_interface begin
+    setquadobj!
+    setquadobjterms!
+    addquadconstr!
 end
 
 function setquadobjterms!(m::AbstractMathProgModel, rowidx, colidx, quadval)
