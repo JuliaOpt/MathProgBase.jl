@@ -178,7 +178,7 @@ setvartype(m,v)
 getvartype(m)
 ```
 
-Get/set vector of variable types. ``v`` should be a ``Char`` vector where `'C'` indicates continuous and `'I'` indicates integer. (Binaries should be specified as `'I'` with lower bound 0 and upper bound 1). 
+Get/set vector of variable types. ``v`` should be a ``Symbol`` vector where ``:Cont`` indicates continuous, ``:Bin`` indicates binary, ``:Int`` indicates general integer, ``:SemiCont`` indicates semi-continuous, and ``:SemiInt`` indicates semi-integer.
 
 ---
 
