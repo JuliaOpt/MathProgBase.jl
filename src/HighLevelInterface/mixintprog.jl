@@ -59,7 +59,7 @@ function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub
     end
 end
 
-mixintprog(c,A,rowlb,rowub,varypes,solver::AbstractMathProgSolver=defaultMIPsolver) = mixintprog(c,A,rowlb,rowub,vartypes,0,Inf,solver)
+mixintprog(c,A,rowlb,rowub,vartypes,solver::AbstractMathProgSolver=defaultMIPsolver) = mixintprog(c,A,rowlb,rowub,vartypes,0,Inf,solver)
 
 export mixintprog
 
