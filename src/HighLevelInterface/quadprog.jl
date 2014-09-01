@@ -6,7 +6,7 @@ type QuadprogSolution
     attrs
 end
 
-function quadprog(c::InputVector, Q::AbstractMatrix, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = defaultQPsolver)
+function quadprog(c::InputVector, Q::AbstractMatrix, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultQPsolver)
     m = model(solver)
     nrow,ncol = size(A)
 

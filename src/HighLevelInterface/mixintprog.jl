@@ -8,7 +8,7 @@ end
 
 typealias SymbolInputVector Union(Vector{Symbol},Symbol)
 
-function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::SymbolInputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = defaultMIPsolver)
+function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::SymbolInputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultMIPsolver)
     m = model(solver)
     nrow,ncol = size(A)
 
