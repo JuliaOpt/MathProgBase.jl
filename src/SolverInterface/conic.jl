@@ -1,5 +1,5 @@
 @define_interface begin
-    loadconicproblem
+    loadconicproblem!
     getconicdual
 end
 
