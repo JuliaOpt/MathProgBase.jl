@@ -44,7 +44,7 @@ end
 
 MathProgSolverInterface.jac_structure(d::HS071) = [1,1,1,1,2,2,2,2],[1,2,3,4,1,2,3,4]
 # lower triangle only
-MathProgSolverInterface.hesslag_structure(d::HS071) = findn(sparse(tril(ones(4,4))))
+MathProgSolverInterface.hesslag_structure(d::HS071) = [1,2,2,3,3,3,4,4,4,4],[1,1,2,1,2,3,1,2,3,4]
 
 
 function MathProgSolverInterface.eval_jac_g(d::HS071, J, x)
