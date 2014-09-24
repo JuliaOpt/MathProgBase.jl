@@ -12,15 +12,15 @@ We consider the following primal problem to be in canonical conic form:
 
 .. math::
     \min_{x}\, &c^Tx\\
-    s.t.\,   &Ax - b \in K_1\\
+    s.t.\,   &b - Ax \in K_1\\
              &x \in K_2\\
 
 where :math:`K_1` and :math:`K_2` are cones (likely a product of a number of cones),
 with corresponding dual
 
 .. math::
-    \max_y\, &b^Ty\\
-    s.t.\,   &c - A^Ty \in K_2^*\\
+    \max_y\, &-b^Ty\\
+    s.t.\,   &c + A^Ty \in K_2^*\\
              &y \in K_1^*
 
 where :math:`K_1^*` and :math:`K_2^*` are the dual cones of :math:`K_1` and :math:`K_2`, respectively.
