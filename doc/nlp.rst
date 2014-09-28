@@ -151,11 +151,26 @@ The abstract type ``AbstractNLPEvaluator`` is used by solvers for accessing the 
 
 .. function:: obj_expr(d::AbstractNLPEvaluator)
 
-    Returns an expression graph for the objective function. *FORMAT TO BE DETERMINED*
+    Returns an expression graph for the objective function as a standard Julia ``Expr``
+    object. All sums and products are flattened out as simple ``Expr(:+,...)`` and
+    ``Expr(:*,...)`` objects. The symbol ``x`` is used as a placeholder for the
+    vector of decision variables. No other undefined symbols are permitted;
+    coefficients are embedded as explicit values.
+    For example, the expression
+    :math:`x_1+\sin(x_2/\exp(x_3))` would be represented as the Julia object
+    ``:(x[1] + sin(x[2]/exp(x[3])))``. See the `Julia manual <http://docs.julialang.org/en/release-0.3/manual/metaprogramming/#expressions-and-eval>`_ for more information
+    on the structure of ``Expr`` objects. There are currently no restrictions on
+    recognized functions; typically these will be built-in Julia functions like
+    ``^``, ``exp``, ``log``, ``cos``, ``tan``, ``sqrt``, etc., but modeling
+    interfaces may choose to extend these basic functions.
 
 .. function:: constr_expr(d::AbstractNLPEvaluator, i)
 
-    Returns an expression graph for the :math:`i\text{th}` constraint. *FORMAT TO BE DETERMINED*
+    Returns an expression graph for the :math:`i\text{th}` constraint in the same format as described above. The head of the expression is ``:comparison``, indicating the sense
+    of the constraint. The right-hand side of the comparison must be a constant; that is,
+    ``:(x[1]^3 <= 1)`` is allowed, while ``:(1 <= x[1]^3)`` is not valid.
+    Double-sided constraints are allowed, in which case both the lower bound and
+    upper bounds should be constants; for example, ``:(-1 <= cos(x[1]) + sin(x[2]) <= 1)`` is valid.
 
 
 The solution vector, optimal objective value, termination status, etc. should be accessible from the standard methods, e.g., ``getsolution``, ``getobjval``, ``status``, respectively.
