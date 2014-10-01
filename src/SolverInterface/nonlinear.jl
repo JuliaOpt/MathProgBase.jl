@@ -18,6 +18,8 @@ export AbstractNLPEvaluator
     isobjlinear
     isobjquadratic
     isconstrlinear
+    obj_expr
+    constr_expr
 end
 
 # additional methods for AbstractMathProgModel
