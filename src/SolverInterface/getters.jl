@@ -24,4 +24,5 @@
     getnodecount
     getmipgap
     getobjbound
+    getbasis
 end
