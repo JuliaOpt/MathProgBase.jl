@@ -9,7 +9,7 @@ using Base.Test
 using MathProgBase
 using MathProgBase.MathProgSolverInterface
 
-function conicinterfacetest(s::MathProgBase.AbstractMathProgSolver)
+function coniclineartest(s::MathProgBase.AbstractMathProgSolver)
 
 # Problem 1 - all vars in nonneg cone
 # min -3x - 2y - 4z
@@ -123,7 +123,9 @@ MathProgBase.optimize!(m)
 @test_approx_eq_eps MathProgBase.getsolution(m)[3] 16.0 1e-6
 @test_approx_eq_eps MathProgBase.getsolution(m)[4]  0.0 1e-6
 
+end
 
+function conicSOCtest(s::MathProgBase.AbstractMathProgSolver)
 # Problem 3 - SOC
 # min 0x - 1y - 1z
 #  st  x            == 1
