@@ -9,11 +9,11 @@ using Base.Test
 using MathProgBase
 using MathProgBase.MathProgSolverInterface
 
-function coniclineartest(s::MathProgBase.AbstractMathProgSolver)
+function coniclineartest(s::MathProgBase.AbstractMathProgSolver;duals=false)
 
 # Problem 1 - all vars in nonneg cone
 # min -3x - 2y - 4z
-# st    x +  y +  z == 3
+# st    x +  y +  z == 3 '4' -> z=2, x->2, obj -> -14
 #            y +  z == 2
 #       x>=0 y>=0 z>=0
 # Opt solution = -11
@@ -33,6 +33,11 @@ MathProgBase.optimize!(m)
 @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 1e-6
 @test_approx_eq_eps MathProgBase.getsolution(m)[2] 0.0 1e-6
 @test_approx_eq_eps MathProgBase.getsolution(m)[3] 2.0 1e-6
+if duals
+  d = MathProgBase.getconicdual(m)
+  @test_approx_eq_eps d[1] -3.0 1e-6
+  @test_approx_eq_eps d[2] -1.0 1e-6
+end
 
 # Problem 1A - same as Problem 1, but with variable bounds
 #              as constraints instead
@@ -62,6 +67,14 @@ MathProgBase.optimize!(m)
 @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 1e-6
 @test_approx_eq_eps MathProgBase.getsolution(m)[2] 0.0 1e-6
 @test_approx_eq_eps MathProgBase.getsolution(m)[3] 2.0 1e-6
+if duals
+  d = MathProgBase.getconicdual(m)
+  @test_approx_eq_eps d[1] -3.0 1e-6
+  @test_approx_eq_eps d[2] -1.0 1e-6
+  @test_approx_eq_eps d[3]  0.0 1e-6
+  @test_approx_eq_eps d[4] -2.0 1e-6
+  @test_approx_eq_eps d[5]  0.0 1e-6
+end
 
 # Problem 2 - mixed free, nonneg, nonpos, zero, shuffled cones
 # min  3x + 2y - 4z + 0s
@@ -91,6 +104,12 @@ MathProgBase.optimize!(m)
 @test_approx_eq_eps MathProgBase.getsolution(m)[2] -3.0 1e-6
 @test_approx_eq_eps MathProgBase.getsolution(m)[3] 16.0 1e-6
 @test_approx_eq_eps MathProgBase.getsolution(m)[4]  0.0 1e-6
+if duals
+  d = MathProgBase.getconicdual(m)
+  @test_approx_eq_eps d[1]  7.0 1e-6  # Check: change RHS to -3, x->-3, z->15
+  @test_approx_eq_eps d[2]  2.0 1e-6  #        then obj +3+4=+7
+  @test_approx_eq_eps d[3] -4.0 1e-6
+end
 
 # Problem 2A - Problem 2 but with y,z variable bounds as constraints
 # min       3x + 2y - 4z + 0s
@@ -122,10 +141,18 @@ MathProgBase.optimize!(m)
 @test_approx_eq_eps MathProgBase.getsolution(m)[2] -3.0 1e-6
 @test_approx_eq_eps MathProgBase.getsolution(m)[3] 16.0 1e-6
 @test_approx_eq_eps MathProgBase.getsolution(m)[4]  0.0 1e-6
+if duals
+  d = MathProgBase.getconicdual(m)
+  @test_approx_eq_eps d[1]  7.0 1e-6
+  @test_approx_eq_eps d[2]  2.0 1e-6
+  @test_approx_eq_eps d[3] -4.0 1e-6
+  @test_approx_eq_eps d[4]  0.0 1e-6
+  @test_approx_eq_eps d[5]  0.0 1e-6
+end
 
 end
 
-function conicSOCtest(s::MathProgBase.AbstractMathProgSolver)
+function conicSOCtest(s::MathProgBase.AbstractMathProgSolver;duals=false)
 # Problem 3 - SOC
 # min 0x - 1y - 1z
 #  st  x            == 1
@@ -144,7 +171,10 @@ MathProgBase.optimize!(m)
 @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 1e-6
 @test_approx_eq_eps MathProgBase.getsolution(m)[2] 1.0/sqrt(2.0) 1e-6
 @test_approx_eq_eps MathProgBase.getsolution(m)[3] 1.0/sqrt(2.0) 1e-6
-
+if duals
+  d = MathProgBase.getconicdual(m)
+  @test_approx_eq_eps d[1] -sqrt(2.0) 1e-6
+end
 
 
 # Problem 3A - Problem 3 but in ECOS form
@@ -170,5 +200,12 @@ MathProgBase.optimize!(m)
 @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 1e-6
 @test_approx_eq_eps MathProgBase.getsolution(m)[2] 1.0/sqrt(2.0) 1e-6
 @test_approx_eq_eps MathProgBase.getsolution(m)[3] 1.0/sqrt(2.0) 1e-6
+if duals
+  d = MathProgBase.getconicdual(m)
+  @test_approx_eq_eps d[1] -sqrt(2.0) 1e-6
+  @test_approx_eq_eps d[2] -sqrt(2.0) 1e-6
+  @test_approx_eq_eps d[3] 1.0 1e-6
+  @test_approx_eq_eps d[4] 1.0 1e-6
+end
 
 end
