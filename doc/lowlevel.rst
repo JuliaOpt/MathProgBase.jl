@@ -55,7 +55,7 @@ to indicate equality constraints.
 
 .. function:: getconstrLB(m::AbstractMathProgModel)
    
-    Returns a vector containing the lower bounds :math:`lb` on the constraints.
+    Returns a vector containing the lower bounds :math:`lb` on the linear constraints.
 
 .. function:: setconstrLB!(m::AbstractMathProgModel, lb)
    
@@ -63,23 +63,23 @@ to indicate equality constraints.
 
 .. function:: getconstrUB(m::AbstractMathProgModel)
    
-    Returns a vector containing the upper bounds :math:`ub` on the constraints.
+    Returns a vector containing the upper bounds :math:`ub` on the linear constraints.
 
 .. function:: setconstrUB!(m::AbstractMathProgModel, ub)
    
-    Sets the upper bounds on the constraints.
+    Sets the upper bounds on the linear constraints.
 
 .. function:: getobj(m::AbstractMathProgModel)
    
-    Returns a vector containing the objective coefficients :math:`c`.
+    Returns a vector containing the linear objective coefficients :math:`c`.
 
 .. function:: setobj!(m::AbstractMathProgModel, c)
    
-    Sets the objective coefficients.
+    Sets the linear objective coefficients.
 
 .. function:: getconstrmatrix(m::AbstractMathProgModel)
 
-    Returns the full constraint matrix :math:`A`, typically as a 
+    Returns the full linear constraint matrix :math:`A`, typically as a
     ``SparseMatrixCSC``.
 
 .. function:: addvar!(m::AbstractMathProgModel, constridx, constrcoef, l, u, objcoef)
@@ -89,7 +89,7 @@ to indicate equality constraints.
     objective coefficient ``objcoef``. Constraint coefficients for this new variable
     are specified in a sparse format: the ``constrcoef`` vector contains the nonzero
     coefficients, and the ``constridx`` vector contains the indices of the corresponding
-    constraints.
+    linear constraints.
 
 .. function:: addvar!(m::AbstractMathProgModel, l, u, objcoef)
 
@@ -101,7 +101,7 @@ to indicate equality constraints.
 
 .. function:: addconstr!(m::AbstractMathProgModel, varidx, coef, lb, ub)
 
-    Adds a new constraint to the model, with lower bound ``lb`` (``-Inf`` if none)
+    Adds a new linear constraint to the model, with lower bound ``lb`` (``-Inf`` if none)
     and upper bound ``ub`` (``Inf`` if none). Coefficients for this new constraint
     are specified in a sparse format: the ``coef`` vector contains the nonzero
     coefficients, and the ``varidx`` vector contains the indices of the corresponding
@@ -127,7 +127,15 @@ to indicate equality constraints.
 
 .. function:: numconstr(m::AbstractMathProgModel)
 
-    Returns the number of constraints in the model.
+    Returns the total number of constraints in the model.
+
+.. function:: numlinconstr(m::AbstractMathProgModel)
+
+    Returns the number of linear constraints in the model.
+
+.. function:: numquadconstr(m::AbstractMathProgModel)
+
+    Returns the number of quadratic constraints in the model.
 
 .. function:: optimize!(m::AbstractMathProgModel)
 
@@ -157,7 +165,7 @@ to indicate equality constraints.
 
 .. function:: getconstrsolution(m::AbstractMathProgModel)
 
-    Returns a vector containing the values of the constraints
+    Returns a vector containing the values of the linear constraints
     at the solution. This is the vector :math:`Ax`.
 
 .. function:: getreducedcosts(m::AbstractMathProgModel)
@@ -167,7 +175,7 @@ to indicate equality constraints.
 
 .. function:: getconstrduals(m::AbstractMathProgModel)
 
-    Returns the dual solution vector corresponding to the constraints.
+    Returns the dual solution vector corresponding to the linear constraints.
     Not available when integer variables are present.
 
 .. function:: getinfeasibilityray(m::AbstractMathProgModel)
@@ -253,7 +261,7 @@ to indicate equality constraints.
 
 .. function:: setquadobj!(m::AbstractMathProgModel,rowidx,colidx,quadval)
 
-    Adds a quadratic term :math:`\frac{1}{2}x^TQx` to the objective, replacing any existing quadratic terms. Note the implicit :math:`\frac{1}{2}` scaling factor. The matrix :math:`Q` must be symmetric positive semidefinite (when minimizing). Here the entries of :math:`Q` should be provided in sparse triplet form; e.g. entry indexed by ``k`` will fill ``quadval[k]`` in the ``(rowidx[k],colidx[k])`` entry of matrix ``Q``. Duplicate index sets ``(i,j)`` are accepted and will be summed together. Off-diagonal entries will be mirrored, so either the upper triangular or lower triangular entries of ``Q`` should be provided. If entries for both ``(i,j)`` and ``(j,i)`` are provided, these are considered duplicate terms. For example, ``setquadobj!(m, [1,1,2,2], [1,2,1,2], [3,1,1,1])`` and ``setquadobj!(m, [1,1,2], [1,2,2], [3,2,1])`` are both are valid descriptions for the matrix :math:`Q = \begin{pmatrix} 3 & 2 \\ 2 & 1 \end{pmatrix}`.
+    Adds a quadratic term :math:`\frac{1}{2}x^TQx` to the objective, replacing any existing quadratic terms. Note the implicit :math:`\frac{1}{2}` scaling factor. Here the entries of :math:`Q` should be provided in sparse triplet form; e.g. entry indexed by ``k`` will fill ``quadval[k]`` in the ``(rowidx[k],colidx[k])`` entry of matrix ``Q``. Duplicate index sets ``(i,j)`` are accepted and will be summed together. Off-diagonal entries will be mirrored, so either the upper triangular or lower triangular entries of ``Q`` should be provided. If entries for both ``(i,j)`` and ``(j,i)`` are provided, these are considered duplicate terms. For example, ``setquadobj!(m, [1,1,2,2], [1,2,1,2], [3,1,1,1])`` and ``setquadobj!(m, [1,1,2], [1,2,2], [3,2,1])`` are both are valid descriptions for the matrix :math:`Q = \begin{pmatrix} 3 & 2 \\ 2 & 1 \end{pmatrix}`.
 
 .. function:: setquadobjterms!(m::AbstractMathProgModel,rowidx,colidx,quadval)
 
@@ -261,4 +269,10 @@ to indicate equality constraints.
 
 .. function:: addquadconstr!(m::AbstractMathProgModel, linearidx, linearval, quadrowidx, quadcolidx, quadval, sense, rhs)
 
-    Adds the quadratic constraint :math:`s^Tx + \sum_{i,j} q_{i,j}x_ix_j \,\, sense \, rhs` to the model. The ``linearidx`` and ``linearval`` arrays specify the sparse vector ``s``. The quadratic terms are specified as in ``setquadobjterms!`` in the "terms" format. Sense must be ``'<'`` or ``'>'``, and :math:`Q` must be positive semidefinite or negative semidefinite, respectively. If supported by the solver, ``addquadconstr!`` may also be used to specify second-order cone (SOCP) and rotated second-order cone constraints. These should be of the form :math:`x^Tx -y^2 \le 0` or :math:`x^Tx -yz \le 0`, where :math:`y` and :math:`z` are restricted to be non-negative (in particular, :math:`Q` can have at most one off-diagonal term).
+    Adds the quadratic constraint :math:`s^Tx + \sum_{i,j} q_{i,j}x_ix_j \,\, sense \, rhs` to the model. The ``linearidx`` and ``linearval`` arrays specify the sparse vector ``s``. The quadratic terms are specified as in ``setquadobjterms!`` in the "terms" format. Sense must be ``'<'``, ``'>'``, or ``'='``. If supported by the solver, ``addquadconstr!`` may also be used to specify second-order cone (SOCP) and rotated second-order cone constraints. These should be of the form :math:`x^Tx -y^2 \le 0` or :math:`x^Tx -yz \le 0`, where :math:`y` and :math:`z` are restricted to be non-negative (in particular, :math:`Q` can have at most one off-diagonal term).
+
+.. function:: getquadconstrduals(m::AbstractMathProgModel)
+
+    Returns the Lagrangian dual solution vector corresponding to the
+    quadratic constraints. Some solvers do not compute these values by
+    default. Not available when integer variables are present.
