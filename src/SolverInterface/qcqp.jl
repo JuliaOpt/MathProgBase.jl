@@ -1,7 +1,9 @@
 @define_interface begin
+    numquadconstr
     setquadobj!
     setquadobjterms!
     addquadconstr!
+    getquadconstrduals
 end
 
 function setquadobjterms!(m::AbstractMathProgModel, rowidx, colidx, quadval)

@@ -8,6 +8,7 @@
     getsense
     numvar
     numconstr
+    numlinconstr
     status
     getobjval
     getsolution

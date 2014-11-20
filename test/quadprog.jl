@@ -39,6 +39,43 @@ function quadprogtest(solver=MathProgBase.defaultQPsolver)
     println("Done")
 end
 
+function qpdualtest(solver=MathProgBase.defaultQPsolver)
+    println("Testing QP duals with solver ", string(typeof(solver)))
+    # max x
+    # s.t. x^2 <= 2
+    m = model(solver)
+    loadproblem!(m, Array(Float64,0,1), [-Inf], [Inf], [1.0], Float64[], Float64[], :Max)
+    addquadconstr!(m, [], [], [1], [1], [1.0], '<', 2.0)
+    optimize!(m)
+    stat = status(m)
+
+    @test numlinconstr(m) == 0
+    @test numquadconstr(m) == 1
+    @test numconstr(m) == 1
+    @test stat == :Optimal
+    @test_approx_eq_eps getobjval(m) sqrt(2) 1e-6
+    @test_approx_eq_eps getsolution(m)[1] sqrt(2) 1e-6
+    @test_approx_eq_eps getquadconstrduals(m)[1] 0.5/sqrt(2) 1e-6
+
+    # min -x
+    # s.t. x^2 <= 2
+    m = model(solver)
+    loadproblem!(m, Array(Float64,0,1), [-Inf], [Inf], [-1.0], Float64[], Float64[], :Min)
+    addquadconstr!(m, [], [], [1], [1], [1.0], '<', 2.0)
+    optimize!(m)
+    stat = status(m)
+
+    @test numlinconstr(m) == 0
+    @test numquadconstr(m) == 1
+    @test numconstr(m) == 1
+    @test stat == :Optimal
+    @test_approx_eq_eps getobjval(m) -sqrt(2) 1e-6
+    @test_approx_eq_eps getsolution(m)[1] sqrt(2) 1e-6
+    @test_approx_eq_eps getquadconstrduals(m)[1] -0.5/sqrt(2) 1e-6
+
+    println("Done")
+end
+
 function socptest(solver=MathProgBase.defaultQPsolver)
     println("Testing SOCP interface with solver ", string(typeof(solver)))
     
