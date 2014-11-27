@@ -276,6 +276,11 @@ Quadratic Programming
 
     Adds the quadratic constraint :math:`s^Tx + \sum_{i,j} q_{i,j}x_ix_j \,\, sense \, rhs` to the model. The ``linearidx`` and ``linearval`` arrays specify the sparse vector ``s``. The quadratic terms are specified as in ``setquadobjterms!`` in the "terms" format. Sense must be ``'<'``, ``'>'``, or ``'='``. If supported by the solver, ``addquadconstr!`` may also be used to specify second-order cone (SOCP) and rotated second-order cone constraints. These should be of the form :math:`x^Tx -y^2 \le 0` or :math:`x^Tx -yz \le 0`, where :math:`y` and :math:`z` are restricted to be non-negative (in particular, :math:`Q` can have at most one off-diagonal term).
 
+.. function:: getquadconstrsolution(m::AbstractMathProgModel)
+
+    Returns a vector containing the values of the quadratic constraints
+    at the solution.
+
 .. function:: getquadconstrduals(m::AbstractMathProgModel)
 
     Returns the Lagrangian dual solution vector corresponding to the

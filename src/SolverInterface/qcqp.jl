@@ -3,6 +3,7 @@
     setquadobj!
     setquadobjterms!
     addquadconstr!
+    getquadconstrsolution
     getquadconstrduals
     getquadinfeasibilityray
     getquadconstrRHS
