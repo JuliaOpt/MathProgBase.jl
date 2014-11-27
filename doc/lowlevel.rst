@@ -51,15 +51,13 @@ to indicate equality constraints.
    
     Sets the upper bounds on the variables.
 
-
-
 .. function:: getconstrLB(m::AbstractMathProgModel)
    
     Returns a vector containing the lower bounds :math:`lb` on the linear constraints.
 
 .. function:: setconstrLB!(m::AbstractMathProgModel, lb)
    
-    Sets the lower bounds on the constraints.
+    Sets the lower bounds on the linear constraints.
 
 .. function:: getconstrUB(m::AbstractMathProgModel)
    
@@ -133,10 +131,6 @@ to indicate equality constraints.
 
     Returns the number of linear constraints in the model.
 
-.. function:: numquadconstr(m::AbstractMathProgModel)
-
-    Returns the number of quadratic constraints in the model.
-
 .. function:: optimize!(m::AbstractMathProgModel)
 
     Solves the optimization problem.
@@ -180,7 +174,8 @@ to indicate equality constraints.
 
 .. function:: getinfeasibilityray(m::AbstractMathProgModel)
 
-    Returns a "Farkas" proof of infeasibility, i.e., an unbounded ray of the dual. 
+    Returns a "Farkas" proof of infeasibility, i.e., an unbounded ray of the dual,
+    for the linear constraints.
     Note that for some solvers, one must specify additional options for this
     ray to be computed.
 
@@ -216,10 +211,6 @@ to indicate equality constraints.
 
     Returns the cumulative number of barrier iterations during the optimization process.
 
-.. function:: getnodecount(m::AbstractMathProgModel)
-
-    Returns the total number of branch-and-bound nodes explored during the MIP optimization process.
-
 .. function:: getobjgap(m::AbstractMathProgModel)
 
     Returns the final relative optimality gap as optimization terminated. That is, it returns 
@@ -229,6 +220,20 @@ to indicate equality constraints.
 .. function:: getrawsolver(m::AbstractMathProgModel)
 
     Returns an object that may be used to access a solver-specific API for this model.
+
+.. function:: setwarmstart!(m::AbstractMathProgModel, v)
+
+    Provide an initial solution ``v`` to the solver, as supported. To leave values undefined, set them
+    to ``NaN``. MIP solvers should ignore provided solutions that are infeasible or
+    cannot be completed to a feasible solution. Nonlinear solvers may use provided
+    solutions as starting points even if infeasible.
+
+Integer Programming
+^^^^^^^^^^^^^^^^^^^
+
+.. function:: getnodecount(m::AbstractMathProgModel)
+
+    Returns the total number of branch-and-bound nodes explored during the MIP optimization process.
 
 .. function:: setvartype!(m::AbstractMathProgModel, v::Vector{Symbol})
 
@@ -240,13 +245,6 @@ to indicate equality constraints.
 
     Returns a vector indicating the types of each variable, with values described above.
 
-.. function:: setwarmstart!(m::AbstractMathProgModel, v)
-
-    Provide an initial solution ``v`` to the solver, as supported. To leave values undefined, set them
-    to ``NaN``. MIP solvers should ignore provided solutions that are infeasible or
-    cannot be completed to a feasible solution. Nonlinear solvers may use provided
-    solutions as starting points even if infeasible.
-
 .. function:: addsos1!(m::AbstractMathProgModel, idx, weight)
     
     Adds a special ordered set (SOS) constraint of type 1. Of the variables indexed by ``idx``, at most one can be nonzero. The ``weight`` argument induces the ordering of the variables; as such, they should be unique values. A typical SOS1 constraint might look like :math:`y=\sum_i w_i x_i`, where :math:`x_i \in \{0,1\}` are binary variables and the :math:`w_i` are weights. See `here <http://lpsolve.sourceforge.net/5.5/SOS.htm>`_ for a description of SOS constraints and their potential uses.
@@ -254,6 +252,13 @@ to indicate equality constraints.
 .. function:: addsos2!(m::AbstractMathProgModel, idx, weight)
     
     Adds a special ordered set (SOS) constraint of type 2. Of the variables indexed by ``idx``, at most two can be nonzero, and if two are nonzero, they must be adjacent in the set. The ``weight`` argument induces the ordering of the variables; as such, they should be unique values. A common application for SOS2 constraints is modeling nonconvex piecewise linear functions; see `here <http://lpsolve.sourceforge.net/5.5/SOS.htm>`_ for details.
+
+Quadratic Programming
+^^^^^^^^^^^^^^^^^^^^^
+
+.. function:: numquadconstr(m::AbstractMathProgModel)
+
+    Returns the number of quadratic constraints in the model.
 
 .. function:: setquadobj!(m::AbstractMathProgModel,Q)
 
@@ -276,3 +281,18 @@ to indicate equality constraints.
     Returns the Lagrangian dual solution vector corresponding to the
     quadratic constraints. Some solvers do not compute these values by
     default. Not available when integer variables are present.
+
+.. function:: getquadinfeasibilityray(m::AbstractMathProgModel)
+
+    Returns a "Farkas" proof of infeasibility, i.e., an unbounded ray of the dual,
+    for the quadratic constraints.
+    Note that for some solvers, one must specify additional options for this
+    ray to be computed.
+
+.. function:: getquadconstrRHS(m::AbstractMathProgModel)
+
+    Returns a vector containing the right-hand side values on the quadratic constraints.
+
+.. function:: setquadconstrRHS!(m::AbstractMathProgModel, lb)
+
+    Sets the right-hand side values on the quadratic constraints. If the constraint was provided in the special second-order conic format, the solver may reject changing the right-hand side from zero.
