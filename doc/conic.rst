@@ -66,5 +66,9 @@ Not all solvers are expected to support all types of cones. However, when a simp
 
     If the solve was successful, returns the optimal dual solution vector :math:`y`.
 
+.. function:: supportedcones(m::AbstractMathProgSolver)
+
+    Returns a list of cones supported by the solver.
+
 The solution vector, optimal objective value, termination status, etc. should be accessible from the standard methods, e.g., ``getsolution``, ``getobjval``, ``status``, respectively.
     
