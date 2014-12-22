@@ -1,6 +1,7 @@
 @define_interface begin
     loadconicproblem!
     getconicdual
+    supportedcones
 end
 
 # This fallback method trys to solve the cone problem as an LP, but
@@ -119,4 +120,18 @@ function loadconicproblem!(m::AbstractMathProgModel, c, A, b, constr_cones, var_
         addquadconstr!(m, Int[], Float64[], [idx1, idxrest], [idx1, idxrest], [-1.0,ones(length(idxrest))], '<', 0.0)
         k += length(idx)
     end
+end
+
+# Generic fallback
+function supportedcones(s::AbstractMathProgSolver)
+    cones = Symbol[]
+    m = model(s)
+    if method_exists(loadproblem!, (typeof(m), SparseMatrixCSC{Float64,Int}, Vector{Float64}, Vector{Float64}, Vector{Float64}, Vector{Float64}, Vector{Float64}, Symbol))
+        append!(cones, [:Free,:Zero,:NonNeg,:NonPos])
+    end
+    if method_exists(addquadconstr!, (typeof(m), Vector{Int}, Vector{Float64}, Vector{Int}, Vector{Int}, Vector{Float64}, Char, Float64))
+        # Imprecise heuristic, solvers may support convex quadratic constraints but not SOC
+        push!(cones, :SOC)
+    end
+    return cones
 end
