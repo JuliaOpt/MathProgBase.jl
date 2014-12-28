@@ -9,6 +9,10 @@ macro define_interface(args)
         code = quote
             $code
             $(func)() = throw(MethodError($(func),()))
+            function $(func)(::Int)
+                q = Any[1]
+                return q[1] # infer Any return type, workaround for julia issue #9479
+            end
         end
         push!(code.args, Expr(:export, func))
     end
@@ -38,5 +42,6 @@ include("qcqp.jl")
 include("sdp.jl")
 include("nonlinear.jl")
 include("conic.jl")
+include("quad_to_conic.jl")
 
 end
