@@ -74,6 +74,15 @@ function optimize!(wrap::ConicModelWrapper)
     J = Int[]
     extrarows = 0
     for j in 1:nvar
+        if collb[j] == colub[j] # Fixed variable
+            extrarows += 1
+            push!(I,extrarows)
+            push!(J,j)
+            push!(b,collb[j])
+            push!(constr_cones, (:Zero,extrarows))
+            push!(wrap.varboundmap, j)
+            continue
+        end
         if collb[j] != -Inf
             # Variable has lower bound
             extrarows += 1
