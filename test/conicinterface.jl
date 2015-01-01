@@ -318,8 +318,6 @@ if duals
   # a = 1
   # b = [0 1 0; -1 0 0; 0 0 0]
   d = MathProgBase.getconicdual(m)
-  # TODO: Unfortunately SCS will give an incorrect dual for d[1] - d[9] until its fixed
-  # https://github.com/JuliaOpt/SCS.jl/issues/10
   @test_approx_eq_eps d[1] 0 tol
   @test_approx_eq_eps d[2] -1 tol;
   @test_approx_eq_eps d[3] 0 tol;
