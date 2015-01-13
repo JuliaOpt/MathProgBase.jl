@@ -22,6 +22,7 @@ function quadprog(c::InputVector, Q::AbstractMatrix, A::AbstractMatrix, rowlb::I
         sense = rowlbtmp
         rhs = rowubtmp
         @assert realtype <: Real
+        warn_no_inf(realtype)
         rowlb = Array(realtype, nrow)
         rowub = Array(realtype, nrow)
         for i in 1:nrow

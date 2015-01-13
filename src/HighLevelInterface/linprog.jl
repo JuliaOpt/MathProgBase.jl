@@ -33,9 +33,11 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
     # rowlb is allowed to be vector of senses
     if eltype(rowlbtmp) == Char
         realtype = eltype(rowubtmp)
+        warn_no_inf(realtype)
         sense = rowlbtmp
         rhs = rowubtmp
         @assert realtype <: Real
+
         rowlb = Array(realtype, nrow)
         rowub = Array(realtype, nrow)
         for i in 1:nrow
