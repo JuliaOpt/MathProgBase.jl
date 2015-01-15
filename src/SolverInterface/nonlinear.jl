@@ -22,6 +22,11 @@ export AbstractNLPEvaluator
     constr_expr
 end
 
+# fallback options
+isobjlinear(::AbstractNLPEvaluator) = false
+isobjquadratic(::AbstractNLPEvaluator) = false
+isconstrlinear(::AbstractNLPEvaluator, i::Int) = false
+
 # additional methods for AbstractMathProgModel
 loadnonlinearproblem!() = throw(MethodError(:loadnonlinearproblem!,()))
 export loadnonlinearproblem!
