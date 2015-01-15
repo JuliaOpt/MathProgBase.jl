@@ -25,7 +25,7 @@ end
 # fallback options
 isobjlinear(::AbstractNLPEvaluator) = false
 isobjquadratic(::AbstractNLPEvaluator) = false
-isconstrlinear(::AbstractNLPEvaluator, i::Int) = false
+isconstrlinear(::AbstractNLPEvaluator, i::Integer) = false
 
 # additional methods for AbstractMathProgModel
 loadnonlinearproblem!() = throw(MethodError(:loadnonlinearproblem!,()))
