@@ -61,8 +61,8 @@ Not all solvers are expected to support all types of cones. However, when a simp
     in column-major (resp., row-major) order. Since an :math:`n \times n`
     matrix has :math:`\frac{n(n+1)}{2}` lower-triangular elements,
     by inverting this formula, when :math:`y` elements are specified in
-    ``indices``, the corresponding matrix is
-    :math:`\left(\sqrt{\frac{1}{4}+2y}-\frac{1}{2}\right) \times \left(\sqrt{\frac{1}{4}+2y}-\frac{1}{2}\right)`.
+    ``indices``, the corresponding matrix has
+    :math:`\left(\sqrt{\frac{1}{4}+2y}-\frac{1}{2}\right) \times \left(\sqrt{\frac{1}{4}+2y}-\frac{1}{2}\right)` elements.
 
 .. function:: getconicdual(m::AbstractMathProgModel)
 
