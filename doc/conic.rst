@@ -53,14 +53,16 @@ Not all solvers are expected to support all types of cones. However, when a simp
     which belong to this cone (may be given as a ``Range``). All variables
     and constraints must be listed in exactly one cone,
     and the indices given must correspond to the order of the columns and
-    rows in in the constraint matrix ``A``.
+    rows in the constraint matrix ``A``.
     Cones may be listed in any order, and cones of the same class may appear
     multiple times.
-    For the semidefinite cone, the number of variables or constraints present
-    must be a square integer :math:`n` corresponding to a
-    :math:`\sqrt{n}\times \sqrt{n}` matrix;
-    variables should be listed in column-major, or by symmetry,
-    row-major order.
+    For the semidefinite cone, the number of variables or constraints
+    present correspond to the lower (or upper) triangular elements
+    in column-major (resp., row-major) order. Since an :math:`n \times n`
+    matrix has :math:`\frac{n(n+1)}{2}` lower-triangular elements,
+    by inverting this formula, when :math:`y` elements are specified in
+    ``indices``, the corresponding matrix has
+    :math:`\left(\sqrt{\frac{1}{4}+2y}-\frac{1}{2}\right) \times \left(\sqrt{\frac{1}{4}+2y}-\frac{1}{2}\right)` elements.
 
 .. function:: getconicdual(m::AbstractMathProgModel)
 
