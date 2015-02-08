@@ -8,14 +8,14 @@ Solves the quadratic programming problem:
 
 .. math::
     \min_{x}\, &\frac{1}{2}x^TQx + c^Tx\\
-    s.t.     &a_i^Tx \text{ sense}_i \, b_i \forall\,\, i\\
+    s.t.     &A x \text{ sense} b\\
              &l \leq x \leq u\\
 
 where:
 
 *    ``c`` is the objective vector, always in the sense of minimization
 *    ``Q`` is the Hessian matrix of the objective
-*    ``A`` is the constraint matrix, with rows :math:`a_i`
+*    ``A`` is the constraint matrix
 *    ``sense`` is a vector of constraint sense characters ``'<'``, ``'='``, and ``'>'``
 *    ``b`` is the right-hand side vector
 *    ``l`` is the vector of lower bounds on the variables
