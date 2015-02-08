@@ -15,7 +15,7 @@ where:
 
 *    ``c`` is the objective vector, always in the sense of minimization
 *    ``Q`` is the Hessian matrix of the objective
-*    ``A`` is the constraint matrix, with rows :math:`a_i`
+*    ``A`` is the constraint matrix, with rows :math:`a_i` (viewed as column-oriented vectors)
 *    ``sense`` is a vector of constraint sense characters ``'<'``, ``'='``, and ``'>'``
 *    ``b`` is the right-hand side vector
 *    ``l`` is the vector of lower bounds on the variables
