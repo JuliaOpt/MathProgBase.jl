@@ -8,6 +8,7 @@ export MathProgCallbackData
     setlazycallback!
     setcutcallback!
     setheuristiccallback!
+    setinfocallback!
     cbgetmipsolution
     cbgetlpsolution
     cbgetobj

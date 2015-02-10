@@ -22,7 +22,11 @@ The ``MathProgSolverInterface`` exports an abstract type ``MathProgCallbackData`
 .. function:: setheuristiccallback!(m::AbstractMathProgModel,f)
 
    Adds heuristic callback ``f`` to the model. Function ``f`` takes as argument only a ``MathProgCallbackData`` object.
-   
+
+.. function:: setinfocallback!(m::AbstractMathProgModel,f)
+
+   Adds informational callback ``f`` to the model. Function ``f`` takes as argument only a ``MathProgCallbackData`` object.
+
 .. function:: cbgetmipsolution(d::MathProgCallbackData[, output])
 
    Grabs current best integer-feasible solution to the model. The optional second argument specifies an output vector.
