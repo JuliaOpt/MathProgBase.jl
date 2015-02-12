@@ -11,14 +11,16 @@ A more detailed description of the three types of supported callbacks can be fou
 
 The ``MathProgSolverInterface`` exports an abstract type ``MathProgCallbackData`` which represents the solver-specific data needed to implement the callback.
 
+If a callback function returns ``:Exit``, the solver is expected to handle this and terminate the optimization.
+
 .. function:: setlazycallback!(m::AbstractMathProgModel,f)
 
    Adds lazy constraint callback ``f`` to the model. Function ``f`` takes as argument only a ``MathProgCallbackData`` object.
-   
+
 .. function:: setcutcallback!(m::AbstractMathProgModel,f)
 
    Adds cut callback ``f`` to the model. Function ``f`` takes as argument only a ``MathProgCallbackData`` object.
-   
+
 .. function:: setheuristiccallback!(m::AbstractMathProgModel,f)
 
    Adds heuristic callback ``f`` to the model. Function ``f`` takes as argument only a ``MathProgCallbackData`` object.
@@ -30,19 +32,19 @@ The ``MathProgSolverInterface`` exports an abstract type ``MathProgCallbackData`
 .. function:: cbgetmipsolution(d::MathProgCallbackData[, output])
 
    Grabs current best integer-feasible solution to the model. The optional second argument specifies an output vector.
-   
+
 .. function:: cbgetlpsolution(d::MathProgCallbackData[, output])
 
    Grabs current best linear relaxation solution to the model. The optional second argument specifies an output vector.
-   
+
 .. function:: cbgetobj(d::MathProgCallbackData)
 
    Grabs objective value for current best integer-feasible solution.
-   
-.. function:: cbgetbestbound(d::MathProgCallbackData) 
+
+.. function:: cbgetbestbound(d::MathProgCallbackData)
 
    Grabs best bound for objective function found so far (lower bound when minimizing, upper bound when maximizing).
-   
+
 .. function:: cbgetexplorednodes(d::MathProgCallbackData)
 
    Returns number of nodes that have been explored so far in the solve process.
@@ -51,10 +53,10 @@ The ``MathProgSolverInterface`` exports an abstract type ``MathProgCallbackData`
 
    Returns current location in solve process: ``:MIPNode`` if at node in branch-and-cut tree, ``:MIPSol`` at an integer-feasible solution, and ``:Other`` otherwise.
 
-.. function:: cbaddcut!(d::MathProgCallbackData,varidx,varcoef,sense,rhs) 
+.. function:: cbaddcut!(d::MathProgCallbackData,varidx,varcoef,sense,rhs)
 
    Adds cut to model. The coefficient values are represented sparsely, with (one-indexed) indices in ``varidx`` and values in ``varcoef``. The constraint sense ``sense`` is a character taking value ``<``, ``>``, or ``=``, and the right-hand side value is ``rhs``.
-   
+
 .. function:: cbaddlazy!(d::MathProgCallbackData,varidx,varcoef,sense,rhs)
 
    Adds lazy constraint to model. The coefficient values are represented sparsely, with (one-indexed) indices in ``varidx`` and values in ``varcoef``. The constraint sense ``sense`` is a character taking value ``<``, ``>``, or ``=``, and the right-hand side value is ``rhs``.
