@@ -1,7 +1,7 @@
 warn("The MathProgSolverInterface.jl file is DEPRECATED in favor of the SolverInterface/ directory. Do not point your packages directly to this file.")
 
 module MathProgSolverInterface
-   require(joinpath(Pkg.dir("MathProgBase"),"src","SolverInterface","SolverInterface.jl"))
+   require(joinpath(dirname(@__FILE__),"SolverInterface","SolverInterface.jl"))
    importall SolverInterface
    export AbstractMathProgModel,
           AbstractMathProgSolver,
