@@ -23,7 +23,7 @@
     getsimplexiter
     getbarrieriter
     getnodecount
-    getmipgap
+    getobjgap
     getobjbound
     getbasis
 end
