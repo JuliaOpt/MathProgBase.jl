@@ -34,12 +34,16 @@ function loadproblem!(wrap::ConicModelWrapper, A, collb, colub, obj, rowlb, rowu
     wrap.sense = sense
 end
 
+const notsoc_error = "Only quadratic constraints in second-order conic format (x'x <= y^2) are supported"
+
 function addquadconstr!(wrap::ConicModelWrapper, linearidx, linearval, quadrowidx, quadcolidx, quadval, sense, rhs)
-    if length(linearidx) > 0 || length(linearval) > 0 || sense != '<' || rhs != 0 || any(quadrowidx .!= quadcolidx) || mapreduce(v-> v == 1.0, +, 0, quadval) != length(quadval) - 1 || mapreduce(v->v == -1.0, +, 0, quadval) != 1
-        error("Only quadratic constraints in second-order conic format (x'x <= y^2) are supported")
+    if length(linearidx) > 0 || length(linearval) > 0 || sense != '<' || rhs != 0 || mapreduce(v-> v == 1.0, +, 0, quadval) != length(quadval) - 1 || mapreduce(v->v == -1.0, +, 0, quadval) != 1
+        error(notsoc_error)
     end
+    length(quadrowidx) == length(quadcolidx) == length(quadval) || error("Inconsistent dimensions")
     SOCconstr = Int[]
     for i in 1:length(quadval)
+        quadrowidx[i] == quadcolidx[i] || quadval[i] == 0 || error(notsoc_error)
         if quadval[i] == 1.0
             push!(SOCconstr, quadcolidx[i])
         else
@@ -62,7 +66,7 @@ function optimize!(wrap::ConicModelWrapper)
 
     (nvar = length(collb)) == length(colub) || error("Unequal lengths for column bounds")
     (nrow = length(rowlb)) == length(rowub) || error("Unequal lengths for row bounds")
-    
+
     constr_cones = Array(Any,0)
     var_cones = [(:Free,1:nvar)]
 
