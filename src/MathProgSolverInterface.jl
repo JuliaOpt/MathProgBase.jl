@@ -44,7 +44,7 @@ module MathProgSolverInterface
           getsimplexiter,
           getbarrieriter,
           getnodecount,
-          getmipgap,
+          getobjgap,
           getobjbound,
           initialize,
           features_available,
