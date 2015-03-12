@@ -46,8 +46,10 @@ function addquadconstr!(wrap::ConicModelWrapper, linearidx, linearval, quadrowid
         quadrowidx[i] == quadcolidx[i] || quadval[i] == 0 || error(notsoc_error)
         if quadval[i] == 1.0
             push!(SOCconstr, quadcolidx[i])
-        else
+        elseif quadval[i] == -1.0
             unshift!(SOCconstr, quadcolidx[i])
+        else
+            @assert quadval[i] == 0.0
         end
     end
     push!(wrap.SOCconstrs, SOCconstr)
