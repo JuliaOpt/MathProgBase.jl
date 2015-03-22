@@ -218,7 +218,7 @@ function MathProgSolverInterface.eval_grad_f(d::Rosenbrock, grad_f, x)
     grad_f[2] = 200*(x[2]-x[1]^2)
 end
 
-MathProgSolverInterface.jac_structure(d::Rosenbrock) = [],[]
+MathProgSolverInterface.jac_structure(d::Rosenbrock) = Int[],Int[]
 MathProgSolverInterface.hesslag_structure(d::Rosenbrock) = [1,2,2],[1,1,2]
 
 
