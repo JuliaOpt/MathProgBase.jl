@@ -40,7 +40,7 @@ function loadconicproblem!(m::AbstractMathProgModel, c, A, b, constr_cones, var_
         cone in bad_cones && error("Cone type $(cone) not supported")
     end
 
-    c = [c,zeros(num_aux)]
+    c = vcat(c,zeros(num_aux))
     # Variable bounds
     l = fill(-Inf, length(c))
     u = fill(Inf, length(c))
