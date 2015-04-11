@@ -99,8 +99,8 @@ function loadconicproblem!(m::AbstractMathProgModel, c, A, b, constr_cones, var_
         Aaux speye(num_aux) ]
         lbaux = b[socconstr_idx]
         ubaux = lbaux
-        lb = [lb, lbaux]
-        ub = [ub, ubaux]
+        lb = [lb; lbaux]
+        ub = [ub; ubaux]
     end
 
     loadproblem!(m, Alin, l, u, c, lb, ub, :Min)
@@ -117,7 +117,7 @@ function loadconicproblem!(m::AbstractMathProgModel, c, A, b, constr_cones, var_
         cone == :SOC || continue
         idx1 = num_orig + k
         idxrest = (num_orig+k+1):(num_orig+k+length(idx)-1)
-        addquadconstr!(m, Int[], Float64[], [idx1, idxrest], [idx1, idxrest], [-1.0,ones(length(idxrest))], '<', 0.0)
+        addquadconstr!(m, Int[], Float64[], [idx1; idxrest], [idx1; idxrest], [-1.0;ones(length(idxrest))], '<', 0.0)
         k += length(idx)
     end
 end
