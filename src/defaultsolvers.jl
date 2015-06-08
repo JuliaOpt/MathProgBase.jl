@@ -15,7 +15,8 @@ const MIPsolvers = [(:Cbc,:CbcSolver),
      
 const QPsolvers = [(:Gurobi,:GurobiSolver),
                    (:CPLEX,:CplexSolver),
-                   (:Mosek,:MosekSolver)]
+                   (:Mosek,:MosekSolver),
+                   (:Ipopt,:IpoptSolver)]
 
 const SDPsolvers = [(:Mosek,:MosekSolver)]
 
