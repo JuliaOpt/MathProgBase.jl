@@ -45,7 +45,8 @@ for solvertype in ["LP", "MIP", "QP", "SDP", "NLP", "Conic"]
                 try
                     eval(Expr(:import,pkgname))
                 catch
-                    warn("Package ",string(pkgname)," is installed but couldn't be loaded")
+                    warn("Package ",string(pkgname)," is installed but couldn't be loaded. ",
+                        "You may need to run `Pkg.build(\"$pkgname\")`")
                 end
                 ex = Expr(:(=), $(quot(defaultname)), Expr(:call,Expr(:.,pkgname,quot(solvername))))
                 eval(ex)
