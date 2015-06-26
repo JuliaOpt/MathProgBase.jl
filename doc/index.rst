@@ -26,7 +26,6 @@ Contents
     solvers.rst
     mipcallbacks.rst
     conic.rst
-    sdp.rst
     nlp.rst
 
 
