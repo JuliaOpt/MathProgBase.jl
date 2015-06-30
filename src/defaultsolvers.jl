@@ -12,17 +12,19 @@ const MIPsolvers = [(:Cbc,:CbcSolver),
                     (:Gurobi,:GurobiSolver),
                     (:CPLEX,:CplexSolver),
                     (:Mosek,:MosekSolver)]
-     
+
 const QPsolvers = [(:Gurobi,:GurobiSolver),
                    (:CPLEX,:CplexSolver),
                    (:Mosek,:MosekSolver),
                    (:Ipopt,:IpoptSolver)]
 
-const SDPsolvers = [(:Mosek,:MosekSolver)]
+const SDPsolvers = [(:Mosek,:MosekSolver),
+                    (:SCS,:SCSSolver)]
 
 const NLPsolvers = [(:Ipopt,:IpoptSolver)]
 
-const Conicsolvers = [(:ECOS,:ECOSSolver)]
+const Conicsolvers = [(:ECOS,:ECOSSolver),
+                      (:SCS,:SCSSolver)]
 
 using Base.Meta
 
