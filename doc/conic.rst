@@ -36,7 +36,7 @@ The recognized cones are:
 - ``:SDP``, the cone of symmetric positive semidefinite matrices :math:`\{ X \in \mathbb{R}^{n\times n} : X \succeq 0\}`
 - ``:ExpPrimal``, the exponential cone :math:`\operatorname{cl}\{ (x,y,z) \in \mathbb{R}^3 : y > 0, y e^{x/y} \leq z \}`
 - ``:ExpDual``, the dual of the exponential cone :math:`\{ (u,v,w) \in \mathbb{R}^3 : u < 0, -ue^{v/q} \leq ew\} \cup \{(0,v,w) : v \geq 0, w \geq 0\}` 
-- ``:Power``, the power cone :math:`\{ (x,y,z) \in \mathbb{R}^3 : x^a y^(1-a) \geq |z|, x\geq0, y\geq0\}`
+- ``:Power``, the power cone :math:`\{ (x,y,z) \in \mathbb{R}^3 : x^a y^(1-a) \geq |z|, x\geq 0, y\geq 0\}`
 
 Not all solvers are expected to support all types of cones. However, when a simple transformation to a supported cone is available, for example, from ``:NonPos`` to ``:NonNeg`` or from ``:SOCRotated`` to ``:SOC``, solvers *should* perform this transformation in order to allow users the extra flexibility in modeling.
 
