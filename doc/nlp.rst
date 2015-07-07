@@ -173,5 +173,5 @@ The abstract type ``AbstractNLPEvaluator`` is used by solvers for accessing the 
     upper bounds should be constants; for example, ``:(-1 <= cos(x[1]) + sin(x[2]) <= 1)`` is valid.
 
 
-The solution vector, optimal objective value, termination status, etc. should be accessible from the standard methods, e.g., ``getsolution``, ``getobjval``, ``status``, respectively.
+The solution vector, optimal objective value, termination status, etc. should be accessible from the standard methods, e.g., ``getsolution``, ``getobjval``, ``status``, respectively. Nonlinear solvers may also provide optimal Lagrange multipliers if available through ``getreducedcosts`` and ``getconstrduals``.
 
