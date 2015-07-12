@@ -88,7 +88,7 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
     end
 end
 
-linprog(c,A,rowlb,rowub, solver::AbstractMathProgSolver = defaultLPsolver) = linprog(c,A,rowlb,rowub,0,Inf, solver)
+linprog(c,A,rowlb,rowub, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver) = linprog(c,A,rowlb,rowub,0,Inf, solver)
 
 export linprog
 
