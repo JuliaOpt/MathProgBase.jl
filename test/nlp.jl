@@ -111,6 +111,11 @@ function nlptest(solver=MathProgBase.defaultNLPsolver)
     @test_approx_eq_eps x[4] 1.3794082897556983 1e-5
     @test_approx_eq_eps MathProgSolverInterface.getobjval(m) 17.014017145179164 1e-5
 
+    # Test that a second call to optimize! works
+    MathProgSolverInterface.setwarmstart!(m,[1,5,5,1])
+    MathProgSolverInterface.optimize!(m)
+    stat = MathProgSolverInterface.status(m)
+    @test stat == :Optimal
 end
 
 # a test for convex nonlinear solvers
@@ -185,6 +190,10 @@ function convexnlptest(solver=MathProgBase.defaultNLPsolver)
     @test_approx_eq_eps (x[1]+x[2]) -1/3 1e-3
     @test_approx_eq_eps MathProgSolverInterface.getobjval(m) -1-4/sqrt(3) 1e-5
 
+    # Test that a second call to optimize! works
+    MathProgSolverInterface.optimize!(m)
+    stat = MathProgSolverInterface.status(m)
+    @test stat == :Optimal
 end
 
 
@@ -253,4 +262,8 @@ function rosenbrocktest(solver=MathProgBase.defaultNLPsolver)
     @test_approx_eq_eps x[2] 1.0 1e-5
     @test_approx_eq_eps MathProgSolverInterface.getobjval(m) 0.0 1e-5
 
+    # Test that a second call to optimize! works
+    MathProgSolverInterface.optimize!(m)
+    stat = MathProgSolverInterface.status(m)
+    @test stat == :Optimal
 end
