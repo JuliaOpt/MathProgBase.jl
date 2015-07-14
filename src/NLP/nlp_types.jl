@@ -24,24 +24,24 @@ immutable NLPModelMeta <: NLPModelMeta_BaseType
   lvar :: Array{Float64,1}  # vector of lower bounds
   uvar :: Array{Float64,1}  # vector of upper bounds
 
-  ifix  :: Array{Int64,1}   # indices of fixed variables
-  ilow  :: Array{Int64,1}   # indices of variables with lower bound only
-  iupp  :: Array{Int64,1}   # indices of variables with upper bound only
-  irng  :: Array{Int64,1}   # indices of variables with lower and upper bound (range)
-  ifree :: Array{Int64,1}   # indices of free variables
-  iinf  :: Array{Int64,1}   # indices of infeasible bounds
+  ifix  :: Array{Int,1}     # indices of fixed variables
+  ilow  :: Array{Int,1}     # indices of variables with lower bound only
+  iupp  :: Array{Int,1}     # indices of variables with upper bound only
+  irng  :: Array{Int,1}     # indices of variables with lower and upper bound (range)
+  ifree :: Array{Int,1}     # indices of free variables
+  iinf  :: Array{Int,1}     # indices of infeasible bounds
 
   ncon :: Int               # number of general constraints
   y0   :: Array{Float64,1}  # initial Lagrange multipliers
   lcon :: Array{Float64,1}  # vector of constraint lower bounds
   ucon :: Array{Float64,1}  # vector of constraint upper bounds
 
-  jfix  :: Array{Int64,1}   # indices of equality constraints
-  jlow  :: Array{Int64,1}   # indices of constraints of the form c(x) ≥ cl
-  jupp  :: Array{Int64,1}   # indices of constraints of the form c(x) ≤ cu
-  jrng  :: Array{Int64,1}   # indices of constraints of the form cl ≤ c(x) ≤ cu
-  jfree :: Array{Int64,1}   # indices of "free" constraints (there shouldn't be any)
-  jinf  :: Array{Int64,1}   # indices of the visibly infeasible constraints
+  jfix  :: Array{Int,1}     # indices of equality constraints
+  jlow  :: Array{Int,1}     # indices of constraints of the form c(x) ≥ cl
+  jupp  :: Array{Int,1}     # indices of constraints of the form c(x) ≤ cu
+  jrng  :: Array{Int,1}     # indices of constraints of the form cl ≤ c(x) ≤ cu
+  jfree :: Array{Int,1}     # indices of "free" constraints (there shouldn't be any)
+  jinf  :: Array{Int,1}     # indices of the visibly infeasible constraints
 
   nnzj :: Int               # number of nonzeros in the sparse Jacobian
   nnzh :: Int               # number of nonzeros in the sparse Hessian
@@ -50,9 +50,9 @@ immutable NLPModelMeta <: NLPModelMeta_BaseType
   nnln  :: Int              # number of nonlinear general constraints
   nnet  :: Int              # number of nonlinear network constraints
 
-  lin   :: Array{Int64,1}   # indices of linear constraints
-  nln   :: Array{Int64,1}   # indices of nonlinear constraints
-  net   :: Array{Int64,1}   # indices of nonlinear network constraints
+  lin   :: Array{Int,1}     # indices of linear constraints
+  nln   :: Array{Int,1}     # indices of nonlinear constraints
+  net   :: Array{Int,1}     # indices of nonlinear network constraints
 
   minimize :: Bool          # true if optimize == minimize
   islp :: Bool              # true if the problem is a linear program
