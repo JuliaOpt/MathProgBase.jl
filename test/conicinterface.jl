@@ -192,7 +192,7 @@ MathProgBase.loadconicproblem!(m,
                       0.0  -1.0   0.0;
                       0.0   0.0  -1.0],
                     [ 1.0, 0.0, 0.0, 0.0],
-                    {(:Zero,1),(:SOC,2:4)},
+                    Any[(:Zero,1),(:SOC,2:4)],
                     [(:Free,1:3)])
 MathProgBase.optimize!(m)
 @test MathProgBase.status(m) == :Optimal
