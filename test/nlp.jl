@@ -118,6 +118,68 @@ function nlptest(solver=MathProgBase.defaultNLPsolver)
     @test stat == :Optimal
 end
 
+# Same as above but no hessian callback
+type HS071_2 <: MathProgSolverInterface.AbstractNLPEvaluator
+end
+
+# hs071
+# min x1 * x4 * (x1 + x2 + x3) + x3
+# st  x1 * x2 * x3 * x4 >= 25
+#     x1^2 + x2^2 + x3^2 + x4^2 = 40
+#     1 <= x1, x2, x3, x4 <= 5
+# Start at (1,5,5,1)
+# End at (1.000..., 4.743..., 3.821..., 1.379...)
+
+function MathProgSolverInterface.initialize(d::HS071_2, requested_features::Vector{Symbol})
+    for feat in requested_features
+        if !(feat in [:Grad, :Jac])
+            error("Unsupported feature $feat")
+            # TODO: implement Jac-vec and Hess-vec products
+            # for solvers that need them
+        end
+    end
+end
+
+MathProgSolverInterface.features_available(d::HS071_2) = [:Grad, :Jac]
+
+MathProgSolverInterface.eval_f(d::HS071_2, x) = MathProgSolverInterface.eval_f(HS071(), x)
+
+MathProgSolverInterface.eval_g(d::HS071_2, g, x) = MathProgSolverInterface.eval_g(HS071(), g, x)
+
+MathProgSolverInterface.eval_grad_f(d::HS071_2, grad_f, x) = MathProgSolverInterface.eval_grad_f(HS071(), grad_f, x)
+
+MathProgSolverInterface.jac_structure(d::HS071_2) = MathProgSolverInterface.jac_structure(HS071())
+
+MathProgSolverInterface.eval_jac_g(d::HS071_2, J, x) = MathProgSolverInterface.eval_jac_g(HS071(), J, x)
+
+function nlptest_nohessian(solver=MathProgBase.defaultNLPsolver)
+
+    m = MathProgSolverInterface.model(solver)
+    l = [1,1,1,1]
+    u = [5,5,5,5]
+    lb = [25, 40]
+    ub = [Inf, 40]
+    MathProgSolverInterface.loadnonlinearproblem!(m, 4, 2, l, u, lb, ub, :Min, HS071_2())
+    MathProgSolverInterface.setwarmstart!(m,[1,5,5,1])
+
+    MathProgSolverInterface.optimize!(m)
+    stat = MathProgSolverInterface.status(m)
+
+    @test stat == :Optimal
+    x = MathProgSolverInterface.getsolution(m)
+    @test_approx_eq_eps x[1] 1.0000000000000000 1e-5
+    @test_approx_eq_eps x[2] 4.7429996418092970 1e-5
+    @test_approx_eq_eps x[3] 3.8211499817883077 1e-5
+    @test_approx_eq_eps x[4] 1.3794082897556983 1e-5
+    @test_approx_eq_eps MathProgSolverInterface.getobjval(m) 17.014017145179164 1e-5
+
+    # Test that a second call to optimize! works
+    MathProgSolverInterface.setwarmstart!(m,[1,5,5,1])
+    MathProgSolverInterface.optimize!(m)
+    stat = MathProgSolverInterface.status(m)
+    @test stat == :Optimal
+end
+
 # a test for convex nonlinear solvers
 
 type QCQP <: MathProgSolverInterface.AbstractNLPEvaluator
