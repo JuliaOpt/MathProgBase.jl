@@ -1,3 +1,5 @@
+VERSION >= v"0.4.0-dev+6521" && __precompile__()
+
 module MathProgBase
 
 include(joinpath(dirname(@__FILE__),"SolverInterface","SolverInterface.jl"))
