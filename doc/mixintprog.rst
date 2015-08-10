@@ -42,4 +42,4 @@ We can solve a `binary knapsack problem <http://en.wikipedia.org/wiki/Knapsack_p
 
 with the code::
     
-    mixintprog(-[5.,3.,2.,7.,4.],[2. 8. 4. 2. 5.],'<',10,'I',0,1)
+    mixintprog(-[5.,3.,2.,7.,4.],[2. 8. 4. 2. 5.],'<',10,:Int,0,1)
