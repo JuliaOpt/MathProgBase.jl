@@ -35,8 +35,8 @@ MathProgBase.optimize!(m)
 @test_approx_eq_eps MathProgBase.getsolution(m)[3] 2.0 tol
 if duals
   d = MathProgBase.getconicdual(m)
-  @test_approx_eq_eps d[1] -3.0 tol
-  @test_approx_eq_eps d[2] -1.0 tol
+  @test_approx_eq_eps d[1] 3.0 tol
+  @test_approx_eq_eps d[2] 1.0 tol
 end
 
 # Problem 1A - same as Problem 1, but with variable bounds
@@ -69,8 +69,8 @@ MathProgBase.optimize!(m)
 @test_approx_eq_eps MathProgBase.getsolution(m)[3] 2.0 tol
 if duals
   d = MathProgBase.getconicdual(m)
-  @test_approx_eq_eps d[1] -3.0 tol
-  @test_approx_eq_eps d[2] -1.0 tol
+  @test_approx_eq_eps d[1]  3.0 tol
+  @test_approx_eq_eps d[2]  1.0 tol
   @test_approx_eq_eps d[3]  0.0 tol
   @test_approx_eq_eps d[4] -2.0 tol
   @test_approx_eq_eps d[5]  0.0 tol
@@ -106,9 +106,9 @@ MathProgBase.optimize!(m)
 @test_approx_eq_eps MathProgBase.getsolution(m)[4]  0.0 tol
 if duals
   d = MathProgBase.getconicdual(m)
-  @test_approx_eq_eps d[1]  7.0 tol  # Check: change RHS to -3, x->-3, z->15
-  @test_approx_eq_eps d[2]  2.0 tol  #        then obj +3+4=+7
-  @test_approx_eq_eps d[3] -4.0 tol
+  @test_approx_eq_eps d[1] -7.0 tol
+  @test_approx_eq_eps d[2] -2.0 tol
+  @test_approx_eq_eps d[3]  4.0 tol
 end
 
 # Problem 2A - Problem 2 but with y,z variable bounds as constraints
@@ -143,9 +143,9 @@ MathProgBase.optimize!(m)
 @test_approx_eq_eps MathProgBase.getsolution(m)[4]  0.0 tol
 if duals
   d = MathProgBase.getconicdual(m)
-  @test_approx_eq_eps d[1]  7.0 tol
-  @test_approx_eq_eps d[2]  2.0 tol
-  @test_approx_eq_eps d[3] -4.0 tol
+  @test_approx_eq_eps d[1] -7.0 tol
+  @test_approx_eq_eps d[2] -2.0 tol
+  @test_approx_eq_eps d[3]  4.0 tol
   @test_approx_eq_eps d[4]  0.0 tol
   @test_approx_eq_eps d[5]  0.0 tol
 end
@@ -153,11 +153,11 @@ end
 end
 
 function conicSOCtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e-6)
-# Problem 3 - SOC
+# Problem SOC1
 # min 0x - 1y - 1z
 #  st  x            == 1
 #      x >= ||(y,z)||
-println("Problem 3")
+println("Problem SOC1")
 m = MathProgBase.model(s)
 MathProgBase.loadconicproblem!(m,
                     [ 0.0, -1.0, -1.0],
@@ -173,17 +173,17 @@ MathProgBase.optimize!(m)
 @test_approx_eq_eps MathProgBase.getsolution(m)[3] 1.0/sqrt(2.0) tol
 if duals
   d = MathProgBase.getconicdual(m)
-  @test_approx_eq_eps d[1] -sqrt(2.0) tol
+  @test_approx_eq_eps d[1] sqrt(2.0) tol
 end
 
 
-# Problem 3A - Problem 3 but in ECOS form
+# Problem SOC1A - Problem SOC1 but in ECOS form
 # min      0x - 1y - 1z
 #  st [1]-[ x          ] ZERO
 #     [0]-[-x          ] SOC
 #     [0]-[     -y     ] SOC
 #     [0]-[          -z] SOC
-println("Problem 3A")
+println("Problem SOC1A")
 m = MathProgBase.model(s)
 MathProgBase.loadconicproblem!(m,
                     [ 0.0, -1.0, -1.0],
@@ -202,83 +202,142 @@ MathProgBase.optimize!(m)
 @test_approx_eq_eps MathProgBase.getsolution(m)[3] 1.0/sqrt(2.0) tol
 if duals
   d = MathProgBase.getconicdual(m)
-  @test_approx_eq_eps d[1] -sqrt(2.0) tol
-  @test_approx_eq_eps d[2] -sqrt(2.0) tol
-  @test_approx_eq_eps d[3] 1.0 tol
-  @test_approx_eq_eps d[4] 1.0 tol
+  @test_approx_eq_eps d[1] sqrt(2.0) tol
+  @test_approx_eq_eps d[2] sqrt(2.0) tol
+  @test_approx_eq_eps d[3] -1.0 tol
+  @test_approx_eq_eps d[4] -1.0 tol
 end
+
+# Problem SOC2
+# min  x
+# s.t. y ≥ 1/√2
+#      x² + y² ≤ 1
+# in conic form:
+# min  x
+# s.t.  -1/√2 + y ∈ R₊
+#        1 - t ∈ {0}
+#      (t,x,y) ∈ SOC₃
+println("Problem SOC2")
+
+b = [-1/sqrt(2), 1, 0, 0, 0]
+A = [ 0 -1 0
+      0 0 1
+      0 0 -1
+      -1 0 0
+      0 -1 0 ]
+c = [ 1, 0, 0 ]
+constr_cones = [(:NonNeg,1:1),(:Zero,2:2),(:SOC,3:5)]
+var_cones = [(:Free,1:3)]
+
+m = MathProgBase.model(s)
+MathProgBase.loadconicproblem!(m, c, A, b, constr_cones, var_cones)
+MathProgBase.optimize!(m)
+@test MathProgBase.status(m) == :Optimal
+@test_approx_eq_eps MathProgBase.getobjval(m) -1/sqrt(2) tol
+@test_approx_eq_eps MathProgBase.getsolution(m) [-1/sqrt(2), 1/sqrt(2), 1.0] tol
+
+if duals
+  y = MathProgBase.getconicdual(m)
+  @test_approx_eq_eps -dot(b,y) -1/sqrt(2) tol
+  @test_approx_eq_eps c + A'y zeros(3) tol
+end
+
+# Problem SOC2A
+# Same as above but with NonPos instead of NonNeg
+# min  x
+# s.t.  1/√2 - y ∈ R₋
+#        1 - t ∈ {0}
+#      (t,x,y) ∈ SOC₃
+println("Problem SOC2")
+
+b = [1/sqrt(2), 1, 0, 0, 0]
+A = [ 0 1 0
+      0 0 1
+      0 0 -1
+      -1 0 0
+      0 -1 0 ]
+c = [ 1, 0, 0 ]
+constr_cones = [(:NonPos,1:1),(:Zero,2:2),(:SOC,3:5)]
+var_cones = [(:Free,1:3)]
+
+m = MathProgBase.model(s)
+MathProgBase.loadconicproblem!(m, c, A, b, constr_cones, var_cones)
+MathProgBase.optimize!(m)
+@test MathProgBase.status(m) == :Optimal
+@test_approx_eq_eps MathProgBase.getobjval(m) -1/sqrt(2) tol
+@test_approx_eq_eps MathProgBase.getsolution(m) [-1/sqrt(2), 1/sqrt(2), 1.0] tol
+
+if duals
+  y = MathProgBase.getconicdual(m)
+  @test_approx_eq_eps -dot(b,y) -1/sqrt(2) tol
+  @test_approx_eq_eps c + A'y zeros(3) tol
+end
+
 
 end
 
 function conicEXPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e-6)
-# Problem 4 - ExpPrimal
-# min x + y + z
-#  st  y e^(x/y) <= x, y > 0 (i.e (x, y, z) are in the exponential primal cone)
-#      x == 1
-#      y == 2
+    # Problem 4 - ExpPrimal
+    # min x + y + z
+    #  st  y e^(x/y) <= x, y > 0 (i.e (x, y, z) are in the exponential primal cone)
+    #      x == 1
+    #      y == 2
 
-println("Problem 4")
-m = MathProgBase.model(s)
-MathProgBase.loadconicproblem!(m,
-[1.0, 1.0, 1.0],
-[0.0 1.0 0.0;
- 1.0 0.0 0.0],
-[2.0, 1.0],
-[(:Zero,1:2)],
-[(:ExpPrimal, 1:3)])
-MathProgBase.optimize!(m)
-@test MathProgBase.status(m) == :Optimal
-@test_approx_eq_eps MathProgBase.getobjval(m) 6.2974 tol
-@test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 tol
-@test_approx_eq_eps MathProgBase.getsolution(m)[2] 2.0 tol
-@test_approx_eq_eps MathProgBase.getsolution(m)[3] 3.29744 tol
+    println("Problem 4")
+    m = MathProgBase.model(s)
+    c = [1.0, 1.0, 1.0]
+    A = [0.0 1.0 0.0;
+         1.0 0.0 0.0]
+    b = [2.0, 1.0]
+    MathProgBase.loadconicproblem!(m, c, A, b,
+    [(:Zero,1:2)],
+    [(:ExpPrimal, 1:3)])
+    MathProgBase.optimize!(m)
+    @test MathProgBase.status(m) == :Optimal
+    @test_approx_eq_eps MathProgBase.getobjval(m) 6.2974 tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[2] 2.0 tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 3.29744 tol
 
-if duals
-  # cvx_begin
-  #     variable x, y, z;
-  #     dual variable a, b, c, d;
-  #     minimize( x + y + z );
-  #     subject to
-  #         a : x == 1;
-  #         b : y == 2
-  #         { x, y, z } == exponential( 1 );
-  # cvx_end
-  # gives
-  # a = 2.6488
-  # b = 1.8243
-  d = MathProgBase.getconicdual(m)
-  @test_approx_eq_eps d[1] 1.8243 tol
-  @test_approx_eq_eps d[2] 2.6488 tol
-end
+    if duals
+        d = MathProgBase.getconicdual(m)
+        @test_approx_eq_eps -dot(b,d) MathProgBase.getobjval(m) tol
+        u,v,w = c+A'd
+        # should belong to the ExpDual cone
+        @test u < 0
+        @test -u*exp(v/w) ≤ exp(1)*w + tol
+    end
 
-# Problem 4A - ExpPrimal
-# Same as previous, except we put :ExpPrimal on constr_cones
-println("Problem 4A")
-m = MathProgBase.model(s)
-MathProgBase.loadconicproblem!(m,
-[1.0, 1.0, 1.0],
-[0.0 1.0 0.0;
- 1.0 0.0 0.0;
- -1.0 0.0 0.0;
- 0.0 -1.0 0.0;
- 0.0 0.0 -1.0],
-[2.0, 1.0, 0.0, 0.0, 0.0],
-[(:Zero,1:2), (:ExpPrimal, 3:5)],
-[(:Free, 1:3)])
-MathProgBase.optimize!(m)
-@test MathProgBase.status(m) == :Optimal
-@test_approx_eq_eps MathProgBase.getobjval(m) 6.2974 tol
-@test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 tol
-@test_approx_eq_eps MathProgBase.getsolution(m)[2] 2.0 tol
-@test_approx_eq_eps MathProgBase.getsolution(m)[3] 3.29744 tol
+    # Problem 4A - ExpPrimal
+    # Same as previous, except we put :ExpPrimal on constr_cones
+    println("Problem 4A")
+    m = MathProgBase.model(s)
+    c = [1.0, 1.0, 1.0]
+    A = [0.0 1.0 0.0;
+         1.0 0.0 0.0;
+         -1.0 0.0 0.0;
+         0.0 -1.0 0.0;
+         0.0 0.0 -1.0]
+    b = [2.0, 1.0, 0.0, 0.0, 0.0]
+    MathProgBase.loadconicproblem!(m, c, A, b,
+    [(:Zero,1:2), (:ExpPrimal, 3:5)],
+    [(:Free, 1:3)])
+    MathProgBase.optimize!(m)
+    @test MathProgBase.status(m) == :Optimal
+    @test_approx_eq_eps MathProgBase.getobjval(m) 6.2974 tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[2] 2.0 tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 3.29744 tol
 
-if duals
-  d = MathProgBase.getconicdual(m)
-  @test_approx_eq_eps d[1] 1.8243 tol
-  @test_approx_eq_eps d[2] 2.6488 tol
-  # TODO: How do I calculate the dual of the exp constraint and check it with a non-SCS library?
-  #
-end
+    if duals
+        d = MathProgBase.getconicdual(m)
+        @test_approx_eq_eps -dot(b,d) MathProgBase.getobjval(m) tol
+        @test_approx_eq_eps c+A'd zeros(3) tol
+        u,v,w = d[3:5]
+        # should belong to the ExpDual cone
+        @test u < 0
+        @test -u*exp(v/w) ≤ exp(1)*w + tol
+    end
 end
 
 
