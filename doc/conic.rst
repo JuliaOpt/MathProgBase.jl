@@ -66,7 +66,7 @@ Not all solvers are expected to support all types of cones. However, when a simp
 
 .. function:: getconicdual(m::AbstractMathProgModel)
 
-    If the solve was successful, returns the optimal dual solution vector :math:`y`.
+    If the solve was successful, returns the optimal dual solution vector :math:`y`. If the problem was found to be infeasible, returns a ray of the dual problem satisfying :math:`A^Ty \in K_2^*`, :math:`y \in K_1^*`, and :math:`-b^Ty > 0`.
 
 .. function:: supportedcones(m::AbstractMathProgSolver)
 
