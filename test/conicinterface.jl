@@ -288,7 +288,9 @@ function conicSOCtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
     @test_approx_eq_eps MathProgBase.getobjval(m) -1/sqrt(2) tol
-    @test_approx_eq_eps MathProgBase.getsolution(m) [-1/sqrt(2), 1/sqrt(2), 1.0] tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[1] -1/sqrt(2)  tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[2]  1/sqrt(2)  tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[3]  1.0  tol
 
     if duals
         y = MathProgBase.getconicdual(m)
@@ -319,7 +321,9 @@ function conicSOCtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
     @test_approx_eq_eps MathProgBase.getobjval(m) -1/sqrt(2) tol
-    @test_approx_eq_eps MathProgBase.getsolution(m) [-1/sqrt(2), 1/sqrt(2), 1.0] tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[1] -1/sqrt(2)  tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[2]  1/sqrt(2)  tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[3]  1.0  tol
 
     if duals
         y = MathProgBase.getconicdual(m)
