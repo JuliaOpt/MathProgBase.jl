@@ -53,6 +53,7 @@ immutable NLPModelMeta <: NLPModelMeta_BaseType
   jfree :: Array{Int,1}     # indices of "free" constraints (there shouldn't be any)
   jinf  :: Array{Int,1}     # indices of the visibly infeasible constraints
 
+  nnzo :: Int               # number of nonzeros in all objectives gradients
   nnzj :: Int               # number of nonzeros in the sparse Jacobian
   nnzh :: Int               # number of nonzeros in the sparse Hessian
 
@@ -67,6 +68,7 @@ immutable NLPModelMeta <: NLPModelMeta_BaseType
   lnet  :: Array{Int,1}     # indices of linear network constraints
 
   minimize :: Bool          # true if optimize == minimize
+  nlo  :: Int               # number of nonlinear objectives
   islp :: Bool              # true if the problem is a linear program
   name :: ASCIIString       # problem name
 
@@ -87,6 +89,7 @@ immutable NLPModelMeta <: NLPModelMeta_BaseType
                         y0=zeros(ncon,),
                         lcon=-Inf * ones(ncon,),
                         ucon=Inf * ones(ncon,),
+                        nnzo=nvar,
                         nnzj=nvar * ncon,
                         nnzh=nvar * (nvar + 1) / 2,
                         lin=[],
@@ -98,6 +101,7 @@ immutable NLPModelMeta <: NLPModelMeta_BaseType
                         nnnet=length(nnet),
                         nlnet=length(lnet),
                         minimize=true,
+                        nlo=1,
                         islp=false,
                         name="Generic")
     if (nvar < 1) || (ncon < 0)
@@ -135,9 +139,9 @@ immutable NLPModelMeta <: NLPModelMeta_BaseType
         nlvbi, nlvci, nlvoi, nwv,
         ncon, y0, lcon, ucon,
         jfix, jlow, jupp, jrng, jfree, jinf,
-        nnzj, nnzh,
+        nnzo, nnzj, nnzh,
         nlin, nnln, nnnet, nlnet, lin, nln, nnet, lnet,
-        minimize, islp, name)
+        minimize, nlo, islp, name)
   end
 end
 
