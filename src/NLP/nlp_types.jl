@@ -31,6 +31,16 @@ immutable NLPModelMeta <: NLPModelMeta_BaseType
   ifree :: Array{Int,1}     # indices of free variables
   iinf  :: Array{Int,1}     # indices of infeasible bounds
 
+  nbv   :: Int              # number of linear binary variables
+  niv   :: Int              # number of linear non-binary integer variables
+  nlvb  :: Int              # number of nonlinear variables in both objectives and constraints
+  nlvo  :: Int              # number of nonlinear variables in objectives (includes nlvb)
+  nlvc  :: Int              # number of nonlinear variables in constraints (includes nlvb)
+  nlvbi :: Int              # number of integer nonlinear variables in both objectives and constraints
+  nlvci :: Int              # number of integer nonlinear variables in constraints only
+  nlvoi :: Int              # number of integer nonlinear variables in objectives only
+  nwv   :: Int              # number of linear network (arc) variables
+
   ncon :: Int               # number of general constraints
   y0   :: Array{Float64,1}  # initial Lagrange multipliers
   lcon :: Array{Float64,1}  # vector of constraint lower bounds
@@ -43,18 +53,22 @@ immutable NLPModelMeta <: NLPModelMeta_BaseType
   jfree :: Array{Int,1}     # indices of "free" constraints (there shouldn't be any)
   jinf  :: Array{Int,1}     # indices of the visibly infeasible constraints
 
+  nnzo :: Int               # number of nonzeros in all objectives gradients
   nnzj :: Int               # number of nonzeros in the sparse Jacobian
   nnzh :: Int               # number of nonzeros in the sparse Hessian
 
   nlin  :: Int              # number of linear constraints
   nnln  :: Int              # number of nonlinear general constraints
-  nnet  :: Int              # number of nonlinear network constraints
+  nnnet :: Int              # number of nonlinear network constraints
+  nlnet :: Int              # number of linear network constraints
 
   lin   :: Array{Int,1}     # indices of linear constraints
   nln   :: Array{Int,1}     # indices of nonlinear constraints
-  net   :: Array{Int,1}     # indices of nonlinear network constraints
+  nnet  :: Array{Int,1}     # indices of nonlinear network constraints
+  lnet  :: Array{Int,1}     # indices of linear network constraints
 
   minimize :: Bool          # true if optimize == minimize
+  nlo  :: Int               # number of nonlinear objectives
   islp :: Bool              # true if the problem is a linear program
   name :: ASCIIString       # problem name
 
@@ -62,19 +76,32 @@ immutable NLPModelMeta <: NLPModelMeta_BaseType
                         x0=zeros(nvar,),
                         lvar=-Inf * ones(nvar,),
                         uvar=Inf * ones(nvar,),
+                        nbv=0,
+                        niv=0,
+                        nlvb=nvar,
+                        nlvo=nvar,
+                        nlvc=nvar,
+                        nlvbi=0,
+                        nlvci=0,
+                        nlvoi=0,
+                        nwv=0,
                         ncon=0,
                         y0=zeros(ncon,),
                         lcon=-Inf * ones(ncon,),
                         ucon=Inf * ones(ncon,),
+                        nnzo=nvar,
                         nnzj=nvar * ncon,
-                        nnzh=nvar * nvar,
+                        nnzh=nvar * (nvar + 1) / 2,
                         lin=[],
                         nln=1:ncon,
-                        net=[],
+                        nnet=[],
+                        lnet=[],
                         nlin=length(lin),
                         nnln=length(nln),
-                        nnet=length(net),
+                        nnnet=length(nnet),
+                        nlnet=length(lnet),
                         minimize=true,
+                        nlo=1,
                         islp=false,
                         name="Generic")
     if (nvar < 1) || (ncon < 0)
@@ -85,8 +112,9 @@ immutable NLPModelMeta <: NLPModelMeta_BaseType
     @lencheck ncon y0 lcon ucon
     @lencheck nlin lin
     @lencheck nnln nln
-    @lencheck nnet net
-    @rangecheck 1 ncon lin nln net
+    @lencheck nnnet nnet
+    @lencheck nlnet lnet
+    @rangecheck 1 ncon lin nln nnet lnet
 
     ifix  = find(lvar .== uvar);
     ilow  = find((lvar .> -Inf) & (uvar .== Inf));
@@ -107,11 +135,13 @@ immutable NLPModelMeta <: NLPModelMeta_BaseType
 
     new(nvar, x0, lvar, uvar,
         ifix, ilow, iupp, irng, ifree, iinf,
+        nbv, niv, nlvb, nlvo, nlvc,
+        nlvbi, nlvci, nlvoi, nwv,
         ncon, y0, lcon, ucon,
         jfix, jlow, jupp, jrng, jfree, jinf,
-        nnzj, nnzh,
-        nlin, nnln, nnet, lin, nln, net,
-        minimize, islp, name)
+        nnzo, nnzj, nnzh,
+        nlin, nnln, nnnet, nlnet, lin, nln, nnet, lnet,
+        minimize, nlo, islp, name)
   end
 end
 
@@ -143,7 +173,10 @@ function print(io :: IO, nlp :: NLPModelMeta)
   if nlp.nnln > 0
     @printf("nonlinear constraints: "); display(nlp.nln'); @printf("\n");
   end
-  if nlp.nnet > 0
-    @printf("network constraints:   "); display(nlp.net'); @printf("\n");
+  if nlp.nlnet > 0
+    @printf("linear network constraints:   "); display(nlp.lnet'); @printf("\n");
+  end
+  if nlp.nnnet > 0
+    @printf("nonlinear network constraints:   "); display(nlp.nnet'); @printf("\n");
   end
 end
