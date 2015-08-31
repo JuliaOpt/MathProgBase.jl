@@ -366,7 +366,7 @@ end
 function conicEXPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e-6)
     # Problem 4 - ExpPrimal
     # min x + y + z
-    #  st  y e^(x/y) <= x, y > 0 (i.e (x, y, z) are in the exponential primal cone)
+    #  st  y e^(x/y) <= z, y > 0 (i.e (x, y, z) are in the exponential primal cone)
     #      x == 1
     #      y == 2
 
@@ -381,10 +381,10 @@ function conicEXPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     [(:ExpPrimal, 1:3)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @test_approx_eq_eps MathProgBase.getobjval(m) 6.2974 tol
+    @test_approx_eq_eps MathProgBase.getobjval(m) (2*exp(1/2)+3) tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[2] 2.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 3.29744 tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 2*exp(1/2) tol
 
     if duals
         d = MathProgBase.getconicdual(m)
@@ -411,10 +411,10 @@ function conicEXPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     [(:Free, 1:3)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @test_approx_eq_eps MathProgBase.getobjval(m) 6.2974 tol
+    @test_approx_eq_eps MathProgBase.getobjval(m) (2*exp(1/2)+3) tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[2] 2.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 3.29744 tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 2*exp(1/2) tol
 
     if duals
         d = MathProgBase.getconicdual(m)
