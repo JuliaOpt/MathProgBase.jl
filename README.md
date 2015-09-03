@@ -1,5 +1,6 @@
 # MathProgBase
 
+[![Build Status](https://travis-ci.org/JuliaOpt/MathProgBase.jl.svg?branch=master)](https://travis-ci.org/JuliaOpt/MathProgBase.jl)
 [![MathProgBase](http://pkg.julialang.org/badges/MathProgBase_0.3.svg)](http://pkg.julialang.org/?pkg=MathProgBase&ver=0.3)
 [![MathProgBase](http://pkg.julialang.org/badges/MathProgBase_0.4.svg)](http://pkg.julialang.org/?pkg=MathProgBase&ver=0.4)
 
