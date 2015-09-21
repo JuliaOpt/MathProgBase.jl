@@ -6,7 +6,7 @@ type MixintprogSolution
     attrs
 end
 
-typealias SymbolInputVector Union(Vector{Symbol},Symbol)
+@compat typealias SymbolInputVector Union{Vector{Symbol},Symbol}
 
 function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::SymbolInputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultMIPsolver)
     m = model(solver)

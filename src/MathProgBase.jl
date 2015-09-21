@@ -6,7 +6,11 @@ include(joinpath(dirname(@__FILE__),"SolverInterface","SolverInterface.jl"))
 using .SolverInterface
 
 # deprecated name
-const MathProgSolverInterface = SolverInterface
+if VERSION > v"0.4-"
+    @eval @Base.deprecate_binding MathProgSolverInterface SolverInterface
+else
+    const MathProgSolverInterface = SolverInterface
+end
 
 include("defaultsolvers.jl")
 
