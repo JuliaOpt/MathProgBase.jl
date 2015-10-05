@@ -7,7 +7,6 @@
 
 using Base.Test
 using MathProgBase
-using MathProgBase.MathProgSolverInterface
 
 function coniclineartest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e-6)
 
