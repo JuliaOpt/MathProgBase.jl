@@ -32,6 +32,7 @@ export AbstractMathProgSolver
     loadproblem!
     writeproblem
     updatemodel!
+    freemodel!
     optimize!
 end
 

@@ -105,7 +105,14 @@ to indicate equality constraints.
     coefficients, and the ``varidx`` vector contains the indices of the corresponding
     variables.
 
+.. function:: freemodel!(m::AbstractMathProgModel)
 
+    Release any resources and memory used by the model. Note that the
+    Julia garbage collector takes care of this automatically, but
+    automatic collection cannot always be forced. This method is useful for more
+    precise control of resources, especially in the case of commercial solvers
+    with licensing restrictions on the number of concurrent runs.
+    Users must discard the model object after this method is invoked.
 
 .. function:: updatemodel!(m::AbstractMathProgModel)
 
