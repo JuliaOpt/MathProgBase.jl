@@ -106,11 +106,6 @@ to indicate equality constraints.
     variables.
 
 
-
-.. function:: updatemodel!(m::AbstractMathProgModel)
-
-    Commits recent changes to the model. Only required by some solvers (e.g. Gurobi).
-
 .. function:: setsense!(m::AbstractMathProgModel, sense)
 
     Sets the optimization sense of the model. Accepted values are ``:Min`` and ``:Max``.

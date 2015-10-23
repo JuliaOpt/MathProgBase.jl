@@ -1,6 +1,6 @@
 using Base.Test
 using MathProgBase
-using MathProgBase.MathProgSolverInterface
+using MathProgBase.SolverInterface
 
 function linprogsolvertest(solver::AbstractMathProgSolver)
 
@@ -31,7 +31,6 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     setsense!(m, :Max)
     # max x
     setobj!(m, [1.0,0.0])
-    updatemodel!(m)
     optimize!(m)
 
     @test status(m) == :Optimal
@@ -46,7 +45,6 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     # s.t. x + y + z <= 1
     # x,y,z >= 0
     addvar!(m, [1], [1.0], 0, Inf, 2.0)
-    updatemodel!(m)
 
     @test numvar(m) == 3
     @test numconstr(m) == 1
@@ -61,7 +59,6 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     @test_approx_eq getreducedcosts(m) [-1.0, -2.0, 0.0]
 
     setvarLB!(m, [-1.0,0.0,0.0])
-    updatemodel!(m)
     optimize!(m)
 
     @test status(m) == :Optimal
@@ -70,7 +67,6 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     # fix z to zero
     setvarLB!(m, [0.0,0.0,0.0])
     setvarUB!(m, [Inf,Inf,0.0])
-    updatemodel!(m)
     optimize!(m)
 
     @test status(m) == :Optimal
@@ -78,12 +74,10 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
 
     setconstrUB!(m, [2.0])
     setconstrLB!(m, [2.0])
-    updatemodel!(m)
     optimize!(m)
     @test_approx_eq getobjval(m) 2
 
     setobj!(m, [1.0, 2.0, 0.0])
-    updatemodel!(m)
     optimize!(m)
     @test_approx_eq getobjval(m) 4
     @test_approx_eq getsolution(m) [0.0, 2.0, 0.0]
@@ -96,7 +90,6 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
 
     # add constraint x - y >= 0
     addconstr!(m, [1,2], [1.0,-1.0], 0.0, Inf)
-    updatemodel!(m)
     optimize!(m)
 
     @test status(m) == :Optimal
@@ -115,9 +108,7 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     # x, y >= 0
     addvar!(m, 0, Inf, -1)
     addvar!(m, 0, Inf, 0)
-    updatemodel!(m)
     addconstr!(m, [1, 2], [1.0, 1.0], -Inf, 1.0)
-    updatemodel!(m)
     @test numvar(m) == 2
     @test numconstr(m) == 1
     @test getvarLB(m) == [0.,0.]

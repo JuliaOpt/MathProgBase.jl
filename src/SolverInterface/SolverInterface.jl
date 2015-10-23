@@ -31,7 +31,7 @@ export AbstractMathProgSolver
     model
     loadproblem!
     writeproblem
-    updatemodel!
+    updatemodel! # THIS IS DEPRECATED, REMOVE IN MPB v0.4
     optimize!
 end
 
