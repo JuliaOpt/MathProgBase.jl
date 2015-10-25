@@ -42,22 +42,25 @@ for solvertype in ["LP", "MIP", "QP", "SDP", "NLP", "Conic"]
     solvers = symbol(solvertype*"solvers")
 
 
-    @eval begin function SolverInterface.model(s::$typename)
+    @eval function SolverInterface.model(s::$typename)
         for (pkgname, solvername) in $solvers
-            if isdir(Pkg.dir((string(pkgname))))
-                try
-                    eval(Expr(:import,pkgname))
-                catch
-                    warn("Package ",string(pkgname)," is installed but couldn't be loaded. ",
-                        "You may need to run `Pkg.build(\"$pkgname\")`")
+            try
+                eval(Expr(:import,pkgname))
+            catch
+                if isdir(Pkg.dir((string(pkgname))))
+                    warn("Package ",string(pkgname),
+                         " is installed but couldn't be loaded. ",
+                         "You may need to run `Pkg.build(\"$pkgname\")`")
                 end
-                ex = Expr(:(=), $(quot(defaultname)), Expr(:call,Expr(:.,pkgname,quot(solvername))))
-                eval(ex)
-                ex = Expr(:call,:model, $(quot(defaultname)))
-                return eval(ex)
+                continue
             end
+            ex = Expr(:(=), $(quot(defaultname)),
+                      Expr(:call, Expr(:., pkgname, quot(solvername))))
+            eval(ex)
+            ex = Expr(:call, :model, $(quot(defaultname)))
+            return eval(ex)
         end
         suggestions = join(["\"$(pkgname)\", " for (pkgname,solvername) in $solvers], ' ')
         error("No ",$solvertype, " solver detected. Try installing one of the following packages: ", suggestions, " and restarting Julia")
-    end end
+    end
 end
