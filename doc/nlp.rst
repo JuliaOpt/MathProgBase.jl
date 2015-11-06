@@ -44,7 +44,7 @@ We take the prototypical format for a nonlinear problem as
     s.t.     &lb \leq g(x) \leq ub\\
              &l \leq x \leq u\\
 
-Where :math:`x \in \mathbb{R}^n, f: \mathbb{R}^n \to \mathbb{R}, g: \mathbb{R}^n \to \mathbb{R}^m`, and vectors :math:`lb \in \mathbb{R}^m \cup \{-\infty\}, ub \in \mathbb{R}^m \cup \{\infty\},l \in \mathbb{R}^n \cup \{-\infty\}, u \in \mathbb{R}^n \cup \{\infty\}`.
+Where :math:`x \in \mathbb{R}^n, f: \mathbb{R}^n \to \mathbb{R}, g: \mathbb{R}^n \to \mathbb{R}^m`, and vectors :math:`lb \in (\mathbb{R} \cup \{-\infty\})^m, ub \in (\mathbb{R} \cup \{\infty\})^m,l \in (\mathbb{R} \cup \{-\infty\})^n, u \in (\mathbb{R} \cup \{\infty\})^n`.
 
 The objective function :math:`f` and constraint function :math:`g` may be nonlinear and nonconvex, but are typically expected to be twice differentiable.
 
