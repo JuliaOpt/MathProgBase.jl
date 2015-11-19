@@ -1,6 +1,6 @@
 using Base.Test
 using MathProgBase
-using MathProgBase.MathProgSolverInterface
+using MathProgBase.SolverInterface
 
 function linprogsolvertest(solver::AbstractMathProgSolver)
 
