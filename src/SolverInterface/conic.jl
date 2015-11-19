@@ -109,7 +109,7 @@ function loadconicproblem!(m::AbstractMathProgModel, c, A, b, constr_cones, var_
 
     for (cone, idx) in var_cones
         cone == :SOC || continue
-        addquadconstr!(m, Int[], Float64[], vcat(idx), vcat(idx), [-1.0, ones(length(idx)-1)], '<', 0.0)
+        addquadconstr!(m, Int[], Float64[], vcat(idx), vcat(idx), [-1.0; ones(length(idx)-1)], '<', 0.0)
     end
 
     k = 1
