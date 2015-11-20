@@ -5,7 +5,7 @@ type LinprogSolution
     attrs
 end
 
-@compat typealias InputVector{T<:Union{Real,Char}} Union{Vector{T},Real,Char}
+typealias InputVector{T<:Union{Real,Char}} Union{Vector{T},Real,Char}
 
 function expandvec(x,len::Integer)
     if isa(x,Vector)
