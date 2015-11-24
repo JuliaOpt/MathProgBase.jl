@@ -1,10 +1,10 @@
----------------------
-Nonlinear Programming
----------------------
+----------------
+Nonlinear models
+----------------
 
-MathProgBase provides an interface for nonlinear programming which is independent of both the solver and the user's representation of the problem, whether using an algebraic modeling language or customized low-level code.
+The abstraction for nonlinear models is independent of both the solver and the user's representation of the problem, whether using an algebraic modeling language or customized low-level code.
 
-The diagram below illustrates MathProgBase as the connection between typical NLP solvers IPOPT, MOSEK, and KNITRO, and modeling languages such as `JuMP <https://github.com/JuliaOpt/JuMP.jl>`_ and `AMPL <http://ampl.com/>`_ (via `ampl.jl <https://github.com/dpo/ampl.jl>`_).
+The diagram below illustrates MathProgBase as the connection between typical nonlinear programming (NLP) solvers IPOPT, MOSEK, and KNITRO, and modeling languages such as `JuMP <https://github.com/JuliaOpt/JuMP.jl>`_ and `AMPL <http://ampl.com/>`_ (via `AmplNLReader.jl <https://github.com/dpo/AmplNLReader.jl>`_).
 
 .. graph:: foo
   
@@ -48,9 +48,9 @@ Where :math:`x \in \mathbb{R}^n, f: \mathbb{R}^n \to \mathbb{R}, g: \mathbb{R}^n
 
 The objective function :math:`f` and constraint function :math:`g` may be nonlinear and nonconvex, but are typically expected to be twice differentiable.
 
-Below we describe extensions to the ``MathProgSolverInterface`` for these nonlinear programming problems.
+Below we describe the interface for ``AbstractNonlinearModel``.
 
-.. function:: loadnonlinearproblem!(m::AbstractMathProgModel, numVar, numConstr, l, u, lb, ub, sense, d::AbstractNLPEvaluator)
+.. function:: loadproblem!(m::AbstractNonlinearModel, numVar, numConstr, l, u, lb, ub, sense, d::AbstractNLPEvaluator)
     
     Loads the nonlinear programming problem into the model. The parameter `numVar` is the number of variables in the problem, ``numConstr`` is the number of constraints, ``l`` contains the variable lower bounds, ``u`` contains the variable upper bounds, ``lb`` contains the constraint lower bounds, and ``ub`` contains the constraint upper bounds. Sense contains the symbol ``:Max`` or ``:Min``, indicating the direction of optimization. The final parameter ``d`` is an instance of an ``AbstractNLPEvaluator``, described below, which may be queried for evaluating :math:`f` and :math:`g` and their corresponding derivatives.
 
@@ -172,6 +172,17 @@ The abstract type ``AbstractNLPEvaluator`` is used by solvers for accessing the 
     Double-sided constraints are allowed, in which case both the lower bound and
     upper bounds should be constants; for example, ``:(-1 <= cos(x[1]) + sin(x[2]) <= 1)`` is valid.
 
+Nonlinear solvers may also provide optimal Lagrange multipliers if available through ``getreducedcosts`` and ``getconstrduals``.
 
-The solution vector, optimal objective value, termination status, etc. should be accessible from the standard methods, e.g., ``getsolution``, ``getobjval``, ``status``, respectively. Nonlinear solvers may also provide optimal Lagrange multipliers if available through ``getreducedcosts`` and ``getconstrduals``.
+.. function:: getreducedcosts(m::AbstractNonlinearModel)
+
+    Returns the dual solution vector corresponding to the variable bounds,
+    known as the reduced costs. Not available when integer variables are present.
+
+.. function:: getconstrduals(m::AbstractNonlinearModel)
+
+    Returns the dual solution vector corresponding to the constraints.
+    Not available when integer variables are present.
+
+
 

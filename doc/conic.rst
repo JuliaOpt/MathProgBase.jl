@@ -1,10 +1,10 @@
------------------
-Conic Programming
------------------
+------------
+Conic models
+------------
 
 Conic programming is an important class of convex optimization problems for
 which there exist specialized efficient solvers. 
-We describe extensions to the ``MathProgSolverInterface`` for conic problems.
+We describe the interface for ``AbstractConicModel`` here.
 
 The design of this interface is inspired by the `CBLIB format <http://cblib.zib.de/format.pdf>`_ and the `MOSEK modeling manual <http://docs.mosek.com/generic/modeling-letter.pdf>`_. 
 
@@ -40,7 +40,7 @@ The recognized cones are:
 Not all solvers are expected to support all types of cones. However, when a simple transformation to a supported cone is available, for example, from ``:NonPos`` to ``:NonNeg`` or from ``:SOCRotated`` to ``:SOC``, solvers *should* perform this transformation in order to allow users the extra flexibility in modeling.
 
 
-.. function:: loadconicproblem!(m::AbstractMathProgModel, c, A, b, constr_cones, var_cones)
+.. function:: loadproblem!(m::AbstractConicModel, c, A, b, constr_cones, var_cones)
    
     Load the conic problem in primal form into the model. The parameter ``c``
     is the objective vector, the parameter ``A``
@@ -64,13 +64,10 @@ Not all solvers are expected to support all types of cones. However, when a simp
     ``indices``, the corresponding matrix has
     :math:`\left(\sqrt{\frac{1}{4}+2y}-\frac{1}{2}\right) \times \left(\sqrt{\frac{1}{4}+2y}-\frac{1}{2}\right)` elements.
 
-.. function:: getconicdual(m::AbstractMathProgModel)
+.. function:: getdual(m::AbstractConicModel)
 
     If the solve was successful, returns the optimal dual solution vector :math:`y`. If the problem was found to be infeasible, returns a ray of the dual problem satisfying :math:`A^Ty \in K_2^*`, :math:`y \in K_1^*`, and :math:`-b^Ty > 0`.
 
 .. function:: supportedcones(m::AbstractMathProgSolver)
 
-    Returns a list of cones supported by the solver.
-
-The solution vector, optimal objective value, termination status, etc. should be accessible from the standard methods, e.g., ``getsolution``, ``getobjval``, ``status``, respectively.
-    
+    If the solver implements ``ConicModel``, returns a list of cones supported.
