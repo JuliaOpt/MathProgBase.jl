@@ -1,8 +1,14 @@
+# Methods for the Nonlinear interface
+
+abstract AbstractNonlinearModel <: AbstractMathProgModel
+export AbstractNonlinearModel
+
 abstract AbstractNLPEvaluator
 export AbstractNLPEvaluator
 
 # methods for AbstractNLPEvaluator
 @define_interface begin
+    NonlinearModel
     initialize
     features_available
     eval_f
@@ -27,6 +33,4 @@ isobjlinear(::AbstractNLPEvaluator) = false
 isobjquadratic(::AbstractNLPEvaluator) = false
 isconstrlinear(::AbstractNLPEvaluator, i::Integer) = false
 
-# additional methods for AbstractMathProgModel
-loadnonlinearproblem!() = throw(MethodError(:loadnonlinearproblem!,()))
-export loadnonlinearproblem!
+# getreducedcosts and getconstrduals already have stubs

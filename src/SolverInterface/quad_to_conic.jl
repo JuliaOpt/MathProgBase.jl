@@ -4,10 +4,10 @@ end
 
 export ConicSolverWrapper
 
-model(s::ConicSolverWrapper) = ConicModelWrapper(model(s.solver), sparse(Int[],Int[],Float64[]), Float64[], Float64[], Float64[], Float64[], Float64[], :Uninitialized, Int[], Array(Vector{Int},0))
+LinearQuadraticModel(s::ConicSolverWrapper) = ConicModelWrapper(ConicModel(s.solver), sparse(Int[],Int[],Float64[]), Float64[], Float64[], Float64[], Float64[], Float64[], :Uninitialized, Int[], Array(Vector{Int},0))
 
-type ConicModelWrapper <: AbstractMathProgModel
-    m::AbstractMathProgModel
+type ConicModelWrapper <: AbstractLinearQuadraticModel
+    m::AbstractConicModel
     A::SparseMatrixCSC{Float64,Int}
     collb::Vector{Float64}
     colub::Vector{Float64}
@@ -163,7 +163,7 @@ function optimize!(wrap::ConicModelWrapper)
     end
 
     #@show obj, full(A), b, constr_cones, var_cones
-    loadconicproblem!(wrap.m, obj, A, b, constr_cones, var_cones)
+    loadproblem!(wrap.m, obj, A, b, constr_cones, var_cones)
     optimize!(wrap.m)
 
 end
@@ -180,7 +180,7 @@ end
 
 function getreducedcosts(wrap::ConicModelWrapper)
     redcost = zeros(length(wrap.collb))
-    conedual = getconicdual(wrap.m)
+    conedual = getdual(wrap.m)
     for i in 1:length(wrap.varboundmap)
         varidx = wrap.varboundmap[i]
         redcost[varidx] -= conedual[i]
@@ -194,7 +194,7 @@ end
 function getconstrduals(wrap::ConicModelWrapper)
     constrduals = zeros(length(wrap.rowlb))
     offset = length(wrap.varboundmap)
-    conedual = getconicdual(wrap.m)
+    conedual = getdual(wrap.m)
     for i in (offset+1):(offset+length(wrap.rowlb))
         constrduals[i-offset] -= conedual[i]
     end

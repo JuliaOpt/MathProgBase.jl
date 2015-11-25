@@ -1,12 +1,17 @@
+# Methods for the Conic interface
+
+abstract AbstractConicModel <: AbstractMathProgModel
+export AbstractConicModel
+
 @define_interface begin
-    loadconicproblem!
-    getconicdual
+    ConicModel
+    getdual
     supportedcones
 end
 
 # This fallback method trys to solve the cone problem as an LP, but
 # will error if an incompatable cone is detected
-function loadconicproblem!(m::AbstractMathProgModel, c, A, b, constr_cones, var_cones)
+function loadproblem!(m::AbstractConicModel, c, A, b, constr_cones, var_cones)
     # Conic form        LP form
     # min  c'x          min      c'x
     #  st b-Ax ∈ K_1     st lb <= Ax <= b

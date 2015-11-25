@@ -9,7 +9,7 @@ end
 typealias SymbolInputVector Union{Vector{Symbol},Symbol}
 
 function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::SymbolInputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultMIPsolver)
-    m = model(solver)
+    m = LinearQuadraticModel(solver)
     nrow,ncol = size(A)
 
     c = expandvec(c, ncol)

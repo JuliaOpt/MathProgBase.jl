@@ -4,7 +4,7 @@ using MathProgBase.SolverInterface
 
 function linprogsolvertest(solver::AbstractMathProgSolver)
 
-    m = model(solver)
+    m = LinearQuadraticModel(solver)
 
     # Min -x
     # s.t. x + y <= 1
@@ -108,7 +108,7 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
 
     # test addvar! interface
 
-    m = model(solver)
+    m = LinearQuadraticModel(solver)
 
     # Min -x
     # s.t. x + y <= 1
