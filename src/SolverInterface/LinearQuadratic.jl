@@ -1,0 +1,110 @@
+# Methods for the LinearQuadratic interface
+
+abstract AbstractLinearQuadraticModel <: AbstractMathProgModel
+export AbstractLinearQuadraticModel 
+
+#    writeproblem
+#    updatemodel!
+#    freemodel!
+#    optimize!
+
+@define_interface begin
+    LinearQuadraticModel
+    setvarLB!
+    setvarUB!
+    setconstrLB!
+    setconstrUB!
+    setobj!
+    addvar!
+    addconstr!
+    setsense!
+    setvartype!
+    setwarmstart!
+    addsos1!
+    addsos2!
+    updatemodel!
+    writeproblem
+    getvarLB
+    getvarUB
+    getconstrLB
+    getconstrUB
+    getobj
+    getconstrmatrix
+    getsense
+    numlinconstr
+    getconstrsolution
+    getreducedcosts
+    getconstrduals
+    getvartype
+    getinfeasibilityray
+    getunboundedray
+    getsimplexiter
+    getbarrieriter
+    getnodecount
+    getbasis
+end
+
+# default addvar!, not adding to any existing constraints
+addvar!(m::AbstractMathProgModel, collb, colub, objcoef) = addvar!(m, [], [], collb, colub, objcoef)
+
+# Quadratic methods
+
+@define_interface begin
+    numquadconstr
+    setquadobj!
+    setquadobjterms!
+    addquadconstr!
+    getquadconstrsolution
+    getquadconstrduals
+    getquadinfeasibilityray
+    getquadconstrRHS
+    setquadconstrRHS!
+end
+
+function setquadobjterms!(m::AbstractMathProgModel, rowidx, colidx, quadval)
+    (n = length(rowidx)) == length(colidx) == length(quadval) || error("Inconsistent input dimensions")
+    nquadval = copy(quadval)
+    for i in 1:length(rowidx)
+        if rowidx[i] == colidx[i] # if on diagonal...
+            nquadval[i] *= 2
+        end
+    end
+    if applicable(setquadobj!, m, rowidx, colidx, nquadval)
+        setquadobj!(m, rowidx, colidx, nquadval)
+    else
+        error("Solver does not support quadratic objectives")
+    end
+end
+
+setquadobj!(m::AbstractMathProgModel,Q::Matrix) = setquadobj!(m,sparse(float(Q)))
+function setquadobj!(m::AbstractMathProgModel,Q::SparseMatrixCSC{Float64})
+    if issym(Q) || istriu(Q)
+        nnz_q = nnz(Q)
+        qr = Array(Cint, nnz_q)
+        qc = Array(Cint, nnz_q)
+        qv = Array(Cdouble, nnz_q)
+        k = 0
+        colptr::Vector{Int} = Q.colptr
+        nzval::Vector{Float64} = Q.nzval
+
+        for i = 1:numvar(m)
+            qi::Cint = convert(Cint, i)
+            for j = colptr[i]:(colptr[i+1]-1)
+                qj = convert(Cint, Q.rowval[j])
+                if qi <= qj
+                    k += 1
+                    qr[k] = qi
+                    qc[k] = qj
+                    qv[k] = nzval[j]
+                end
+            end
+        end
+        if applicable(setquadobj!, m, qr, qc, qv)
+            setquadobj!(m,qr[1:k],qc[1:k],qv[1:k])
+        else
+            error("Solver does not support quadratic objectives")
+        end
+    else
+        error("Quadratic cost coefficient matrix Q is not symmetric or upper triangular")
+    end
+end
