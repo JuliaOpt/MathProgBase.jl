@@ -27,7 +27,7 @@ abstract AbstractMathProgSolver
 export AbstractMathProgSolver
 
 # create dummy method to define function so that we can attach methods in other modules
-# these are the common methods fore AbstractMathProgModel
+# these are the common methods for AbstractMathProgModel
 @define_interface begin
     getsolution
     getobjval
