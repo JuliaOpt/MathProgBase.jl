@@ -1,12 +1,9 @@
-type ConicSolverWrapper <: AbstractMathProgSolver
-    solver::AbstractMathProgSolver
-end
+# wrapper to convert Conic solver into LPQP solver
 
-export ConicSolverWrapper
+# To enable LPQP support from a Conic solver, define, e.g.,
+# LinearQuadraticModel(s::ECOSSolver) = ConicToLPQPBridge(ConicModel(s))
 
-LinearQuadraticModel(s::ConicSolverWrapper) = ConicModelWrapper(ConicModel(s.solver), sparse(Int[],Int[],Float64[]), Float64[], Float64[], Float64[], Float64[], Float64[], :Uninitialized, Int[], Array(Vector{Int},0))
-
-type ConicModelWrapper <: AbstractLinearQuadraticModel
+type ConicToLPQPBridge <: AbstractLinearQuadraticModel
     m::AbstractConicModel
     A::SparseMatrixCSC{Float64,Int}
     collb::Vector{Float64}
@@ -19,12 +16,16 @@ type ConicModelWrapper <: AbstractLinearQuadraticModel
     SOCconstrs::Vector{Vector{Int}} # x'x <= y^2, y is first index in vector
 end
 
+ConicToLPQPBridge(s::AbstractConicModel) = ConicToLPQPBridge(s, sparse(Int[],Int[],Float64[]), Float64[], Float64[], Float64[], Float64[], Float64[], :Uninitialized, Int[], Array(Vector{Int},0))
+
+export ConicToLPQPBridge
+
 # Loads the provided problem data to set up the linear programming problem:
 # min c'x
 # st  lb <= Ax <= ub
 #      l <=  x <= u
 # where sense = :Min or :Max
-function loadproblem!(wrap::ConicModelWrapper, A, collb, colub, obj, rowlb, rowub, sense)
+function loadproblem!(wrap::ConicToLPQPBridge, A, collb, colub, obj, rowlb, rowub, sense)
     wrap.A = A
     wrap.collb = collb
     wrap.colub = colub
@@ -36,7 +37,7 @@ end
 
 const notsoc_error = "For conic solvers, only quadratic constraints in second-order conic format (x'x <= y^2) are supported"
 
-function addquadconstr!(wrap::ConicModelWrapper, linearidx, linearval, quadrowidx, quadcolidx, quadval, sense, rhs)
+function addquadconstr!(wrap::ConicToLPQPBridge, linearidx, linearval, quadrowidx, quadcolidx, quadval, sense, rhs)
     if length(linearidx) > 0 || length(linearval) > 0 || sense != '<' || rhs != 0 || mapreduce(v-> (v == 0.0 || v == 1.0), +, 0, quadval) != length(quadval) - 1 || mapreduce(v->v == -1.0, +, 0, quadval) != 1
         error(notsoc_error)
     end
@@ -56,7 +57,7 @@ function addquadconstr!(wrap::ConicModelWrapper, linearidx, linearval, quadrowid
 end
 
 
-function optimize!(wrap::ConicModelWrapper)
+function optimize!(wrap::ConicToLPQPBridge)
     A = wrap.A
     collb = wrap.collb
     colub = wrap.colub
@@ -168,9 +169,9 @@ function optimize!(wrap::ConicModelWrapper)
 
 end
 
-getsolution(wrap::ConicModelWrapper) = getsolution(wrap.m)
-status(wrap::ConicModelWrapper) = status(wrap.m)
-function getobjval(wrap::ConicModelWrapper)
+getsolution(wrap::ConicToLPQPBridge) = getsolution(wrap.m)
+status(wrap::ConicToLPQPBridge) = status(wrap.m)
+function getobjval(wrap::ConicToLPQPBridge)
     if wrap.sense == :Max
         return -getobjval(wrap.m)
     else
@@ -178,7 +179,7 @@ function getobjval(wrap::ConicModelWrapper)
     end
 end
 
-function getreducedcosts(wrap::ConicModelWrapper)
+function getreducedcosts(wrap::ConicToLPQPBridge)
     redcost = zeros(length(wrap.collb))
     conedual = getdual(wrap.m)
     for i in 1:length(wrap.varboundmap)
@@ -191,7 +192,7 @@ function getreducedcosts(wrap::ConicModelWrapper)
     return redcost
 end
 
-function getconstrduals(wrap::ConicModelWrapper)
+function getconstrduals(wrap::ConicToLPQPBridge)
     constrduals = zeros(length(wrap.rowlb))
     offset = length(wrap.varboundmap)
     conedual = getdual(wrap.m)

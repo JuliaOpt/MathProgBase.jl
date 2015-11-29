@@ -54,7 +54,9 @@ include("Nonlinear.jl")
 include("Conic.jl")
 
 # Solver conversion routines
-include("quad_to_conic.jl")
+include("conic_to_lpqp.jl")
+include("lpqp_to_conic.jl")
+include("nonlinear_to_lpqp.jl")
 
 
 end
