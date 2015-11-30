@@ -40,7 +40,7 @@ Solver objects should inherit from the ``AbstractMathProgSolver`` abstract type.
 
 The interfaces for these three classes of models are defined in the subsequent sections.
 
-All abstract model types inherit from the abstact type ``AbstractMathProgModel``. The following methods are common to all model types:
+All abstract model types inherit from the abstract type ``AbstractMathProgModel``. The following methods are common to all model types:
 
 .. function:: getsolution(m::AbstractMathProgModel)
 
