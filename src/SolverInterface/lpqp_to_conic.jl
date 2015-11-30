@@ -2,6 +2,8 @@
 
 # To enable Conic support from an LPQP solver, define, e.g.,
 # ConicModel(s::GurobiSolver) = LPQPtoConicBridge(LinearQuadraticModel(s))
+# Must also implement supportedcones(). List SOC as a supported cone if it can
+# be passed as a quadratic constraint.
 
 type LPQPtoConicBridge <: AbstractConicModel
     lpqpmodel::AbstractLinearQuadraticModel
