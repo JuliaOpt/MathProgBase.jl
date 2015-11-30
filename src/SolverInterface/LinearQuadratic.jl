@@ -1,3 +1,54 @@
+# Methods for the LinearQuadratic interface
+
+abstract AbstractLinearQuadraticModel <: AbstractMathProgModel
+export AbstractLinearQuadraticModel 
+
+#    writeproblem
+#    updatemodel!
+#    freemodel!
+#    optimize!
+
+@define_interface begin
+    LinearQuadraticModel
+    setvarLB!
+    setvarUB!
+    setconstrLB!
+    setconstrUB!
+    setobj!
+    addvar!
+    addconstr!
+    setsense!
+    setvartype!
+    setwarmstart!
+    addsos1!
+    addsos2!
+    updatemodel!
+    writeproblem
+    getvarLB
+    getvarUB
+    getconstrLB
+    getconstrUB
+    getobj
+    getconstrmatrix
+    getsense
+    numlinconstr
+    getconstrsolution
+    getreducedcosts
+    getconstrduals
+    getvartype
+    getinfeasibilityray
+    getunboundedray
+    getsimplexiter
+    getbarrieriter
+    getnodecount
+    getbasis
+end
+
+# default addvar!, not adding to any existing constraints
+addvar!(m::AbstractMathProgModel, collb, colub, objcoef) = addvar!(m, [], [], collb, colub, objcoef)
+
+# Quadratic methods
+
 @define_interface begin
     numquadconstr
     setquadobj!

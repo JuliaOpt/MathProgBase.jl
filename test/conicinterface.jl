@@ -18,8 +18,8 @@ function coniclineartest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol
     # Opt solution = -11
     # x = 1, y = 0, z = 2
     println("Problem LIN1")
-    m = MathProgBase.model(s)
-    MathProgBase.loadconicproblem!(m,
+    m = MathProgBase.ConicModel(s)
+    MathProgBase.loadproblem!(m,
     [-3.0, -2.0, -4.0],
     [ 1.0   1.0   1.0;
       0.0   1.0   1.0],
@@ -33,7 +33,7 @@ function coniclineartest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[2] 0.0 tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[3] 2.0 tol
     if duals
-        d = MathProgBase.getconicdual(m)
+        d = MathProgBase.getdual(m)
         @test_approx_eq_eps d[1] 3.0 tol
         @test_approx_eq_eps d[2] 1.0 tol
     end
@@ -49,8 +49,8 @@ function coniclineartest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol
     # Opt solution = -11
     # x = 1, y = 0, z = 2
     println("Problem LIN1A")
-    m = MathProgBase.model(s)
-    MathProgBase.loadconicproblem!(m,
+    m = MathProgBase.ConicModel(s)
+    MathProgBase.loadproblem!(m,
     [-3.0, -2.0, -4.0],
     [ 1.0   1.0   1.0;
       0.0   1.0   1.0;
@@ -67,7 +67,7 @@ function coniclineartest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[2] 0.0 tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[3] 2.0 tol
     if duals
-        d = MathProgBase.getconicdual(m)
+        d = MathProgBase.getdual(m)
         @test_approx_eq_eps d[1]  3.0 tol
         @test_approx_eq_eps d[2]  1.0 tol
         @test_approx_eq_eps d[3]  0.0 tol
@@ -87,8 +87,8 @@ function coniclineartest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol
     # Opt solution = -82
     # x = -4, y = -3, z = 16, s == 0
     println("Problem LIN2")
-    m = MathProgBase.model(s)
-    MathProgBase.loadconicproblem!(m,
+    m = MathProgBase.ConicModel(s)
+    MathProgBase.loadproblem!(m,
     [ 3.0,  2.0, -4.0,  0.0],
     [ 1.0   0.0   0.0  -1.0;
       0.0   1.0   0.0   0.0;
@@ -104,7 +104,7 @@ function coniclineartest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[3] 16.0 tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[4]  0.0 tol
     if duals
-        d = MathProgBase.getconicdual(m)
+        d = MathProgBase.getdual(m)
         @test_approx_eq_eps d[1] -7.0 tol
         @test_approx_eq_eps d[2] -2.0 tol
         @test_approx_eq_eps d[3]  4.0 tol
@@ -122,8 +122,8 @@ function coniclineartest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol
     # Opt solution = -82
     # x = -4, y = -3, z = 16, s == 0
     println("Problem LIN2A")
-    m = MathProgBase.model(s)
-    MathProgBase.loadconicproblem!(m,
+    m = MathProgBase.ConicModel(s)
+    MathProgBase.loadproblem!(m,
     [ 3.0,  2.0, -4.0,  0.0],
     [ 1.0   0.0   0.0  -1.0;
       0.0   1.0   0.0   0.0;
@@ -141,7 +141,7 @@ function coniclineartest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[3] 16.0 tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[4]  0.0 tol
     if duals
-        d = MathProgBase.getconicdual(m)
+        d = MathProgBase.getdual(m)
         @test_approx_eq_eps d[1] -7.0 tol
         @test_approx_eq_eps d[2] -2.0 tol
         @test_approx_eq_eps d[3]  4.0 tol
@@ -165,12 +165,12 @@ function coniclineartest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol
     constr_cones = [(:NonNeg,1:1),(:NonPos,2:2)]
     var_cones = [(:Free,1:1)]
 
-    m = MathProgBase.model(s)
-    MathProgBase.loadconicproblem!(m, c, A, b, constr_cones, var_cones)
+    m = MathProgBase.ConicModel(s)
+    MathProgBase.loadproblem!(m, c, A, b, constr_cones, var_cones)
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Infeasible
     if duals
-        y = MathProgBase.getconicdual(m)
+        y = MathProgBase.getdual(m)
         @test y[1] > 0
         @test y[2] < 0
         @test_approx_eq_eps A'y zeros(1) tol
@@ -193,12 +193,12 @@ function coniclineartest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol
     constr_cones = [(:NonNeg,1:1)]
     var_cones = [(:NonPos,1:1)]
 
-    m = MathProgBase.model(s)
-    MathProgBase.loadconicproblem!(m, c, A, b, constr_cones, var_cones)
+    m = MathProgBase.ConicModel(s)
+    MathProgBase.loadproblem!(m, c, A, b, constr_cones, var_cones)
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Infeasible
     if duals
-        y = MathProgBase.getconicdual(m)
+        y = MathProgBase.getdual(m)
         @test y[1] > 0
         @test -dot(b,y) > 0
     end
@@ -211,8 +211,8 @@ function conicSOCtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     #  st  x            == 1
     #      x >= ||(y,z)||
     println("Problem SOC1")
-    m = MathProgBase.model(s)
-    MathProgBase.loadconicproblem!(m,
+    m = MathProgBase.ConicModel(s)
+    MathProgBase.loadproblem!(m,
     [ 0.0, -1.0, -1.0],
     [ 1.0   0.0   0.0],
     [ 1.0],
@@ -225,7 +225,7 @@ function conicSOCtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     @test_approx_eq_eps MathProgBase.getsolution(m)[2] 1.0/sqrt(2.0) tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[3] 1.0/sqrt(2.0) tol
     if duals
-        d = MathProgBase.getconicdual(m)
+        d = MathProgBase.getdual(m)
         @test_approx_eq_eps d[1] sqrt(2.0) tol
     end
 
@@ -237,8 +237,8 @@ function conicSOCtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     #     [0]-[     -y     ] SOC
     #     [0]-[          -z] SOC
     println("Problem SOC1A")
-    m = MathProgBase.model(s)
-    MathProgBase.loadconicproblem!(m,
+    m = MathProgBase.ConicModel(s)
+    MathProgBase.loadproblem!(m,
     [ 0.0, -1.0, -1.0],
     [ 1.0   0.0   0.0;
      -1.0   0.0   0.0;
@@ -254,7 +254,7 @@ function conicSOCtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     @test_approx_eq_eps MathProgBase.getsolution(m)[2] 1.0/sqrt(2.0) tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[3] 1.0/sqrt(2.0) tol
     if duals
-        d = MathProgBase.getconicdual(m)
+        d = MathProgBase.getdual(m)
         @test_approx_eq_eps d[1] sqrt(2.0) tol
         @test_approx_eq_eps d[2] sqrt(2.0) tol
         @test_approx_eq_eps d[3] -1.0 tol
@@ -282,8 +282,8 @@ function conicSOCtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     constr_cones = [(:NonNeg,1:1),(:Zero,2:2),(:SOC,3:5)]
     var_cones = [(:Free,1:3)]
 
-    m = MathProgBase.model(s)
-    MathProgBase.loadconicproblem!(m, c, A, b, constr_cones, var_cones)
+    m = MathProgBase.ConicModel(s)
+    MathProgBase.loadproblem!(m, c, A, b, constr_cones, var_cones)
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
     @test_approx_eq_eps MathProgBase.getobjval(m) -1/sqrt(2) tol
@@ -292,7 +292,7 @@ function conicSOCtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     @test_approx_eq_eps MathProgBase.getsolution(m)[3]  1.0  tol
 
     if duals
-        y = MathProgBase.getconicdual(m)
+        y = MathProgBase.getdual(m)
         @test_approx_eq_eps -dot(b,y) -1/sqrt(2) tol
         @test_approx_eq_eps c + A'y zeros(3) tol
     end
@@ -315,8 +315,8 @@ function conicSOCtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     constr_cones = [(:NonPos,1:1),(:Zero,2:2),(:SOC,3:5)]
     var_cones = [(:Free,1:3)]
 
-    m = MathProgBase.model(s)
-    MathProgBase.loadconicproblem!(m, c, A, b, constr_cones, var_cones)
+    m = MathProgBase.ConicModel(s)
+    MathProgBase.loadproblem!(m, c, A, b, constr_cones, var_cones)
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
     @test_approx_eq_eps MathProgBase.getobjval(m) -1/sqrt(2) tol
@@ -325,7 +325,7 @@ function conicSOCtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     @test_approx_eq_eps MathProgBase.getsolution(m)[3]  1.0  tol
 
     if duals
-        y = MathProgBase.getconicdual(m)
+        y = MathProgBase.getdual(m)
         @test_approx_eq_eps -dot(b,y) -1/sqrt(2) tol
         @test_approx_eq_eps c + A'y zeros(3) tol
     end
@@ -347,13 +347,13 @@ function conicSOCtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     constr_cones = [(:NonNeg,1:1),(:NonPos,2:2)]
     var_cones = [(:SOC,1:2)]
 
-    m = MathProgBase.model(s)
-    MathProgBase.loadconicproblem!(m, c, A, b, constr_cones, var_cones)
+    m = MathProgBase.ConicModel(s)
+    MathProgBase.loadproblem!(m, c, A, b, constr_cones, var_cones)
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Infeasible
 
     if duals
-        y = MathProgBase.getconicdual(m)
+        y = MathProgBase.getdual(m)
         @test y[1] > 0
         @test y[2] < 0
         @test (A'y)[1] ≥ abs((A'y)[2])
@@ -370,12 +370,12 @@ function conicEXPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     #      y == 2
 
     println("Problem 4")
-    m = MathProgBase.model(s)
+    m = MathProgBase.ConicModel(s)
     c = [1.0, 1.0, 1.0]
     A = [0.0 1.0 0.0;
          1.0 0.0 0.0]
     b = [2.0, 1.0]
-    MathProgBase.loadconicproblem!(m, c, A, b,
+    MathProgBase.loadproblem!(m, c, A, b,
     [(:Zero,1:2)],
     [(:ExpPrimal, 1:3)])
     MathProgBase.optimize!(m)
@@ -386,7 +386,7 @@ function conicEXPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     @test_approx_eq_eps MathProgBase.getsolution(m)[3] 2*exp(1/2) tol
 
     if duals
-        d = MathProgBase.getconicdual(m)
+        d = MathProgBase.getdual(m)
         @test_approx_eq_eps -dot(b,d) MathProgBase.getobjval(m) tol
         u,v,w = c+A'd
         # should belong to the ExpDual cone
@@ -397,7 +397,7 @@ function conicEXPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     # Problem 4A - ExpPrimal
     # Same as previous, except we put :ExpPrimal on constr_cones
     println("Problem 4A")
-    m = MathProgBase.model(s)
+    m = MathProgBase.ConicModel(s)
     c = [1.0, 1.0, 1.0]
     A = [0.0 1.0 0.0;
          1.0 0.0 0.0;
@@ -405,7 +405,7 @@ function conicEXPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
          0.0 -1.0 0.0;
          0.0 0.0 -1.0]
     b = [2.0, 1.0, 0.0, 0.0, 0.0]
-    MathProgBase.loadconicproblem!(m, c, A, b,
+    MathProgBase.loadproblem!(m, c, A, b,
     [(:Zero,1:2), (:ExpPrimal, 3:5)],
     [(:Free, 1:3)])
     MathProgBase.optimize!(m)
@@ -416,7 +416,7 @@ function conicEXPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     @test_approx_eq_eps MathProgBase.getsolution(m)[3] 2*exp(1/2) tol
 
     if duals
-        d = MathProgBase.getconicdual(m)
+        d = MathProgBase.getdual(m)
         @test_approx_eq_eps -dot(b,d) MathProgBase.getobjval(m) tol
         @test_approx_eq_eps c+A'd zeros(3) tol
         u,v,w = d[3:5]
@@ -438,13 +438,13 @@ function conicSDPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     #  st y[2, 1] == 1
     #     y in SDP cone
     # If symmetricity constraint is working, y[1, 2] will be 1 else unbounded
-    m = MathProgBase.model(s)
+    m = MathProgBase.ConicModel(s)
     c = [0, 1, 0, 0, 0, 0, 0, 0, 0];
     A = -eye(9)
     A = [A; [0, 0, 0, 1, 0, 0, 0, 0, 0]']
     b = zeros(size(A, 1), 1)
     b[10] = 1
-    MathProgBase.loadconicproblem!(m, c, A, b, [(:SDP, 1:9), (:Zero, 10:10)], [(:Free, 1:9)])
+    MathProgBase.loadproblem!(m, c, A, b, [(:SDP, 1:9), (:Zero, 10:10)], [(:Free, 1:9)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
     @test is_symmetric(reshape(MathProgBase.getsolution(m), 3, 3))
@@ -462,7 +462,7 @@ function conicSDPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
         # gives
         # a = 1
         # b = [0 1 0; -1 0 0; 0 0 0]
-        d = MathProgBase.getconicdual(m)
+        d = MathProgBase.getdual(m)
         @test_approx_eq_eps d[1] 0 tol
         @test_approx_eq_eps d[2] -1 tol;
         @test_approx_eq_eps d[3] 0 tol;
@@ -477,18 +477,18 @@ function conicSDPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
 
     # Problem 5A - SDP
     # Same as problem 5, except we enforce :SDP on the var_cone
-    m = MathProgBase.model(s)
+    m = MathProgBase.ConicModel(s)
     c = [0, 1, 0, 0, 0, 0, 0, 0, 0];
     A = [0, 0, 0, 1, 0, 0, 0, 0, 0]'
     b = [1]
-    MathProgBase.loadconicproblem!(m, c, A, b, [(:Zero, 1:1)], [(:SDP, 1:9)])
+    MathProgBase.loadproblem!(m, c, A, b, [(:Zero, 1:1)], [(:SDP, 1:9)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
     @test is_symmetric(reshape(MathProgBase.getsolution(m), 3, 3))
     @test_approx_eq_eps MathProgBase.getsolution(m)[2] 1.0 tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[4] 1.0 tol
     if duals
-        d = MathProgBase.getconicdual(m)
+        d = MathProgBase.getdual(m)
         @test_approx_eq_eps d[1] 1 tol
     end
 

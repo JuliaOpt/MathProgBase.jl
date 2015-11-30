@@ -91,12 +91,12 @@ end
 
 function nlptest(solver=MathProgBase.defaultNLPsolver)
 
-    m = MathProgBase.model(solver)
+    m = MathProgBase.NonlinearModel(solver)
     l = [1,1,1,1]
     u = [5,5,5,5]
     lb = [25, 40]
     ub = [Inf, 40]
-    MathProgBase.loadnonlinearproblem!(m, 4, 2, l, u, lb, ub, :Min, HS071())
+    MathProgBase.loadproblem!(m, 4, 2, l, u, lb, ub, :Min, HS071())
     MathProgBase.setwarmstart!(m,[1,5,5,1])
 
     MathProgBase.optimize!(m)
@@ -153,12 +153,12 @@ MathProgBase.eval_jac_g(d::HS071_2, J, x) = MathProgBase.eval_jac_g(HS071(), J, 
 
 function nlptest_nohessian(solver=MathProgBase.defaultNLPsolver)
 
-    m = MathProgBase.model(solver)
+    m = MathProgBase.NonlinearModel(solver)
     l = [1,1,1,1]
     u = [5,5,5,5]
     lb = [25, 40]
     ub = [Inf, 40]
-    MathProgBase.loadnonlinearproblem!(m, 4, 2, l, u, lb, ub, :Min, HS071_2())
+    MathProgBase.loadproblem!(m, 4, 2, l, u, lb, ub, :Min, HS071_2())
     MathProgBase.setwarmstart!(m,[1,5,5,1])
 
     MathProgBase.optimize!(m)
@@ -236,12 +236,12 @@ end
 
 function convexnlptest(solver=MathProgBase.defaultNLPsolver)
 
-    m = MathProgBase.model(solver)
+    m = MathProgBase.NonlinearModel(solver)
     l = [-2,-2]
     u = [2,2]
     lb = [-Inf]
     ub = [1.0]
-    MathProgBase.loadnonlinearproblem!(m, 2, 1, l, u, lb, ub, :Min, QCQP())
+    MathProgBase.loadproblem!(m, 2, 1, l, u, lb, ub, :Min, QCQP())
 
     MathProgBase.optimize!(m)
     stat = MathProgBase.status(m)
@@ -306,12 +306,12 @@ end
 
 function rosenbrocktest(solver=MathProgBase.defaultNLPsolver)
 
-    m = MathProgBase.model(solver)
+    m = MathProgBase.NonlinearModel(solver)
     l = [-Inf,-Inf]
     u = [Inf,Inf]
     lb = Float64[]
     ub = Float64[]
-    MathProgBase.loadnonlinearproblem!(m, 2, 0, l, u, lb, ub, :Min, Rosenbrock())
+    MathProgBase.loadproblem!(m, 2, 0, l, u, lb, ub, :Min, Rosenbrock())
 
     MathProgBase.setwarmstart!(m,[10.0,10.0])
     MathProgBase.optimize!(m)

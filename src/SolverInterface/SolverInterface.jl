@@ -27,21 +27,36 @@ abstract AbstractMathProgSolver
 export AbstractMathProgSolver
 
 # create dummy method to define function so that we can attach methods in other modules
+# these are the common methods for AbstractMathProgModel
 @define_interface begin
-    model
-    loadproblem!
-    writeproblem
-    updatemodel!
-    freemodel!
+    getsolution
+    getobjval
     optimize!
+    status
+    getobjbound
+    getobjgap
+    getrawsolver
+    getsolvetime
+    setsense!
+    getsense
+    numvar
+    numconstr
+    freemodel!
+    setvartype!
+    getvartype
+    loadproblem!
 end
 
-include("setters.jl")
-include("getters.jl")
+
+include("LinearQuadratic.jl")
 include("callbacks.jl")
-include("qcqp.jl")
-include("nonlinear.jl")
-include("conic.jl")
-include("quad_to_conic.jl")
+include("Nonlinear.jl")
+include("Conic.jl")
+
+# Solver conversion routines
+include("conic_to_lpqp.jl")
+include("lpqp_to_conic.jl")
+include("nonlinear_to_lpqp.jl")
+
 
 end

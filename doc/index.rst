@@ -22,9 +22,9 @@ Contents
     linprog.rst
     mixintprog.rst
     quadprog.rst
-    lowlevel.rst
+    solverinterface.rst
     solvers.rst
-    mipcallbacks.rst
+    lpqcqp.rst
     conic.rst
     nlp.rst
 

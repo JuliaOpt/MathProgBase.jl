@@ -42,25 +42,27 @@ for solvertype in ["LP", "MIP", "QP", "SDP", "NLP", "Conic"]
     solvers = symbol(solvertype*"solvers")
 
 
-    @eval function SolverInterface.model(s::$typename)
-        for (pkgname, solvername) in $solvers
-            try
-                eval(Expr(:import,pkgname))
-            catch
-                if isdir(Pkg.dir((string(pkgname))))
-                    warn("Package ",string(pkgname),
-                         " is installed but couldn't be loaded. ",
-                         "You may need to run `Pkg.build(\"$pkgname\")`")
+    for t in (:LinearQuadraticModel,:ConicModel,:NonlinearModel)
+        @eval function SolverInterface.$t(s::$typename)
+            for (pkgname, solvername) in $solvers
+                try
+                    eval(Expr(:import,pkgname))
+                catch
+                    if isdir(Pkg.dir((string(pkgname))))
+                        warn("Package ",string(pkgname),
+                             " is installed but couldn't be loaded. ",
+                             "You may need to run `Pkg.build(\"$pkgname\")`")
+                    end
+                    continue
                 end
-                continue
+                ex = Expr(:(=), $(quot(defaultname)),
+                          Expr(:call, Expr(:., pkgname, quot(solvername))))
+                eval(ex)
+                ex = Expr(:call, $(quot(t)), $(quot(defaultname)))
+                return eval(ex)
             end
-            ex = Expr(:(=), $(quot(defaultname)),
-                      Expr(:call, Expr(:., pkgname, quot(solvername))))
-            eval(ex)
-            ex = Expr(:call, :model, $(quot(defaultname)))
-            return eval(ex)
+            suggestions = join(["\"$(pkgname)\", " for (pkgname,solvername) in $solvers], ' ')
+            error("No ",$solvertype, " solver detected. Try installing one of the following packages: ", suggestions, " and restarting Julia")
         end
-        suggestions = join(["\"$(pkgname)\", " for (pkgname,solvername) in $solvers], ' ')
-        error("No ",$solvertype, " solver detected. Try installing one of the following packages: ", suggestions, " and restarting Julia")
     end
 end

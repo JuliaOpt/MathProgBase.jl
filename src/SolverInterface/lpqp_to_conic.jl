@@ -1,12 +1,29 @@
-@define_interface begin
-    loadconicproblem!
-    getconicdual
-    supportedcones
+# wrapper to convert LPQP solver into Conic solver
+
+# To enable Conic support from an LPQP solver, define, e.g.,
+# ConicModel(s::GurobiSolver) = LPQPtoConicBridge(LinearQuadraticModel(s))
+
+type LPQPtoConicBridge <: AbstractConicModel
+    lpqpmodel::AbstractLinearQuadraticModel
+    c
+    A
+    b
+    constr_cones
+    var_cones
 end
 
-# This fallback method trys to solve the cone problem as an LP, but
-# will error if an incompatable cone is detected
-function loadconicproblem!(m::AbstractMathProgModel, c, A, b, constr_cones, var_cones)
+LPQPtoConicBridge(m::AbstractLinearQuadraticModel) = LPQPtoConicBridge(m, nothing, nothing, nothing, nothing, nothing)
+
+export LPQPtoConicBridge
+
+# To transform Conic problems into LinearQuadratic problems
+function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
+    m.c = c
+    m.A = A
+    m.b = b
+    m.constr_cones = constr_cones
+    m.var_cones = var_cones
+
     # Conic form        LP form
     # min  c'x          min      c'x
     #  st b-Ax ∈ K_1     st lb <= Ax <= b
@@ -103,13 +120,13 @@ function loadconicproblem!(m::AbstractMathProgModel, c, A, b, constr_cones, var_
         ub = [ub; ubaux]
     end
 
-    loadproblem!(m, Alin, l, u, c, lb, ub, :Min)
+    loadproblem!(m.lpqpmodel, Alin, l, u, c, lb, ub, :Min)
 
     # Add conic constraints
 
     for (cone, idx) in var_cones
         cone == :SOC || continue
-        addquadconstr!(m, Int[], Float64[], vcat(idx), vcat(idx), [-1.0; ones(length(idx)-1)], '<', 0.0)
+        addquadconstr!(m.lpqpmodel, Int[], Float64[], vcat(idx), vcat(idx), [-1.0; ones(length(idx)-1)], '<', 0.0)
     end
 
     k = 1
@@ -117,21 +134,13 @@ function loadconicproblem!(m::AbstractMathProgModel, c, A, b, constr_cones, var_
         cone == :SOC || continue
         idx1 = num_orig + k
         idxrest = (num_orig+k+1):(num_orig+k+length(idx)-1)
-        addquadconstr!(m, Int[], Float64[], [idx1; idxrest], [idx1; idxrest], [-1.0;ones(length(idxrest))], '<', 0.0)
+        addquadconstr!(m.lpqpmodel, Int[], Float64[], [idx1; idxrest], [idx1; idxrest], [-1.0;ones(length(idxrest))], '<', 0.0)
         k += length(idx)
     end
 end
 
-# Generic fallback
-function supportedcones(s::AbstractMathProgSolver)
-    cones = Symbol[]
-    m = model(s)
-    if method_exists(loadproblem!, (typeof(m), SparseMatrixCSC{Float64,Int}, Vector{Float64}, Vector{Float64}, Vector{Float64}, Vector{Float64}, Vector{Float64}, Symbol))
-        append!(cones, [:Free,:Zero,:NonNeg,:NonPos])
-    end
-    if method_exists(addquadconstr!, (typeof(m), Vector{Int}, Vector{Float64}, Vector{Int}, Vector{Int}, Vector{Float64}, Char, Float64))
-        # Imprecise heuristic, solvers may support convex quadratic constraints but not SOC
-        push!(cones, :SOC)
-    end
-    return cones
+for f in [:optimize!, :status, :getsolution, :getobjval, :getreducedcosts, :getvartype]
+    @eval $f(model::LPQPtoConicBridge) = $f(model.lpqpmodel)
 end
+
+setvartype!(model::LPQPtoConicBridge, vtype) = setvartype!(model.lpqpmodel, vtype)

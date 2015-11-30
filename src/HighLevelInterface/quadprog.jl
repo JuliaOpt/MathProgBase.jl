@@ -7,7 +7,7 @@ type QuadprogSolution
 end
 
 function quadprog(c::InputVector, Q::AbstractMatrix, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultQPsolver)
-    m = model(solver)
+    m = LinearQuadraticModel(solver)
     nrow,ncol = size(A)
 
     c = expandvec(c, ncol)
