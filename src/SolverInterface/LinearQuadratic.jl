@@ -61,7 +61,7 @@ addvar!(m::AbstractMathProgModel, collb, colub, objcoef) = addvar!(m, [], [], co
     setquadconstrRHS!
 end
 
-function setquadobjterms!(m::AbstractMathProgModel, rowidx, colidx, quadval)
+function setquadobjterms!(m::AbstractLinearQuadraticModel, rowidx, colidx, quadval)
     (n = length(rowidx)) == length(colidx) == length(quadval) || error("Inconsistent input dimensions")
     nquadval = copy(quadval)
     for i in 1:length(rowidx)
@@ -76,8 +76,8 @@ function setquadobjterms!(m::AbstractMathProgModel, rowidx, colidx, quadval)
     end
 end
 
-setquadobj!(m::AbstractMathProgModel,Q::Matrix) = setquadobj!(m,sparse(float(Q)))
-function setquadobj!(m::AbstractMathProgModel,Q::SparseMatrixCSC{Float64})
+setquadobj!(m::AbstractLinearQuadraticModel,Q::Matrix) = setquadobj!(m,sparse(float(Q)))
+function setquadobj!(m::AbstractLinearQuadraticModel,Q::SparseMatrixCSC{Float64})
     if issym(Q) || istriu(Q)
         nnz_q = nnz(Q)
         qr = Array(Cint, nnz_q)
