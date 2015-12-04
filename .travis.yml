@@ -11,6 +11,9 @@ sudo: false
 addons:
     apt_packages:
         - gfortran
+        - liblapack-dev
+        - libgmp-dev
+        - libglpk-dev
 script:
     - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
     - julia -e 'Pkg.clone(pwd())'
