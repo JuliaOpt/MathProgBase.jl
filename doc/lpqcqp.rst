@@ -240,7 +240,7 @@ The LinearQuadratic interface supports a standardized and abstracted way to impl
 *    Cut callbacks (only cuts off non-integer feasible solutions)
 *    Heuristic callbacks (proposes heuristically constructed integer-feasible solutions at MIP nodes)
 
-A more detailed description of the three types of supported callbacks can be found in the JuMP documentation `here <https://jump.readthedocs.org/en/latest/jump.html#solver-callbacks>`>`_.
+A more detailed description of the three types of supported callbacks can be found in the JuMP documentation `here <http://jump.readthedocs.org/en/latest/callbacks.html>`_.
 
 The ``SolverInterface`` module exports an abstract type ``MathProgCallbackData`` which represents the solver-specific data needed to implement the callback.
 
