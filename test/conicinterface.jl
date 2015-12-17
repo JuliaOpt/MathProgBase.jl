@@ -362,6 +362,32 @@ function conicSOCtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
 
 end
 
+function conicSOCINTtest(s::MathProgBase.AbstractMathProgSolver;tol=1e-6)
+    # Problem SOCINT1
+    # min 0x - 2y - 1z
+    #  st  x            == 1
+    #      x >= ||(y,z)||
+    #      (y,z) binary
+    println("Problem SOCINT1")
+    m = MathProgBase.ConicModel(s)
+    MathProgBase.loadproblem!(m,
+    [ 0.0, -2.0, -1.0],
+    [ 1.0   0.0   0.0],
+    [ 1.0],
+    [(:Zero,1)],
+    [(:SOC,1:3)])
+    MathProgBase.setvartype!(m, [:Cont,:Bin,:Bin])
+    MathProgBase.optimize!(m)
+    @test MathProgBase.status(m) == :Optimal
+    @show MathProgBase.getobjval(m)
+    @show MathProgBase.getsolution(m)
+    @test_approx_eq_eps MathProgBase.getobjval(m) -2 tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[2] 1.0 tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 0.0 tol
+end
+
+
 function conicEXPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e-6)
     # Problem 4 - ExpPrimal
     # min x + y + z
