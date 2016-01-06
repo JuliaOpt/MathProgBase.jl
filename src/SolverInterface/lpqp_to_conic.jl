@@ -18,6 +18,9 @@ LPQPtoConicBridge(m::AbstractLinearQuadraticModel) = LPQPtoConicBridge(m, nothin
 
 export LPQPtoConicBridge
 
+numvar(m::LPQPtoConicBridge) = size(m.A,2)
+numconstr(m::LPQPtoConicBridge) = size(m.A,1)
+
 # To transform Conic problems into LinearQuadratic problems
 function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
     m.c = c
