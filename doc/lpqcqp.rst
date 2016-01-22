@@ -244,7 +244,7 @@ A more detailed description of the three types of supported callbacks can be fou
 
 The ``SolverInterface`` module exports an abstract type ``MathProgCallbackData`` which represents the solver-specific data needed to implement the callback.
 
-If a callback function returns ``:Exit``, the solver is expected to handle this and terminate the optimization.
+If a callback function returns ``:Exit``, the solver is expected to terminate with ``UserLimit`` status.
 
 .. function:: setlazycallback!(m::AbstractLinearQuadraticModel,f)
 
