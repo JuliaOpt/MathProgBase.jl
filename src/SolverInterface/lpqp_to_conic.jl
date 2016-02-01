@@ -147,7 +147,7 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
         # rsoc has x'x <= 2pq
         # quadratic form is x'x <= pq
         diagvec = ones(length(rsocconstr_idx))
-        diagvec[rsoc_start_idx] = 1/sqrt(2)
+        diagvec[rsoc_start_idx] = sqrt(2)
         Alin = [ Alin spzeros(size(Alin,1),length(rsocconstr_idx))
         [Aaux spzeros(size(Aaux,1),length(socconstr_idx))] spdiagm(diagvec) ]
         lbaux = b[rsocconstr_idx]
