@@ -91,15 +91,16 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
     end
 
     # set bounds for auxiliary variables
-    k = 1
+    ksoc = 1
+    krsoc = 1
     for (cone,idx) in constr_cones
         if cone == :SOC
-            l[num_orig + k] = 0
-            k += length(idx)
+            l[num_orig + ksoc] = 0
+            ksoc += length(idx)
         elseif cone == :SOCRotated
-            l[num_orig + k] = 0
-            l[num_orig + k + 1] = 0
-            k += length(idx)
+            l[num_orig + length(socconstr_idx) + krsoc] = 0
+            l[num_orig + length(socconstr_idx) + krsoc + 1] = 0
+            krsoc += length(idx)
         end
     end
 
@@ -147,7 +148,7 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
         # rsoc has x'x <= 2pq
         # quadratic form is x'x <= pq
         diagvec = ones(length(rsocconstr_idx))
-        diagvec[rsoc_start_idx] = sqrt(2)
+        diagvec[rsoc_start_idx] = 1/sqrt(2)
         Alin = [ Alin spzeros(size(Alin,1),length(rsocconstr_idx))
         [Aaux spzeros(size(Aaux,1),length(socconstr_idx))] spdiagm(diagvec) ]
         lbaux = b[rsocconstr_idx]
