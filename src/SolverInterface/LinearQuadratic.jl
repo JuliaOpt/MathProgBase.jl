@@ -1,10 +1,9 @@
 # Methods for the LinearQuadratic interface
 
 abstract AbstractLinearQuadraticModel <: AbstractMathProgModel
-export AbstractLinearQuadraticModel 
+export AbstractLinearQuadraticModel
 
 #    writeproblem
-#    updatemodel!
 #    freemodel!
 #    optimize!
 
@@ -22,7 +21,6 @@ export AbstractLinearQuadraticModel
     setwarmstart!
     addsos1!
     addsos2!
-    updatemodel!
     writeproblem
     getvarLB
     getvarUB
