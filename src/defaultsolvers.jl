@@ -21,10 +21,13 @@ const QPsolvers = [(:Gurobi,:GurobiSolver),
 const SDPsolvers = [(:Mosek,:MosekSolver),
                     (:SCS,:SCSSolver)]
 
-const NLPsolvers = [(:Ipopt,:IpoptSolver)]
+const NLPsolvers = [(:Ipopt,:IpoptSolver),
+                    (:KNITRO,:KnitroSolver),
+                    (:Mosek,:MosekSolver)]
 
 const Conicsolvers = [(:ECOS,:ECOSSolver),
-                      (:SCS,:SCSSolver)]
+                      (:SCS,:SCSSolver),
+                      (:Mosek,:MosekSolver)]
 
 using Base.Meta
 
