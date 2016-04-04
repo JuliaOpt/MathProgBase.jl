@@ -38,9 +38,9 @@ export AbstractLinearQuadraticModel
     getvartype
     getinfeasibilityray
     getunboundedray
-    getsimplexiter
-    getbarrieriter
-    getnodecount
+    getsimplexiter, rewrap
+    getbarrieriter, rewrap
+    getnodecount, rewrap
     getbasis
 end
 

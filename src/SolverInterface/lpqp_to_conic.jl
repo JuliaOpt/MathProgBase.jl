@@ -184,8 +184,12 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
     end
 end
 
-for f in [:optimize!, :status, :getsolution, :getobjval, :getreducedcosts, :getvartype]
+for f in [:optimize!, :status, :getsolution, :getobjval, :getvartype]
     @eval $f(model::LPQPtoConicBridge) = $f(model.lpqpmodel)
 end
 
 setvartype!(model::LPQPtoConicBridge, vtype) = setvartype!(model.lpqpmodel, vtype)
+
+for f in methods_by_tag[:rewrap]
+    @eval $f(model::LPQPtoConicBridge) = $f(model.lpqpmodel)
+end
