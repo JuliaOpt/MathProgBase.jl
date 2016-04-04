@@ -1,17 +1,41 @@
 module SolverInterface
 
+using Base.Meta
+
+const methods_by_tag = Dict{Symbol,Vector{Symbol}}()
+
 macro define_interface(args)
     @assert args.head == :block
     code = quote end
     for line in args.args
-        isa(line, Symbol) || (line.head == :line && continue) || error("Unexpected code in block")
-        func = esc(line)
+        (isexpr(line, :line) && continue)
+        (isa(line,Symbol) || isexpr(line,:tuple)) || error("Unexpected code in block")
+        if isa(line,Symbol)
+            fname = line
+            tags = []
+        else
+            @assert isexpr(line,:tuple)
+            fname = line.args[1]
+            tags = line.args[2:end]
+        end
+        func = esc(fname)
         code = quote
             $code
             $(func)() = throw(MethodError($(func),()))
             function $(func)(::Int)
                 q = Any[1]
                 return q[1] # infer Any return type, workaround for julia issue #9479
+            end
+        end
+        for t in tags
+            t = quot(t)
+            code = quote
+                $code
+                if haskey(methods_by_tag,$t)
+                    push!(methods_by_tag[$t],$(quot(fname)))
+                else
+                    methods_by_tag[$t] = [$(quot(fname))]
+                end
             end
         end
         push!(code.args, Expr(:export, func))
@@ -33,10 +57,10 @@ export AbstractMathProgSolver
     getobjval
     optimize!
     status
-    getobjbound
-    getobjgap
-    getrawsolver
-    getsolvetime
+    getobjbound, rewrap
+    getobjgap, rewrap
+    getrawsolver, rewrap
+    getsolvetime, rewrap
     setsense!
     getsense
     numvar
