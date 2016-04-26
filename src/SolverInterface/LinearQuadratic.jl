@@ -17,8 +17,6 @@ export AbstractLinearQuadraticModel
     setobj!
     addvar!
     addconstr!
-    setsense!
-    setvartype!
     setwarmstart!
     addsos1!
     addsos2!
@@ -30,7 +28,6 @@ export AbstractLinearQuadraticModel
     getconstrUB
     getobj
     getconstrmatrix
-    getsense
     numlinconstr
     getconstrsolution
     getreducedcosts
