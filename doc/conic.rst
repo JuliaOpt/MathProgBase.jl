@@ -3,10 +3,10 @@ Conic models
 ------------
 
 Conic programming is an important class of convex optimization problems for
-which there exist specialized efficient solvers. 
+which there exist specialized efficient solvers.
 We describe the interface for ``AbstractConicModel`` here.
 
-The design of this interface is inspired by the `CBLIB format <http://cblib.zib.de/format.pdf>`_ and the `MOSEK modeling manual <http://docs.mosek.com/generic/modeling-letter.pdf>`_. 
+The design of this interface is inspired by the `CBLIB format <http://cblib.zib.de/format.pdf>`_ and the `MOSEK modeling manual <http://docs.mosek.com/generic/modeling-letter.pdf>`_.
 
 We consider the following primal problem to be in canonical conic form:
 
@@ -30,18 +30,18 @@ The recognized cones are:
 - ``:Free``, no restrictions (equal to :math:`\mathbb{R}^n`)
 - ``:Zero``, all components must be zero
 - ``:NonNeg``, the nonnegative orthant :math:`\{ x \in \mathbb{R}^n : x_i \geq 0, i = 1,\ldots,n \}`
-- ``:NonPos``, the nonpositive orthant :math:`\{ x \in \mathbb{R}^n : x_i \leq 0, i = 1,\ldots,n \}` 
+- ``:NonPos``, the nonpositive orthant :math:`\{ x \in \mathbb{R}^n : x_i \leq 0, i = 1,\ldots,n \}`
 - ``:SOC``, the second-order (Lorentz) cone :math:`\{(p,x) \in \mathbb{R} \times \mathbb{R}^{n-1} : ||x||_2^2 \leq p^2, p \geq 0\}`
-- ``:SOCRotated``, the rotated second-order cone :math:`\{(p,q,x) \in \mathbb{R} \times \mathbb{R} \times \mathbb{R}^{n-2} : ||x||_2^2 \leq 2pq, p \geq 0, q \geq 0\}` 
+- ``:SOCRotated``, the rotated second-order cone :math:`\{(p,q,x) \in \mathbb{R} \times \mathbb{R} \times \mathbb{R}^{n-2} : ||x||_2^2 \leq 2pq, p \geq 0, q \geq 0\}`
 - ``:SDP``, the cone of symmetric positive semidefinite matrices :math:`\{ X \in \mathbb{R}^{n\times n} : X \succeq 0\}`
 - ``:ExpPrimal``, the exponential cone :math:`\operatorname{cl}\{ (x,y,z) \in \mathbb{R}^3 : y > 0, y e^{x/y} \leq z \}`
-- ``:ExpDual``, the dual of the exponential cone :math:`\{ (u,v,w) \in \mathbb{R}^3 : u < 0, -ue^{v/q} \leq ew\} \cup \{(0,v,w) : v \geq 0, w \geq 0\}` 
+- ``:ExpDual``, the dual of the exponential cone :math:`\{ (u,v,w) \in \mathbb{R}^3 : u < 0, w \geq 0, -u \log(-u/w) + u - v \leq 0\} \cup \{(0,v,w) : v \geq 0, w \geq 0\}`
 
 Not all solvers are expected to support all types of cones. However, when a simple transformation to a supported cone is available, for example, from ``:NonPos`` to ``:NonNeg`` or from ``:SOCRotated`` to ``:SOC``, solvers *should* perform this transformation in order to allow users the extra flexibility in modeling.
 
 
 .. function:: loadproblem!(m::AbstractConicModel, c, A, b, constr_cones, var_cones)
-   
+
     Load the conic problem in primal form into the model. The parameter ``c``
     is the objective vector, the parameter ``A``
     is the constraint matrix (typically sparse), and the parameter ``b``
