@@ -68,7 +68,7 @@ All abstract model types inherit from the abstract type ``AbstractMathProgModel`
     This is used, for example, when a branch-and-bound method
     is stopped before finishing.
 
-.. function:: getobjgap(m::AbstractLinearQuadraticModel)
+.. function:: getobjgap(m::AbstractMathProgModel)
 
     Returns the final relative optimality gap as optimization terminated. That is, it returns 
     :math:`\frac{|b-f|}{|f|}`, where :math:`b` is the best bound and :math:`f` is the best 
