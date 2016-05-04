@@ -579,4 +579,29 @@ function conicSDPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
         @test_approx_eq_eps sum(abs(m1*y[1]+m2*y[2]+m3 - M)) 0. tol
         @test eigmin(M) > -tol
     end
+    
+    # Problem 6 
+    # Caused getdual to fail on SCS and Mosek
+    println("Problem 6")
+
+    m = MathProgBase.ConicModel(solver)
+
+    c = [-0.0,-0.0,-0.0,-0.0,-0.0,-0.0,-1.0]
+    b = [10.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+    I = [1,2,8,9,10,11,1,3,8,9,10,11,1,4,8,9,10,11,1,5,8,1,6,8,9,10,11,1,7,8,9,10,11,8,10]
+    J = [1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,3,4,4,4,5,5,5,5,5,5,6,6,6,6,6,6,7,7]
+    V = [1.0,1.0,-0.44999999999999996,0.45000000000000007,-0.4500000000000001,0.0,1.0,1.0,-0.7681980515339464,0.31819805153394654,-0.13180194846605373,0.0,1.0,1.0,-0.9000000000000001,0.0,0.0,0.0,1.0,1.0,-0.22500000000000003,1.0,1.0,-0.11250000000000003,0.1125,-0.11249999999999999,0.0,1.0,1.0,0.0,0.0,-0.22500000000000003,0.0,1.0,1.0]
+    A = sparse(I, J, V, length(b), length(c))
+    cone_con = [(:NonNeg,[1]),(:NonPos,[2,3,4,5,6,7]),(:SDP,8:10),(:Zero,11:11)]
+    cone_var = [(:NonNeg,[1,2,3,4,5,6]),(:Free,[7])]
+    
+    MathProgBase.loadproblem!(m, c, A, b, cone_con, cone_var)
+    MathProgBase.optimize!(m)
+    
+    @test MathProgBase.status(m) == :Optimal
+    pobj = MathProgBase.getobjval(m)
+    @test_approx_eq_eps pobj -1.80002643 tol
+    
+    # TODO add primal and dual solution tests (after we know what they actually are)
+    
 end
