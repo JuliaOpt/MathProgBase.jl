@@ -602,6 +602,23 @@ function conicSDPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     pobj = MathProgBase.getobjval(m)
     @test_approx_eq_eps pobj -1.80002643 tol
     
-    # TODO add primal and dual solution tests (after we know what they actually are)
+    x = MathProgBase.getsolution(m)
+    @test all(x[1:6] .> -tol)
+    con = b - A * x 
+    @test eigmin([con[8] con[9] ; con[9] con[10]]) > -tol
+    @test con[1] >= -tol
+    @test all(con[2:7] .<= tol)
+    @test_approx_eq_eps con[11] 0. tol
     
+    if dual
+        y = MathProgBase.getdual(m)
+        @test eigmin([y[8] y[9] ; y[9] y[10]]) > -tol
+        @test y[1] >= -tol
+        @test all(y[2:7] .<= tol)
+        @test_approx_eq_eps y[11] 0. tol
+        var = c + A' * y
+        @test all(var[1:6] .>= -tol)
+        dobj = dot(y,b)
+        @test_approx_eq_eps pobj dobj tol
+    end
 end
