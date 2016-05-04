@@ -205,7 +205,7 @@ function coniclineartest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol
 
 end
 
-function conicSOCtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e-6)
+function conicSOCtest(s::MathProgBase.AbstractMathProgSolver;duals=true, tol=1e-6)
     # Problem SOC1
     # min 0x - 1y - 1z
     #  st  x            == 1
@@ -388,7 +388,7 @@ function conicSOCINTtest(s::MathProgBase.AbstractMathProgSolver;tol=1e-6)
 end
 
 
-function conicEXPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e-6)
+function conicEXPtest(s::MathProgBase.AbstractMathProgSolver;duals=true, tol=1e-6)
     # Problem 4 - ExpPrimal
     # min x + y + z
     #  st  y e^(x/y) <= z, y > 0 (i.e (x, y, z) are in the exponential primal cone)
@@ -453,7 +453,7 @@ function conicEXPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
 end
 
 
-function conicSDPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e-6)
+function conicSDPtest(s::MathProgBase.AbstractMathProgSolver;duals=true, tol=1e-6)
 
     function is_symmetric(A::Matrix)
         return all(A - A' .< 1e-4)
