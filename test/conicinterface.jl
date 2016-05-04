@@ -466,10 +466,8 @@ function conicSDPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     # If symmetricity constraint is working, y[1, 2] will be 1 else unbounded
     m = MathProgBase.ConicModel(s)
     c = [0, 1, 0, 0, 0, 0, 0, 0, 0];
-    A = -eye(9)
-    A = [A; [0, 0, 0, 1, 0, 0, 0, 0, 0]']
-    b = zeros(size(A, 1), 1)
-    b[10] = 1
+    A = [-eye(9); [0, 0, 0, 1, 0, 0, 0, 0, 0]']
+    b = vcat(zeros(Int, 9), 1)
     MathProgBase.loadproblem!(m, c, A, b, [(:SDP, 1:9), (:Zero, 10:10)], [(:Free, 1:9)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
