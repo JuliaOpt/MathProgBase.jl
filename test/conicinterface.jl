@@ -454,68 +454,70 @@ end
 
 
 function conicSDPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e-6)
-
-    function is_symmetric(A::Matrix)
-        return all(A - A' .< 1e-4)
-    end
-
-    # Problem 5 - SDP
-    # min y[1, 2]
-    #  st y[2, 1] == 1
-    #     y in SDP cone
-    # If symmetricity constraint is working, y[1, 2] will be 1 else unbounded
-    m = MathProgBase.ConicModel(s)
-    c = [0, 1, 0, 0, 0, 0, 0, 0, 0];
-    A = -eye(9)
-    A = [A; [0, 0, 0, 1, 0, 0, 0, 0, 0]']
-    b = zeros(size(A, 1), 1)
-    b[10] = 1
-    MathProgBase.loadproblem!(m, c, A, b, [(:SDP, 1:9), (:Zero, 10:10)], [(:Free, 1:9)])
+    # Problem 5 - sdo1 from MOSEK docs
+    # From Mosek.jl/test/mathprogtestextra.jl, under license:
+    #   Copyright (c) 2013 Ulf Worsoe, Mosek ApS
+    #   Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+    #   software and associated documentation files (the "Software"), to deal in the Software 
+    #   without restriction, including without limitation the rights to use, copy, modify, merge, 
+    #   publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons 
+    #   to whom the Software is furnished to do so, subject to the following conditions:
+    #   The above copyright notice and this permission notice shall be included in all copies or 
+    #   substantial portions of the Software.
+    #
+    #     | 2 1 0 |
+    # min | 1 2 1 | . X + x1
+    #     | 0 1 2 |
+    #
+    #
+    # s.t. | 1 0 0 |
+    #      | 0 1 0 | . X + x1 = 1
+    #      | 0 0 1 |
+    #
+    #      | 1 1 1 |
+    #      | 1 1 1 | . X + x2 + x3 = 1/2
+    #      | 1 1 1 |
+    #
+    #      (x1,x2,x3) in C^3_q
+    #      X in C_sdp
+    #
+    println("Problem 5")
+    
+    m = MathProgBase.ConicModel(solver)
+    #     x1   x2   x3    X11  X21  X31  X22  X32  X33
+    c = [ 1.0, 0.0, 0.0,  2.0, 2.0, 0.0, 2.0, 2.0, 2.0 ]
+    A = [ 1.0  0.0  0.0   1.0  0.0  0.0  1.0  0.0  1.0 ;  # A1
+          0.0  1.0  1.0   1.0  2.0  2.0  1.0  2.0  1.0 ]  # A2
+    b = [ 1.0, 0.5 ]
+    
+    MathProgBase.loadproblem!(m, c, A, b, [(:Zero,1:2)], [(:SOC,1:3),(:SDP,4:9)] )
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @test is_symmetric(reshape(MathProgBase.getsolution(m), 3, 3))
-    @test_approx_eq_eps MathProgBase.getsolution(m)[2] 1.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[4] 1.0 tol
-    if duals
-        # cvx_begin
-        #  variable y(3,3)
-        #  dual variables a b;
-        #  minimize y(1,2)
-        #  subject to
-        #  a : y(2,1) == 1;
-        #  b : y == semidefinite(3)
-        # cvx_end
-        # gives
-        # a = 1
-        # b = [0 1 0; -1 0 0; 0 0 0]
-        d = MathProgBase.getdual(m)
-        @test_approx_eq_eps d[1] 0 tol
-        @test_approx_eq_eps d[2] -1 tol;
-        @test_approx_eq_eps d[3] 0 tol;
-        @test_approx_eq_eps d[4] 1 tol;
-        @test_approx_eq_eps d[5] 0 tol;
-        @test_approx_eq_eps d[6] 0 tol;
-        @test_approx_eq_eps d[7] 0 tol;
-        @test_approx_eq_eps d[8] 0 tol;
-        @test_approx_eq_eps d[9] 0 tol;
-        @test_approx_eq_eps d[10] 1 tol
-    end
+    pobj = MathProgBase.getobjval(m)
+    @test_approx_eq_eps pobj 7.05710509e-01 tol
+    
+    xx = MathProgBase.getsolution(m)
+    x123 = xx[1:3]
+    X = xx[4:9]
 
-    # Problem 5A - SDP
-    # Same as problem 5, except we enforce :SDP on the var_cone
-    m = MathProgBase.ConicModel(s)
-    c = [0, 1, 0, 0, 0, 0, 0, 0, 0];
-    A = [0, 0, 0, 1, 0, 0, 0, 0, 0]'
-    b = [1]
-    MathProgBase.loadproblem!(m, c, A, b, [(:Zero, 1:1)], [(:SDP, 1:9)])
-    MathProgBase.optimize!(m)
-    @test MathProgBase.status(m) == :Optimal
-    @test is_symmetric(reshape(MathProgBase.getsolution(m), 3, 3))
-    @test_approx_eq_eps MathProgBase.getsolution(m)[2] 1.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[4] 1.0 tol
     if duals
-        d = MathProgBase.getdual(m)
-        @test_approx_eq_eps d[1] 1 tol
+        y = MathProgBase.getdual(m)
+        # Check primal objective
+        comp_pobj = dot(X,[2.0,2.0,0.0, 2.0,2.0, 2.0]) + x123[1]
+        # Check dual objective
+        comp_dobj = dot(-y,[1.0, 0.5])
+        @test_approx_eq_eps (comp_pobj/comp_dobj) 1.0 tol
+        
+        s = MathProgBase.getreducedcosts(m)
+        m1 = [ 1 0 0 ; 0 1 0 ; 0 0 1 ]
+        m2 = [ 1 1 1 ; 1 1 1 ; 1 1 1 ]
+        m3 = [ 2 1 0 ; 1 2 1 ; 0 1 2 ]
+        M = [s[4] s[5] s[6]
+             s[5] s[7] s[8]
+             s[6] s[8] s[9]]
+        
+        @test (s[2]^2 + s[3]^2 - s[1]^2) < tol # (s[1],s[2],s[3]) in SOC
+        @test_approx_eq_eps sum(abs(m1*y[1]+m2*y[2]+m3 - M)) 0. tol
+        @test eigmin(M) > -tol
     end
-
 end
