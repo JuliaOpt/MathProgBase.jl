@@ -450,6 +450,65 @@ function conicEXPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
         @test u < 0
         @test -u*exp(v/w) ≤ exp(1)*w + tol
     end
+
+    # Problem Chris1
+    # A problem where ECOS was failing
+    if duals
+        println("Problem Chris1")
+        c = [0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0]
+        b = [0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0]
+
+        I = [8,11,1,4,9,12,1,4,10,13,3,7,6,7,7,8,11,14,15,9,12,14,10,13,14]
+        J = [1,1,2,2,2,2,3,3,3,3,4,4,5,5,6,7,7,7,7,8,8,8,9,9,9]
+        V = [-1.0,1.0,-1.0,-1.0,-1.0,1.0,-1.0,1.0,-1.0,1.0,-1.0,-0.5,-1.0,-0.5,1.0,-0.3,-0.3,1.0,-1.0,-0.3,-0.3,1.0,-0.3,-0.3,1.0]
+        A = sparse(I, J, V, length(b), length(c))
+
+        cone_con = [(:ExpPrimal,1:3),(:ExpPrimal,4:6),(:Zero,7:7),(:NonNeg,8:10),(:NonNeg,11:13),(:NonNeg,14:14),(:Zero,15:15)]
+        cone_var = [(:Free,1:9)]
+        MathProgBase.loadproblem!(m, c, A, b, cone_con, cone_var)
+        MathProgBase.optimize!(m)
+
+        primalobj = MathProgBase.getobjval(m)
+        primalsol = MathProgBase.getsolution(m)
+        # check primal feasibility
+        conval = b-A*primalsol
+        @test conval[3] + tol ≥ conval[2]*exp(conval[1]/conval[2])
+        @test conval[6] + tol ≥ conval[5]*exp(conval[4]/conval[5])
+        @test_approx_eq_eps conval[7] 0.0 tol
+        for i in 8:14
+            @test conval[i] ≥ -tol
+        end
+
+        @test_approx_eq_eps conval[15] 0.0 tol
+
+        y = MathProgBase.getdual(m)
+        dualobj = -dot(b,y)
+        @test_approx_eq_eps primalobj dualobj tol
+        dualconval = c + A'*y
+        for i in 1:9
+            @test_approx_eq_eps dualconval[i] 0.0 tol
+        end
+        if y[1] == 0.0
+            @test y[2] ≥ -tol
+            @test y[3] ≥ -tol
+        else
+            @test y[1] < 0.0
+            @test y[3] > 0.0
+            @test -y[1]*log(-y[1]/y[3]) + y[1] - y[2] ≤ tol
+        end
+        if y[4] == 0.0
+            @test y[5] ≥ -tol
+            @test y[6] ≥ -tol
+        else
+            @test y[4] < 0.0
+            @test y[6] > 0.0
+            @test -y[4]*log(-y[4]/y[6]) + y[4] - y[5] ≤ tol
+        end
+        for i in 8:14
+            @test y[i] ≥ -tol
+        end
+    end
+
 end
 
 
