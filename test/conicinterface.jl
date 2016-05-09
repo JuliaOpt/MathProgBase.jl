@@ -512,8 +512,8 @@ function conicEXPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
 end
 
 
-function conicSDPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e-6)
-    # Problem 5 - sdo1 from MOSEK docs
+function conicSDPtest(s::MathProgBase.AbstractMathProgSolver;duals=true, tol=1e-6)
+    # Problem SDP1 - sdo1 from MOSEK docs
     # From Mosek.jl/test/mathprogtestextra.jl, under license:
     #   Copyright (c) 2013 Ulf Worsoe, Mosek ApS
     #   Permission is hereby granted, free of charge, to any person obtaining a copy of this 
@@ -540,13 +540,14 @@ function conicSDPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     #      (x1,x2,x3) in C^3_q
     #      X in C_sdp
     #
-    println("Problem 5")
+    println("Problem SDP1")
     
     m = MathProgBase.ConicModel(solver)
+    s2 = sqrt(2)
     #     x1   x2   x3    X11  X21  X31  X22  X32  X33
-    c = [ 1.0, 0.0, 0.0,  2.0, 2.0, 0.0, 2.0, 2.0, 2.0 ]
+    c = [ 1.0, 0.0, 0.0,  2.0, s2,  0.0, 2.0, s2,  2.0 ]
     A = [ 1.0  0.0  0.0   1.0  0.0  0.0  1.0  0.0  1.0 ;  # A1
-          0.0  1.0  1.0   1.0  2.0  2.0  1.0  2.0  1.0 ]  # A2
+          0.0  1.0  1.0   1.0  s2   s2   1.0  s2   1.0 ]  # A2
     b = [ 1.0, 0.5 ]
     
     MathProgBase.loadproblem!(m, c, A, b, [(:Zero,1:2)], [(:SOC,1:3),(:SDP,4:9)] )
@@ -554,7 +555,7 @@ function conicSDPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     @test MathProgBase.status(m) == :Optimal
     pobj = MathProgBase.getobjval(m)
     @test_approx_eq_eps pobj 7.05710509e-01 tol
-    
+
     xx = MathProgBase.getsolution(m)
     x123 = xx[1:3]
     X = xx[4:9]
@@ -562,27 +563,24 @@ function conicSDPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     if duals
         y = MathProgBase.getdual(m)
         # Check primal objective
-        comp_pobj = dot(X,[2.0,2.0,0.0, 2.0,2.0, 2.0]) + x123[1]
+        comp_pobj = dot(X,[2.0,s2,0.0, 2.0,s2, 2.0]) + x123[1]
         # Check dual objective
-        comp_dobj = dot(-y,[1.0, 0.5])
-        @test_approx_eq_eps (comp_pobj/comp_dobj) 1.0 tol
-        
+        comp_dobj = -dot(y,b)
+        @test_approx_eq_eps comp_pobj comp_dobj tol
+
         s = c + A' * y
-        m1 = [ 1 0 0 ; 0 1 0 ; 0 0 1 ]
-        m2 = [ 1 1 1 ; 1 1 1 ; 1 1 1 ]
-        m3 = [ 2 1 0 ; 1 2 1 ; 0 1 2 ]
-        M = [s[4] s[5] s[6]
-             s[5] s[7] s[8]
-             s[6] s[8] s[9]]
-        
         @test (s[2]^2 + s[3]^2 - s[1]^2) < tol # (s[1],s[2],s[3]) in SOC
-        @test_approx_eq_eps sum(abs(m1*y[1]+m2*y[2]+m3 - M)) 0. tol
+
+        M = [s[4]    s[5]/s2 s[6]/s2
+             s[5]/s2 s[7]    s[8]/s2
+             s[6]/s2 s[8]/s2 s[9]]
+
         @test eigmin(M) > -tol
     end
-    
-    # Problem 6 
+
+    # Problem SDP2
     # Caused getdual to fail on SCS and Mosek
-    println("Problem 6")
+    println("Problem SDP2")
 
     m = MathProgBase.ConicModel(solver)
 
@@ -600,25 +598,23 @@ function conicSDPtest(s::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e
     
     @test MathProgBase.status(m) == :Optimal
     pobj = MathProgBase.getobjval(m)
-    @test_approx_eq_eps pobj -1.80002643 tol
     
     x = MathProgBase.getsolution(m)
     @test all(x[1:6] .> -tol)
     con = b - A * x 
-    @test eigmin([con[8] con[9] ; con[9] con[10]]) > -tol
+    @test eigmin([con[8] con[9]/s2 ; con[9]/s2 con[10]]) > -tol
     @test con[1] >= -tol
     @test all(con[2:7] .<= tol)
     @test_approx_eq_eps con[11] 0. tol
     
-    if dual
+    if duals
         y = MathProgBase.getdual(m)
-        @test eigmin([y[8] y[9] ; y[9] y[10]]) > -tol
-        y[9] *= sqrt(2) # SVec rescaling per http://docs.mosek.com/slides/ismp2012/sdo.pdf
+        @test eigmin([y[8] y[9]/s2 ; y[9]/s2 y[10]]) > -tol
         @test y[1] >= -tol
         @test all(y[2:7] .<= tol)
-        @test_approx_eq_eps y[11] 0. tol
         var = c + A' * y
         @test all(var[1:6] .>= -tol)
+        @test_approx_eq_eps var[7] 0.0 tol
         dobj = -dot(y,b)
         @test_approx_eq_eps pobj dobj tol
     end
