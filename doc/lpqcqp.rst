@@ -22,54 +22,54 @@ Loads the provided problem data to set up the linear programming problem:
 
 ``sense`` specifies the direction of the optimization problem, and must be either ``:Min`` or ``:Max``.
 
-Both sparse and dense matrices are accepted for ``A``. ``Inf`` and ``-Inf`` indicate that 
+Both sparse and dense matrices are accepted for ``A``. ``Inf`` and ``-Inf`` indicate that
 there is no corresponding upper or lower bound. Equal lower and upper bounds are used
 to indicate equality constraints.
 
 .. function:: writeproblem(m::AbstractLinearQuadraticModel, filename::String)
-    
+
     Writes the current problem data to the given file. Supported file types are solver-dependent.
 
 
 
 .. function:: getvarLB(m::AbstractLinearQuadraticModel)
-   
+
     Returns a vector containing the lower bounds :math:`l` on the variables.
 
 .. function:: setvarLB!(m::AbstractLinearQuadraticModel, l)
-   
+
     Sets the lower bounds on the variables.
 
 .. function:: getvarUB(m::AbstractLinearQuadraticModel)
-   
+
     Returns a vector containing the upper bounds :math:`u` on the variables.
 
 .. function:: setvarUB!(m::AbstractLinearQuadraticModel, u)
-   
+
     Sets the upper bounds on the variables.
 
 .. function:: getconstrLB(m::AbstractLinearQuadraticModel)
-   
+
     Returns a vector containing the lower bounds :math:`lb` on the linear constraints.
 
 .. function:: setconstrLB!(m::AbstractLinearQuadraticModel, lb)
-   
+
     Sets the lower bounds on the linear constraints.
 
 .. function:: getconstrUB(m::AbstractLinearQuadraticModel)
-   
+
     Returns a vector containing the upper bounds :math:`ub` on the linear constraints.
 
 .. function:: setconstrUB!(m::AbstractLinearQuadraticModel, ub)
-   
+
     Sets the upper bounds on the linear constraints.
 
 .. function:: getobj(m::AbstractLinearQuadraticModel)
-   
+
     Returns a vector containing the linear objective coefficients :math:`c`.
 
 .. function:: setobj!(m::AbstractLinearQuadraticModel, c)
-   
+
     Sets the linear objective coefficients.
 
 .. function:: getconstrmatrix(m::AbstractLinearQuadraticModel)
@@ -79,7 +79,7 @@ to indicate equality constraints.
 
 .. function:: addvar!(m::AbstractLinearQuadraticModel, constridx, constrcoef, l, u, objcoef)
 
-    Adds a new variable to the model, with lower bound ``l`` (``-Inf`` if none), 
+    Adds a new variable to the model, with lower bound ``l`` (``-Inf`` if none),
     upper bound ``u`` (``Inf`` if none), and
     objective coefficient ``objcoef``. Constraint coefficients for this new variable
     are specified in a sparse format: the ``constrcoef`` vector contains the nonzero
@@ -88,11 +88,11 @@ to indicate equality constraints.
 
 .. function:: addvar!(m::AbstractLinearQuadraticModel, l, u, objcoef)
 
-    Adds a new variable to the model, with lower bound ``l`` (``-Inf`` if none), 
+    Adds a new variable to the model, with lower bound ``l`` (``-Inf`` if none),
     upper bound ``u`` (``Inf`` if none), and
-    objective coefficient ``objcoef``. This is equivalent to calling the 
+    objective coefficient ``objcoef``. This is equivalent to calling the
     above method with empty arrays for the constraint coefficients.
-    
+
 
 .. function:: addconstr!(m::AbstractLinearQuadraticModel, varidx, coef, lb, ub)
 
@@ -101,10 +101,6 @@ to indicate equality constraints.
     are specified in a sparse format: the ``coef`` vector contains the nonzero
     coefficients, and the ``varidx`` vector contains the indices of the corresponding
     variables.
-
-.. function:: updatemodel!(m::AbstractLinearQuadraticModel)
-
-    Commits recent changes to the model. Only required by some solvers (e.g. Gurobi).
 
 .. function:: numlinconstr(m::AbstractLinearQuadraticModel)
 
@@ -134,19 +130,19 @@ to indicate equality constraints.
 
 .. function:: getbasis(m::AbstractLinearQuadraticModel)
 
-    Returns the basis set for the optimal solution in the form ``(cbasis,rbasis)``, 
-    where both return values are vectors of symbols. The vector ``cbasis`` indexes 
-    the columns of the constraint matrix, while ``rbasis`` indexes the rows (values 
+    Returns the basis set for the optimal solution in the form ``(cbasis,rbasis)``,
+    where both return values are vectors of symbols. The vector ``cbasis`` indexes
+    the columns of the constraint matrix, while ``rbasis`` indexes the rows (values
     indicate whether the constraint is active at a lower/upper bound). The entries
-    take value ``:Basic`` if the element is basic, ``:NonbasicAtLower`` if it is 
-    nonbasic at a lower bound, and ``:NonbasicAtUpper`` if it is nonbasic at upper 
-    bound. Other values may appear, taking solver-specific values. Note that this 
-    function may not work if the optimization algorithm is not able to provide 
+    take value ``:Basic`` if the element is basic, ``:NonbasicAtLower`` if it is
+    nonbasic at a lower bound, and ``:NonbasicAtUpper`` if it is nonbasic at upper
+    bound. Other values may appear, taking solver-specific values. Note that this
+    function may not work if the optimization algorithm is not able to provide
     basis information.
 
 .. function:: getunboundedray(m::AbstractLinearQuadraticModel)
 
-    Returns an unbounded ray of the problem, i.e., an objective-improving direction 
+    Returns an unbounded ray of the problem, i.e., an objective-improving direction
     in which one may travel an infinite distance without violating any constraints.
     Note that for some solvers, one must specify additional options for this
     ray to be computed.
@@ -176,11 +172,11 @@ Integer Programming
 
 
 .. function:: addsos1!(m::AbstractLinearQuadraticModel, idx, weight)
-    
+
     Adds a special ordered set (SOS) constraint of type 1. Of the variables indexed by ``idx``, at most one can be nonzero. The ``weight`` argument induces the ordering of the variables; as such, they should be unique values. A typical SOS1 constraint might look like :math:`y=\sum_i w_i x_i`, where :math:`x_i \in \{0,1\}` are binary variables and the :math:`w_i` are weights. See `here <http://lpsolve.sourceforge.net/5.5/SOS.htm>`_ for a description of SOS constraints and their potential uses.
 
 .. function:: addsos2!(m::AbstractLinearQuadraticModel, idx, weight)
-    
+
     Adds a special ordered set (SOS) constraint of type 2. Of the variables indexed by ``idx``, at most two can be nonzero, and if two are nonzero, they must be adjacent in the set. The ``weight`` argument induces the ordering of the variables; as such, they should be unique values. A common application for SOS2 constraints is modeling nonconvex piecewise linear functions; see `here <http://lpsolve.sourceforge.net/5.5/SOS.htm>`_ for details.
 
 Quadratic Programming
