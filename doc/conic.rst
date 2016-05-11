@@ -63,6 +63,10 @@ Not all solvers are expected to support all types of cones. However, when a simp
     by inverting this formula, when :math:`y` elements are specified in
     ``indices``, the corresponding matrix has
     :math:`\left(\sqrt{\frac{1}{4}+2y}-\frac{1}{2}\right) \times \left(\sqrt{\frac{1}{4}+2y}-\frac{1}{2}\right)` elements.
+    The off-diagonal terms of the semidefinite cone are rescaled by
+    :math:`\sqrt{2}` to preserve inner products in the flattened vector
+    space. See page 3 of `Vandenberghe <http://www.seas.ucla.edu/~vandenbe/publications/coneprog.pdf>`_ for more discussion of the vector representation
+    of symmetric matrices.
 
 .. function:: getdual(m::AbstractConicModel)
 
