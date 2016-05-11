@@ -379,8 +379,6 @@ function conicSOCINTtest(s::MathProgBase.AbstractMathProgSolver;tol=1e-6)
     MathProgBase.setvartype!(m, [:Cont,:Bin,:Bin])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @show MathProgBase.getobjval(m)
-    @show MathProgBase.getsolution(m)
     @test_approx_eq_eps MathProgBase.getobjval(m) -2 tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 tol
     @test_approx_eq_eps MathProgBase.getsolution(m)[2] 1.0 tol
