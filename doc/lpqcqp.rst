@@ -298,7 +298,7 @@ If a callback function returns ``:Exit``, the solver is expected to terminate wi
 
    Adds lazy constraint to model. The coefficient values are represented sparsely, with (one-indexed) indices in ``varidx`` and values in ``varcoef``. The constraint sense ``sense`` is a character taking value ``<``, ``>``, or ``=``, and the right-hand side value is ``rhs``.
  
- .. function:: cbaddlazylocal!(d::MathProgCallbackData,varidx,varcoef,sense,rhs)
+.. function:: cbaddlazylocal!(d::MathProgCallbackData,varidx,varcoef,sense,rhs)
 
    Adds local lazy constraint to model. It works as ``cbaddlazy!`` but the lazy constraint is local in the sense that it only applies to the current node and the subtree rooted at this node.
 
