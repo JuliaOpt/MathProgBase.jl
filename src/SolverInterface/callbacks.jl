@@ -16,8 +16,9 @@ export MathProgCallbackData
     cbgetexplorednodes
     cbgetstate
     cbaddcut!
+    cbaddcutlocal!
     cbaddlazy!
+    cbaddlazylocal!
     cbaddsolution!
     cbsetsolutionvalue!
 end
-
