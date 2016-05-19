@@ -6,5 +6,6 @@ export AbstractConicModel
 @define_interface begin
     ConicModel
     getdual
+    getvardual
     supportedcones
 end
