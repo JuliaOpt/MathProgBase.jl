@@ -128,4 +128,79 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     @test_approx_eq getreducedcosts(m) [0.0, 1.0]
 
 
+    ####################################
+    # test setconstrLB! and setconstrUB!
+    # Test that:
+    #   Modifying lower bound works
+    #   Modifying upper bound works
+    #   Setting upper and lower bound to same value works
+    #
+
+    m = LinearQuadraticModel(solver)
+    # Min  x - y
+    # s.t. 0.0 <= x <= 0.0 
+    #      0.0 <= y <= 0.0 
+    # x,y unbounded
+    loadproblem!(m, [ 1.0 0.0 ; 0.0 1.0 ], [-Inf, -Inf], [Inf,Inf], [1.0, -1.0], [0.0,0.0], [0.0,0.0], :Min)
+
+    optimize!(m)
+    @test_approx_eq getobjval(n) 0.0
+    @test_approx_eq getsolution(m) [ 0.0, 0.0 ]
+
+    # Min  x - y
+    # s.t. 0.0 <= x <= 100.0
+    #      0.0 <= y <= 100.0 
+    # x,y unbounded
+    setconstrUB!(m,[100.0,100.0])
+    optimize!(m)
+    @test_approx_eq getobjval(n) -100.0
+    @test_approx_eq getsolution(m) [ 0.0, 100.0 ]
+
+    # Min  x - y
+    # s.t. -100.0 <= x <= 100.0
+    #      -100.0 <= y <= 100.0 
+    # x,y unbounded
+    setconstrLB!(m,[-100.0,-100.0])
+    optimize!(m)
+    @test_approx_eq getobjval(n) -200.0
+    @test_approx_eq getsolution(m) [ -100.0, 100.0 ]
+
+    # Min  x - y
+    # s.t. -100.0 <= x <= 100.0
+    #      -100.0 <= y <= 100.0
+    # x,y unbounded
+    setconstrLB!(m,[10.0,10.0])
+    setconstrUB!(m,[10.0,10.0])
+    optimize!(m)
+    @test_approx_eq getobjval(n) 20.0
+    @test_approx_eq getsolution(m) [ 10.0, 10.0 ]
+
+    # Min  x - y
+    # s.t. 0.0  <= x <= Inf
+    #      -Inf <= y <= 0.0
+    # x,y unbounded
+    setconstrLB!(m,[0.0,Inf])
+    setconstrUB!(m,[-Inf,0.0])
+    optimize!(m)
+    @test_approx_eq getobjval(n) 0.0
+    @test_approx_eq getsolution(m) [ 0.0, 0.0 ]
+
+    # Min  x - y
+    # s.t. -Inf <= x <= Inf
+    #      -Inf <= y <= 0.0
+    # x,y unbounded
+    setconstrLB!(m,[-Inf,Inf])
+    setconstrUB!(m,[0.0,0.0])
+    optimize!(m)
+    @test_approx_gt getunboundedray(m)'*[1.0,-1.0] 0.0
+
+
+    # Min  x - y
+    # s.t. 0.0 <= x <= Inf
+    #      -Inf <= y <= Inf
+    # x,y unbounded
+    setconstrLB!(m,[0.0,0.0])
+    setconstrUB!(m,[-Inf,Inf])
+    optimize!(m)
+    @test_approx_gt getunboundedray(m)'*[1.0,-1.0] 0.0
 end
