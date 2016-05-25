@@ -192,7 +192,7 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     setconstrLB!(m,[-Inf,Inf])
     setconstrUB!(m,[0.0,0.0])
     optimize!(m)
-    @test_approx_gt getunboundedray(m)'*[1.0,-1.0] 0.0
+    @test getunboundedray(m)'*[1.0,-1.0] > 1e-8
 
 
     # Min  x - y
@@ -202,5 +202,5 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     setconstrLB!(m,[0.0,0.0])
     setconstrUB!(m,[-Inf,Inf])
     optimize!(m)
-    @test_approx_gt getunboundedray(m)'*[1.0,-1.0] 0.0
+    @test getunboundedray(m)'*[1.0,-1.0] > -1e-8
 end
