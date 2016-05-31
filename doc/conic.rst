@@ -72,6 +72,12 @@ Not all solvers are expected to support all types of cones. However, when a simp
 
     If the solve was successful, returns the optimal dual solution vector :math:`y`. If the problem was found to be infeasible, returns a ray of the dual problem satisfying :math:`A^Ty \in K_2^*`, :math:`y \in K_1^*`, and :math:`-b^Ty > 0`.
 
+.. function:: getvardual(m::AbstractConicModel)
+
+    If the solve was successful, returns the optimal dual solution vector
+    :math:`s \in K_2^*` corresponding to the variable cones. This vector
+    should be equal to :math:`c+A^Ty` up to algorithmic convergence tolerances.
+
 .. function:: supportedcones(m::AbstractMathProgSolver)
 
     If the solver implements ``ConicModel``, returns a list of cones supported.
