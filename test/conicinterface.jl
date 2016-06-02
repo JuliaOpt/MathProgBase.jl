@@ -18,14 +18,12 @@ function coniclineartest(solver::MathProgBase.AbstractMathProgSolver;duals=false
     # Opt solution = -11
     # x = 1, y = 0, z = 2
     println("Problem LIN1")
+    c = [-3.0, -2.0, -4.0]
+    A = [ 1.0   1.0   1.0;
+          0.0   1.0   1.0]
+    b = [ 3.0,  2.0]
     m = MathProgBase.ConicModel(solver)
-    MathProgBase.loadproblem!(m,
-    [-3.0, -2.0, -4.0],
-    [ 1.0   1.0   1.0;
-      0.0   1.0   1.0],
-    [ 3.0,  2.0],
-    [(:Zero,1:2)],
-    [(:NonNeg, 1:3)])
+    MathProgBase.loadproblem!(m, c, A, b, [(:Zero,1:2)], [(:NonNeg, 1:3)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
     @test_approx_eq_eps MathProgBase.getobjval(m) -11 tol
@@ -36,6 +34,9 @@ function coniclineartest(solver::MathProgBase.AbstractMathProgSolver;duals=false
         d = MathProgBase.getdual(m)
         @test_approx_eq_eps d[1] 3.0 tol
         @test_approx_eq_eps d[2] 1.0 tol
+        vardual = c + A'd
+        var = MathProgBase.getvardual(m)
+        @test_approx_eq_eps vardual var tol
     end
 
     # Problem LIN1A - same as Problem LIN1, but with variable bounds
@@ -49,16 +50,15 @@ function coniclineartest(solver::MathProgBase.AbstractMathProgSolver;duals=false
     # Opt solution = -11
     # x = 1, y = 0, z = 2
     println("Problem LIN1A")
+    c = [-3.0, -2.0, -4.0]
+    A = [ 1.0   1.0   1.0;
+          0.0   1.0   1.0;
+          1.0   0.0   0.0;
+          0.0   1.0   0.0;
+          0.0   0.0  -1.0]
+    b = [ 3.0,  2.0,  0.0,  0.0,  0.0]
     m = MathProgBase.ConicModel(solver)
-    MathProgBase.loadproblem!(m,
-    [-3.0, -2.0, -4.0],
-    [ 1.0   1.0   1.0;
-      0.0   1.0   1.0;
-      1.0   0.0   0.0;
-      0.0   1.0   0.0;
-      0.0   0.0  -1.0],
-    [ 3.0,  2.0,  0.0,  0.0,  0.0],
-    [(:Zero,1:2),(:NonPos,3:4),(:NonNeg,5)],
+    MathProgBase.loadproblem!(m,c, A, b, [(:Zero,1:2),(:NonPos,3:4),(:NonNeg,5)],
     [(:Free, 1:3)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
@@ -73,6 +73,9 @@ function coniclineartest(solver::MathProgBase.AbstractMathProgSolver;duals=false
         @test_approx_eq_eps d[3]  0.0 tol
         @test_approx_eq_eps d[4] -2.0 tol
         @test_approx_eq_eps d[5]  0.0 tol
+        vardual = c + A'd
+        var = MathProgBase.getvardual(m)
+        @test_approx_eq_eps vardual var tol
     end
 
     # Problem LIN2 - mixed free, nonneg, nonpos, zero, shuffled cones
@@ -492,6 +495,8 @@ function conicEXPtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
         dualobj = -dot(b,y)
         @test_approx_eq_eps primalobj dualobj tol
         dualconval = c + A'*y
+        var = MathProgBase.getvardual(m)
+        @test_approx_eq_eps dualconval var tol
         for i in 1:9
             @test_approx_eq_eps dualconval[i] 0.0 tol
         end
