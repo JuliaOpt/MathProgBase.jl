@@ -1,17 +1,5 @@
-#workspace()
-
-export rc
-export roughly
-export PresolveStack
-export LinearDependency
-export Presolve_Problem
-
-
-
 using MathProgBase
 using GLPKMathProgInterface
-
-#export presolver! (?)
 
 # generates the unique key from row,col index for creating the dictionary
 function rc(x::Int, y::Int, M::Int)
@@ -143,34 +131,9 @@ type Presolve_Problem
     end
 end
 
-#the dict included variation of bitmatrix * float vector multiplication
-function bit_dict_mul!(a::BitArray{2}, dictA::Dict{Float64,Float64}, x::Array{Float64,1},b::Array{Float64,1})
-    m,n = size(a)
-    k = find(a)
-
-    for ind in 1:length(k)
-        i = k[ind] % m
-        j = Int((k[ind] - i)/m + 1)
-        b[i] -= x[j]*dictA[rc(i,j,n)]
-    end
-
-
-`    for i in 1:m
-        for j in find(a[i,:])
-                b[i] -= x[j]*dictA[rc(i,j,n)]
-        end
-    end`
-end
-
 function presolver!(c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::Array{Float64,1}, lb::Array{Float64,1}, ub::Array{Float64,1})
     #println("Making presolve")
     p = Presolve_Problem(c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::Array{Float64,1}, lb::Array{Float64,1}, ub::Array{Float64,1})
-
-    `rintln("JUST TRYING THIS OUT")
-    svariable = rand(p.originaln)
-    @time bit_dict_mul!(p.bitmat,p.dictA,svariable,p.currentb)
-
-    error("STOP")`
 
     counter = 0
     while(counter >= 0)
@@ -413,6 +376,7 @@ end
 
 function check_progress(currentc,dictA,curerntb,currentlb,currentub,rowindices,colindices)
     #checking rows
+    #TODO .. remove rowindices,colindices usage
     for i in 1:N
         for nnz in 1:length(rowindices[i])
             dictA[rc(i,nnz)] == 0 && error("Zero erro in row")
@@ -508,6 +472,7 @@ function make_lp(m::Int, n::Int, s::Float64)
     return m,n,c,A,b,lb,ub,x
 end
 
+# this is only needed because of the way I have generated sample LP instances. Not significant time cost anyway
 function trim(x::Array{Float64,1}, y::Array{Float64,1})
     for i in 1:length(x)
         if(x[i] < y[i])
@@ -516,7 +481,6 @@ function trim(x::Array{Float64,1}, y::Array{Float64,1})
     end
     return x
 end
-
 
 #simplest test, fetch one nice instance and compare.
 function test1()
