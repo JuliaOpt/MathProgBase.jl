@@ -1,3 +1,13 @@
+#workspace()
+
+export rc
+export roughly
+export PresolveStack
+export LinearDependency
+export Presolve_Problem
+
+
+
 using MathProgBase
 using GLPKMathProgInterface
 
@@ -78,13 +88,16 @@ type Presolve_Problem
     currentb :: Array{Float64,1}
     currentlb :: Array{Float64,1}
     currentub :: Array{Float64,1}
-    rowindices :: Array{Array{Int64,1},1}
-    colindices :: Array{Array{Int64,1},1}
+    #rowindices :: Array{Array{Int64,1},1}
+    #colindices :: Array{Array{Int64,1},1}
     independentvar :: BitArray{1}
     activeconstr :: BitArray{1}
     pstack :: Array{PresolveStack,1}
     originalm :: Int64
     originaln :: Int64
+    bitmat :: BitArray{2}
+    rowcounter :: Array{Float64,1}
+    colcounter :: Array{Float64,1}
 
     #   Constructor that creates a Presolve_Problem
     function Presolve_Problem(c::Array{Float64,1},A::SparseMatrixCSC{Float64,Int64},b::Array{Float64,1},lb::Array{Float64,1},ub::Array{Float64,1})
@@ -102,8 +115,11 @@ type Presolve_Problem
         activeconstr = trues(originalm)
         pstack = Array{PresolveStack,1}()
         dictA = Dict{Float64,Float64}()
-        rowindices = Array{Int,1}[Int[] for i=1:originalm]
-        colindices = Array{Int,1}[Int[] for i=1:originaln]
+        rowcounter = zeros(originalm)
+        colcounter = zeros(originaln)
+        #rowindices = Array{Int,1}[Int[] for i=1:originalm]
+        #colindices = Array{Int,1}[Int[] for i=1:originaln]
+        bitmat = falses(originalm,originaln)
 
     #   Iterating through the non-zeros of sparse matrix A to construct the dictionary
         Arows = rowvals(A)
@@ -114,21 +130,51 @@ type Presolve_Problem
                 v = Avals[i]
                 rcval = rc(r,j,originaln)
                 dictA[rcval] = v
-                push!(rowindices[r],j)
-                push!(colindices[j],r)
+                #push!(rowindices[r],j)
+                #push!(colindices[j],r)
+                rowcounter[r] += 1
+                colcounter[j] += 1
+                bitmat[r,j] = true
             end
         end
 
-        new(c,dictA,b,lb,ub,rowindices,colindices,independentvar,activeconstr,pstack,originalm,originaln)
+        #new(c,dictA,b,lb,ub,rowindices,colindices,independentvar,activeconstr,pstack,originalm,originaln,bitmat)
+        new(c,dictA,b,lb,ub,independentvar,activeconstr,pstack,originalm,originaln,bitmat,rowcounter,colcounter)
     end
 end
 
+#the dict included variation of bitmatrix * float vector multiplication
+function bit_dict_mul!(a::BitArray{2}, dictA::Dict{Float64,Float64}, x::Array{Float64,1},b::Array{Float64,1})
+    m,n = size(a)
+    k = find(a)
+
+    for ind in 1:length(k)
+        i = k[ind] % m
+        j = Int((k[ind] - i)/m + 1)
+        b[i] -= x[j]*dictA[rc(i,j,n)]
+    end
+
+
+`    for i in 1:m
+        for j in find(a[i,:])
+                b[i] -= x[j]*dictA[rc(i,j,n)]
+        end
+    end`
+end
+
 function presolver!(c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::Array{Float64,1}, lb::Array{Float64,1}, ub::Array{Float64,1})
+    #println("Making presolve")
     p = Presolve_Problem(c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::Array{Float64,1}, lb::Array{Float64,1}, ub::Array{Float64,1})
+
+    `rintln("JUST TRYING THIS OUT")
+    svariable = rand(p.originaln)
+    @time bit_dict_mul!(p.bitmat,p.dictA,svariable,p.currentb)
+
+    error("STOP")`
 
     counter = 0
     while(counter >= 0)
-         #println("Empty row call")
+        # println("Empty row call")
         # detects empty rows, throws infeasibilty error or marks it for removal
         er = empty_rows!(p::Presolve_Problem)
         #@show er
@@ -142,33 +188,36 @@ function presolver!(c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::A
         #@show fv
         #println("remove fv")
         # removes all fixed variable from the current copy of data.
-        remfv = remove_fixed!(p::Presolve_Problem)
+        #remfv = remove_fixed!(p::Presolve_Problem)
         #@show remfv
         #println("singleton row call")
         # detects singleton rows
         sr = singleton_rows!(p::Presolve_Problem)
+        #sr = false
         #@show sr
         #println("to next iteration")
-        if(!(er||ec||fv||remfv||sr))
+        if(!(er||ec||fv||sr))
             break
         end
         counter+=1
     end
 
     #println("trying make new")
-    newc,newA,newb,newlb,newub = make_new(p::Presolve_Problem)
-
-    return newc,newA,newb,newlb,newub,p.independentvar,p.pstack
+    #@time newc,newA,newb,newlb,newub = make_new(p::Presolve_Problem)
+    c,A,b,lb,ub = make_new(p::Presolve_Problem)
+    return c,A,b,lb,ub,p.independentvar,p.pstack
+    #return newc,newA,newb,newlb,newub,p.independentvar,p.pstack
 end
 
     # detecting and removing empty rows.
 function empty_rows!(p::Presolve_Problem)
     empty_row = false
-    for i in 1:length(p.rowindices)
+    for i in 1:p.originalm
         if(p.activeconstr[i] == false)
             continue
         end
-        if(length(p.rowindices[i])==0)
+        #if(length(p.rowindices[i])==0)
+        if(p.rowcounter[i] == 0)
             #println("Detected Empty Row at $i")
             !(roughly(p.currentb[i],0.0)) && error("Empty Row Infeasibility at row $i and b[i] is - $(p.currentb[i])")
             p.activeconstr[i] = false
@@ -182,12 +231,13 @@ end
     # detecting and removing empty cols.
 function empty_cols!(p::Presolve_Problem)
     empty_col = false
-    for j in 1:length(p.colindices)
+    for j in 1:p.originaln
         if(p.independentvar[j] == false)
             continue
         end
-        if(length(p.colindices[j])==0)
-            #println("Detected Empty col / Unrestricted variable at $j")
+        #if(length(p.colindices[j])==0)
+        if(p.colcounter[j] == 0)
+                #println("Detected Empty col / Unrestricted variable at $j")
             (p.currentc[j] != 0)*(p.currentlb[j] == -Inf64) && error("Problem is unbounded.")
             p.independentvar[j] = false
             empty_col = true
@@ -200,7 +250,7 @@ end
     # detecting an infeasible or fixed variable
 function fixed_variables!(p::Presolve_Problem)
     detect_fixed = false
-    for j in 1:length(p.currentlb)
+    for j in 1:p.originaln
         if(p.independentvar[j] == false)
             continue
         end
@@ -243,8 +293,8 @@ function remove_fixed!(p::Presolve_Problem)
                         if p.rowindices[k][i] > j
                                 break
                         end
-                    end
                 end
+            end
             variable_remove = true
             p.colindices[j]=Vector{Int64}[]
             end
@@ -257,45 +307,46 @@ end
     # SINGLETON ROW
 function singleton_rows!(p::Presolve_Problem)
     singleton_row = false
+    #srows = falses(p.originalm)
+    svariable = zeros(p.originaln)
+
     for i in 1:p.originalm
         if(p.activeconstr[i] == false)
             continue
         end
-        if(length(p.rowindices[i])==1)
+        #if(length(p.rowindices[i])==1)
+        if(p.rowcounter[i] == 1)
             #println("found a row singleton at row $i")
-            j = p.rowindices[i][1]
+            #j = p.rowindices[i][1]
+            j = find(p.bitmat[i,:])[1]
+            if(p.independentvar[j] == false)
+                continue
+            end
             aij = p.dictA[rc(i,j,p.originaln)]
             aij == 0 && error("Unexpected Zero")
             xj = p.currentb[i]/aij
             add_to_stack!(LinearDependency(j,xj),p.independentvar,p.pstack)
             p.activeconstr[i] = false
             singleton_row = true
+                    #    srows[i] = true
+            svariable[j] = xj
+         end
+    end
 
-            # need to change other equations with xj
-            for k in filter(j->length(p.rowindices[j])!=0,1:p.originalm)
-                if k == i
-                    continue
-                end
-                lenk = length(p.rowindices[k])
-                l = 1
-                while l <= lenk
-                    if(p.rowindices[k][l] == j)
-                        key = rc(k,j,p.originaln)
-                        akj = p.dictA[key]
-                        if(lenk==1)
-                            (abs(xj - p.currentb[k]/akj) >= 1e-3) && error("Infeasible Problem i - $i, j - $j ,  xj - $xj , k - $k , akj - $akj , bk = $(p.currentb[k])")
-                        end
-                        p.currentb[k] -= akj*xj
-                        delete!(p.dictA,key)
-                        splice!(p.rowindices[k],l)
-                        lenk -= 1
-                    end
-                    l += 1
-                end
-            end
+    k = find(p.bitmat)
+
+    for ind in 1:length(k)
+        i = k[ind] % p.originalm == 0 ? p.originalm : k[ind]%p.originalm
+        j = Int((k[ind] - i)/p.originalm + 1)
+        key = rc(i,j,p.originaln)
+        if(svariable[j]!=0)
+            p.currentb[i] -= svariable[j]*p.dictA[key]
+            delete!(p.dictA,key)
+            p.bitmat[i,j] = false
+            p.rowcounter[i] -= 1
+            #splice!(p.rowindices[i],j)
         end
     end
-    #println("Exiting row singleton and returning $singleton_row")
     return singleton_row
 end
 
@@ -440,17 +491,17 @@ function make_new(p::Presolve_Problem)
     return newc,newA,newb,newlb,newub
 end
 
-function make_lp()
+function make_lp(m::Int, n::Int, s::Float64)
     #m = rand((1:100))
     #n = rand((1:100))
-    #m = 10000
-    #n = 10000
+    #m = 1000
+    #n = 1000
     #enron data set contained 36,692 nodes and 183,831 nodes at sparsity of 0.00013
-    m = 36692
-    n = 36692
+    #m = 36692
+    #n = 36692
     c = ones(n)
     x = rand((1:1000),n)
-    A = sprand(m,n,0.00001)
+    A = sprand(m,n,s)
     b = A*x
     lb = float(copy(x))
     ub = 1000000*ones(n)
@@ -524,41 +575,59 @@ end
 
 #test1()
 
-function timetest1()
+function timetest1(in1::Int, in2::Int, in3::Float64)
     tol = 1e-3
     println("---------STARTING TIME PROFILE TEST--------")
-    m,n,c,A,b,lb,ub,x = make_lp()
+    m,n,c,A,b,lb,ub,x = make_lp(in1,in2,in3)
     @show m,n
     #@show A
 
     tolerance = tol * ones(n)
     println("FIRST TIMING")
     @time begin
-        answer = linprog(c,A,'=',b,lb,ub,GLPKSolverLP(presolve=false))
+        answer = linprog(c,A,'=',b,lb,ub,GLPKSolverLP(presolve=true))
         answer.status != :Optimal && error("WHAT 1")
     end
 println("NEXT TIMING----------------")
-    @time begin
-        newc,newA,newb,newlb,newub,independentvar,pstack = presolver!(c,A,b,lb,ub)
+    #@time begin
+@time begin        newc,newA,newb,newlb,newub,independentvar,pstack = presolver!(c,A,b,lb,ub)
         @show size(newA)
-        (newA == A) && error("No Presolving Done")
+        #(newA == A) && error("No Presolving Done")
         ans = Array{Float64,1}()
-        if(length(find(independentvar))!=0)
+        #println("Solving the Presolved Problem")
+        #@time begin
+            if(length(find(independentvar))!=0)
             presol = linprog(newc, newA, '=', newb,newlb,newub, GLPKSolverLP(presolve=false))
             #presol = linprog(newc, newA, '=', newb,newlb,newub)
             presol.status != :Optimal && error("WHAT 2")
             ans = presol.sol
-        end
+            end
+        #end
         #@show ans
+        #println("Postsolving")
         finalsol = return_postsolved(ans,independentvar,pstack)
+        #println("Trimming")
         finalsol = trim(finalsol,lb)
     end
+    #end
     @show answer.sol
     @show finalsol
 end
 
-timetest1()
+timetest1(1,1,0.3)
 
 println("AGAIN")
 
-timetest1()
+timetest1(10,10,0.3)
+
+println("AGAIN")
+
+timetest1(100,100,0.01)
+
+println("AGAIN")
+
+timetest1(1000,1000,0.001)
+
+println("AGAIN")
+
+timetest1(10000,10000,0.0001)
