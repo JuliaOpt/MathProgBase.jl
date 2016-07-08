@@ -119,18 +119,28 @@ function do_tests(correctness::Bool, time::Bool)
 
     if(time)
         # Time-Profile tests
-        time_test(1,1,0.3)
-        println("AGAIN")
         time_test(10,10,0.3)
         println("AGAIN")
         time_test(100,100,0.01)
         println("AGAIN")
         time_test(1000,1000,0.001)
-        println("AGAIN YO")
+        println("AGAIN")
         time_test(10000,10000,0.0001)
+        #println("AGAIN")
+        #time_test(100000,100000,0.00001)
     end
 end
 
+println("-------------------RANDOMIZED CORRECTNESS TESTS-----------------")
 do_tests(true,false)
 
-do_tests(false,true)
+time_test(1,1,0.3)
+Profile.clear()
+
+println("-------------------RANDOMIZED TIME TESTS---------------------")
+@profile do_tests(false,true)
+
+#Profile.print(format=:flat)
+using ProfileView
+ProfileView.view()
+ProfileView.svgwrite("profile_results.svg")

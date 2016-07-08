@@ -137,8 +137,8 @@ function presolver!(c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::A
     #println("Making presolve")
     p = Presolve_Problem(c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::Array{Float64,1}, lb::Array{Float64,1}, ub::Array{Float64,1})
 
-    counter = 0
-    while(counter >= 0)
+    #counter = 0
+    #while(counter >= 0)
         # println("Empty row call")
         # detects empty rows, throws infeasibilty error or marks it for removal
         er = empty_rows!(p::Presolve_Problem)
@@ -161,11 +161,11 @@ function presolver!(c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::A
         #sr = false
         #@show sr
         #println("to next iteration")
-        if(!(er||ec||fv||sr))
-            break
-        end
-        counter+=1
-    end
+    #    if(!(er||ec||fv||sr))
+    #        break
+    #    end
+    #    counter+=1
+    #end
 
     #println("trying make new")
     #@time newc,newA,newb,newlb,newub = make_new(p::Presolve_Problem)
