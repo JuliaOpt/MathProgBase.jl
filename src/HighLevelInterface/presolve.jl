@@ -1,13 +1,3 @@
-#workspace()
-
-export rc
-export roughly
-export PresolveStack
-export LinearDependency
-export Presolve_Problem
-export make_lp
-
-
 using MathProgBase
 using GLPKMathProgInterface
 

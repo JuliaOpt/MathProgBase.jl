@@ -132,3 +132,5 @@ function do_tests(correctness::Bool, time::Bool)
 end
 
 do_tests(true,false)
+
+do_tests(false,true)
