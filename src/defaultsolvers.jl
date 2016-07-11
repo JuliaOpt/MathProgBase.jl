@@ -34,15 +34,15 @@ using Base.Meta
 # Don't load packages for default solvers until needed.
 # This reduces the startup time for MathProgBase.
 for solvertype in ["LP", "MIP", "QP", "SDP", "NLP", "Conic"]
-    typename = symbol("Default"*solvertype*"Solver")
+    typename = Symbol("Default"*solvertype*"Solver")
     @eval begin
         type $typename <: SolverInterface.AbstractMathProgSolver
         end
     end
-    defaultname = symbol("default"*solvertype*"solver")
+    defaultname = Symbol("default"*solvertype*"solver")
     @eval $defaultname = ($typename)()
 
-    solvers = symbol(solvertype*"solvers")
+    solvers = Symbol(solvertype*"solvers")
 
 
     for t in (:LinearQuadraticModel,:ConicModel,:NonlinearModel)

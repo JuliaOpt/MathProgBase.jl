@@ -4,6 +4,7 @@ module MathProgBase
 
 include(joinpath(dirname(@__FILE__),"SolverInterface","SolverInterface.jl"))
 using .SolverInterface
+using Compat
 
 # deprecated name
 if VERSION >= v"0.4-rc2"
