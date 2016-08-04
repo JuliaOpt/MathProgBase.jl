@@ -394,13 +394,13 @@ end
 
 
 function conicEXPtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e-6)
-    # Problem 4 - ExpPrimal
+    # Problem EXP1 - ExpPrimal
     # min x + y + z
     #  st  y e^(x/y) <= z, y > 0 (i.e (x, y, z) are in the exponential primal cone)
     #      x == 1
     #      y == 2
 
-    println("Problem 4")
+    println("Problem EXP1")
     m = MathProgBase.ConicModel(solver)
     c = [1.0, 1.0, 1.0]
     A = [0.0 1.0 0.0;
@@ -427,9 +427,9 @@ function conicEXPtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
         @test_approx_eq_eps s c+A'd tol
     end
 
-    # Problem 4A - ExpPrimal
+    # Problem EXP1A - ExpPrimal
     # Same as previous, except we put :ExpPrimal on constr_cones
-    println("Problem 4A")
+    println("Problem EXP1A")
     m = MathProgBase.ConicModel(solver)
     c = [1.0, 1.0, 1.0]
     A = [0.0 1.0 0.0;
@@ -460,10 +460,10 @@ function conicEXPtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
         @test_approx_eq_eps s zeros(3) tol
     end
 
-    # Problem Chris1
+    # Problem EXP2
     # A problem where ECOS was failing
     if duals
-        println("Problem Chris1")
+        println("Problem EXP2")
         c = [0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0]
         b = [0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0]
 
@@ -519,6 +519,45 @@ function conicEXPtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
         for i in 8:14
             @test y[i] ≥ -tol
         end
+    end
+
+    # Problem EXP3
+    # Another problem where ECOS was failing
+    if duals
+        println("Problem EXP3")
+        b = [4.0,0.0,1.0,0.0,5.0]
+        c = [-1.0,0.0]
+
+        I = [1,2,4,5]
+        J = [1,1,2,2]
+        V = [2.0,-1.0,-1.0,1.0]
+        A = sparse(I,J,V,5,2)
+        cone_var = [(:Free,[1,2])]
+        cone_con = [(:NonNeg,[1]),(:ExpPrimal,[2,3,4]),(:NonNeg,[5])]
+        m = MathProgBase.ConicModel(solver)
+        MathProgBase.loadproblem!(m, c, A, b, cone_con, cone_var)
+        MathProgBase.optimize!(m)
+
+        primalobj = MathProgBase.getobjval(m)
+        primalsol = MathProgBase.getsolution(m)
+        # check primal feasibility
+        conval = b-A*primalsol
+        @test conval[4] + tol ≥ conval[3]*exp(conval[2]/conval[3])
+        @test conval[1] ≥ -tol
+        @test conval[5] ≥ -tol
+
+        y = MathProgBase.getdual(m)
+        dualobj = -dot(b,y)
+        @test_approx_eq_eps primalobj dualobj tol
+        dualconval = c + A'*y
+        var = MathProgBase.getvardual(m)
+        @test_approx_eq_eps dualconval var tol
+        for i in 1:2
+            @test_approx_eq_eps dualconval[1] 0.0 tol
+        end
+        @test y[1] ≥ -tol
+        @test -y[2]*log(-y[2]/y[4]) + y[2] - y[3] ≤ tol
+        @test y[5] ≥ -tol
     end
 
 end
