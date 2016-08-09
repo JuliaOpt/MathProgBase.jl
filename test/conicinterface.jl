@@ -369,6 +369,103 @@ function conicSOCtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
 
 end
 
+function conicSOCRotatedtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e-6)
+    # Problem SOCRoated1
+    # min 0a + 0b - 1x - 1y
+    #  st  a            == 1/2
+    #  st  b            == 1
+    #      2a*b >= y^2+z^2
+    println("Problem SOCRotated1")
+    c = [ 0.0, 0.0, -1.0, -1.0]
+    A = [ 1.0  0.0   0.0   0.0
+          0.0  1.0   0.0   0.0]
+    b = [ 0.5, 1.0]
+    m = MathProgBase.ConicModel(solver)
+    MathProgBase.loadproblem!(m,c,A,b,[(:Zero,1:2)],[(:SOCRotated,1:4)])
+    MathProgBase.optimize!(m)
+    @test MathProgBase.status(m) == :Optimal
+    @test_approx_eq_eps MathProgBase.getobjval(m) -sqrt(2.0) tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[1] 0.5 tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[2] 1.0 tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 1.0/sqrt(2.0) tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[4] 1.0/sqrt(2.0) tol
+    if duals
+        d = MathProgBase.getdual(m)
+        dualobj = -dot(b,d)
+        @test_approx_eq_eps dualobj -sqrt(2.0) tol
+        @test all(d .>= 0)
+        vardual = MathProgBase.getvardual(m)
+        @test_approx_eq_eps vardual (c+ A'd) tol
+        @test 2*vardual[1]*vardual[2] ≥ vardual[3]^2 + vardual[4]^2 - tol
+    end
+
+
+    # Problem SOCRotated1A - Problem SOCRotated1 with a and b substituted
+    # min          -y - z
+    #  st [0.5] - [      ] SOCRotated
+    #     [1.0] - [      ] SOCRotated
+    #     [0.0] - [-y    ] SOCRotated
+    #     [0.0] - [    -z] SOCRotated
+    println("Problem SOCRotated1A")
+    c = [-1.0,-1.0]
+    A = [0.0 0.0; 0.0 0.0; -1.0 0.0; 0.0 -1.0]
+    b = [0.5, 1.0, 0.0, 0.0]
+    m = MathProgBase.ConicModel(solver)
+    MathProgBase.loadproblem!(m,c,A,b,
+    [(:SOCRotated,1:4)],
+    [(:Free,1:2)])
+    MathProgBase.optimize!(m)
+    @test MathProgBase.status(m) == :Optimal
+    @test_approx_eq_eps MathProgBase.getobjval(m) -sqrt(2.0) tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0/sqrt(2.0) tol
+    @test_approx_eq_eps MathProgBase.getsolution(m)[2] 1.0/sqrt(2.0) tol
+    if duals
+        d = MathProgBase.getdual(m)
+        @test 2*d[1]*d[2] ≥ d[3]^2 + d[4]^2 - tol
+        dualobj = -dot(b,d)
+        @test_approx_eq_eps dualobj -sqrt(2.0) tol
+
+        vardual = MathProgBase.getvardual(m)
+        @test_approx_eq_eps vardual (c+ A'd) tol
+        @test_approx_eq_eps vardual zeros(2) tol
+    end
+
+    # Problem SOCRotated2 - Infeasible
+    # min 0
+    # s.t. z ≥ 2
+    #      x ≤ 1
+    #      y = 1/2
+    #      z^2 ≤ 2x*y
+    # in conic form:
+    # min 0
+    # s.t. -2 + z ∈ R₊
+    #      -1 + x ∈ R₋
+    #     1/2 - y ∈ {0}
+    #       (x,y,z) ∈ SOCRoated
+    println("Problem SOCRotated2")
+    b = [-2, -1, 1/2]
+    A = [0 0 -1; -1 0 0; 0 1 0]
+    c = [0,0,0]
+    constr_cones = [(:NonNeg,1:1),(:NonPos,2:2),(:Zero,3:3)]
+    var_cones = [(:SOCRotated,1:3)]
+
+    m = MathProgBase.ConicModel(solver)
+    MathProgBase.loadproblem!(m, c, A, b, constr_cones, var_cones)
+    MathProgBase.optimize!(m)
+    @test MathProgBase.status(m) == :Infeasible
+
+    if duals
+        y = MathProgBase.getdual(m)
+        @test y[1] > 0
+        @test y[2] < 0
+        vardual = MathProgBase.getvardual(m)
+        @test_approx_eq_eps A'y vardual tol
+        @test 2*vardual[1]*vardual[2] ≥ vardual[3]^2
+        @test -dot(b,y) > 0
+    end
+
+end
+
 function conicSOCINTtest(solver::MathProgBase.AbstractMathProgSolver;tol=1e-6)
     # Problem SOCINT1
     # min 0x - 2y - 1z
