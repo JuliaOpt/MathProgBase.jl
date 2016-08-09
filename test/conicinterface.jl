@@ -363,7 +363,7 @@ function conicSOCtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
         y = MathProgBase.getdual(m)
         @test y[1] > 0
         @test y[2] < 0
-        @test (A'y)[1] ≥ abs((A'y)[2])
+        @test (A'y)[1]/abs((A'y)[2]) ≥ 1-tol
         @test -dot(b,y) > 0
     end
 
