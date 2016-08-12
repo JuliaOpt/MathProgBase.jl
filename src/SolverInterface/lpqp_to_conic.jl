@@ -67,10 +67,6 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
     @assert num_aux == length(socconstr_idx) + length(rsocconstr_idx)
     for (cone,idxs) in var_cones
         cone in bad_cones && error("Cone type $(cone) not supported")
-        if cone == :SOCRotated
-            # Leave this case as a TODO
-            error("Rotated SOC not yet supported for variable cones")
-        end
     end
 
     c = vcat(c,zeros(num_aux))
@@ -78,15 +74,18 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
     l = fill(-Inf, length(c))
     u = fill(Inf, length(c))
     for (cone,idxs) in var_cones
-        if cone != :SOC
+        if cone == :SOC
+            l[idxs[1]] = 0
+        elseif cone == :SOCRotated
+            l[idxs[1]] = 0
+            l[idxs[2]] = 0
+        else
             cone_l = (cone == :Free || cone == :NonPos) ? -Inf : 0.0
             cone_u = (cone == :Free || cone == :NonNeg) ?  Inf : 0.0
             for idx in idxs
                 l[idx] = cone_l
                 u[idx] = cone_u
             end
-        else
-            l[idxs[1]] = 0
         end
     end
 
@@ -162,8 +161,14 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
     # Add conic constraints
 
     for (cone, idx) in var_cones
-        cone == :SOC || continue
-        addquadconstr!(m.lpqpmodel, Int[], Float64[], vcat(idx), vcat(idx), [-1.0; ones(length(idx)-1)], '<', 0.0)
+        if cone == :SOC
+            addquadconstr!(m.lpqpmodel, Int[], Float64[], vcat(idx), vcat(idx), [-1.0; ones(length(idx)-1)], '<', 0.0)
+        elseif cone == :SOCRotated
+            idx1 = idx[1]
+            idx2 = idx[2]
+            idxrest = idx[3:end]
+            addquadconstr!(m.lpqpmodel, Int[], Float64[], [idx1;idxrest], [idx2;idxrest], [-2.0; ones(length(idxrest))], '<', 0.0)
+        end
     end
 
     ksoc = 1
