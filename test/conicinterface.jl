@@ -367,6 +367,35 @@ function conicSOCtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
         @test -dot(b,y) > 0
     end
 
+    if duals
+        # Problem SOC4
+        # Like SOCINT1 but with copies of variables and integrality relaxed
+        # Tests out-of-order indices in cones
+        println("Problem SOC4")
+        b = [1.0,0.0,0.0]
+        A = [1.0 0.0 0.0 0.0 0.0
+             0.0 1.0 0.0 -1.0 0.0
+             0.0 0.0 1.0 0.0 -1.0]
+        c = [0.0,-2.0,-1.0,0.0,0.0]
+        constr_cones = [(:Zero,[1]),(:Zero,[2,3])]
+        var_cones = [(:SOC,[1,4,5]),(:Free,[2,3])]
+
+        m = MathProgBase.ConicModel(solver)
+        MathProgBase.loadproblem!(m, c, A, b, constr_cones, var_cones)
+        MathProgBase.optimize!(m)
+        @test MathProgBase.status(m) == :Optimal
+
+        x = MathProgBase.getsolution(m)
+        y = MathProgBase.getdual(m)
+        s = MathProgBase.getvardual(m)
+
+        @test_approx_eq_eps dot(c,x) -dot(y,b) tol
+        @test x[1]^2 ≥ x[4]^2 + x[5]^2 - tol
+        @test s[1]^2 ≥ s[4]^2 + s[5]^2 - tol
+        @test_approx_eq_eps s[2] 0.0 tol
+        @test_approx_eq_eps s[3] 0.0 tol
+        @test_approx_eq_eps (c+A'y) s tol
+    end
 end
 
 function conicSOCRotatedtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e-6)
