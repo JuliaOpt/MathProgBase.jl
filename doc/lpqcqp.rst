@@ -280,7 +280,13 @@ If a callback function returns ``:Exit``, the solver is expected to terminate wi
 
 .. function:: cbgetstate(d::MathProgCallbackData)
 
-   Returns current location in solve process: ``:MIPNode`` if at node in branch-and-cut tree, ``:MIPSol`` at an integer-feasible solution, and ``:Other`` otherwise.
+   Returns current location in solve process: ``:MIPNode`` if at node in branch-and-cut tree, ``:MIPSol`` at an integer-feasible solution, and ``:Intermediate`` otherwise. 
+   
+   *    ``MIPNode``: when we are at a node in the branch-and-cut tree. This is generally used for access to the solution of a relaxation (via ``cbgetlpsolution()``), or for adding cuts (via ``cbaddcut!()`` or ``cbaddcutlocal!()``).
+   
+   *    ``MIPSol``: when we have found a new MIP incumbent (an integer-feasible solution). This is generally used for keeping track of the intermediate solutions generated (via ``cbgetmipsolution()``) inside the branch-and-cut tree.
+   
+   *    ``Intermediate``: when we are still in the process of MIP or during iterations of a continuous solver. For MIPs, this is generally be used for keeping track of pessimistic and optimistic bounds (via ``cbgetobj()`` and ``cbgetbestbound()`` respectively), or the number of explored nodes (via ``cbgetexplorednodes()``) in the branch-and-cut tree.
 
 .. function:: cbaddcut!(d::MathProgCallbackData,varidx,varcoef,sense,rhs)
 
