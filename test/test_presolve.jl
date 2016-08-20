@@ -147,18 +147,18 @@ function time_test(in1::Int, in2::Int, in3::Float64, in4::Bool)
     @show m,n
 
     tolerance = tol * ones(n)
-    println("FIRST TIMING")
+    println("GLPK Presolve")
     @time begin
         answer = linprog(c,A,'=',b,lb,ub,GLPKSolverLP(presolve=true))
         answer.status != :Optimal && error("Input feasible problem with an optimal solution but solver status is not optimal")
     end
-println("NEXT TIMING----------------")
+println("My Presolve")
 
 @time begin
         newc,newA,newb,newlb,newub,independentvar,pstack = presolver!(in4,c,A,b,lb,ub)
-        @show size(newA)
-        #(newA == A) && error("No Presolving Done")
         ans = Array{Float64,1}()
+    #    @show size(newA)
+        #(newA == A) && error("No Presolving Done")
             if(length(find(independentvar))!=0)
             presol = linprog(newc, newA, '=', newb,newlb,newub, GLPKSolverLP(presolve=false))
             #presol = linprog(newc, newA, '=', newb,newlb,newub)
@@ -168,8 +168,10 @@ println("NEXT TIMING----------------")
         finalsol = return_postsolved(ans,independentvar,pstack)
         finalsol = trim(finalsol,lb)
     end
-    @show answer.sol
-    @show finalsol
+    @show size(newA)
+
+    #@show answer.sol
+    #@show finalsol
 end
 
 function noob_test()
@@ -218,15 +220,15 @@ function do_tests(correctness::Bool, time::Bool)
 
     if(time)
         # Time-Profile tests
-        time_test(10,10,0.5,false)
-        println("AGAIN")
-        time_test(100,100,0.01,false)
-        println("AGAIN")
-        time_test(1000,1000,0.001,false)
-        println("AGAIN")
+        #time_test(10,10,0.5,false)
+        #println("AGAIN")
+        #time_test(100,100,0.01,false)
+        #println("AGAIN")
+        #time_test(1000,1000,0.001,false)
+        #println("AGAIN")
         time_test(10000,10000,0.0001,false)
         #println("AGAIN")
-        #time_test(100000,100000,0.00001)
+        #time_test(100000,100000,0.00001,false)
     end
 end
 
@@ -235,14 +237,14 @@ end
 #noob_test()
 
 time_test(1,1,0.3,false)
-#Profile.clear()
+Profile.clear()
 
 println("-------------------RANDOMIZED TIME TESTS---------------------")
 do_tests(false,true)
-#@profile do_tests(false,true)
+@profile do_tests(false,true)
 
 #Profile.print(format=:flat)
-#using ProfileView
-#ProfileView.view()
-#ProfileView.svgwrite("profile_results.svg")
+using ProfileView
+ProfileView.view()
+ProfileView.svgwrite("profile_results2.svg")
 #`

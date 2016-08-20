@@ -463,11 +463,12 @@ function make_presolve!(verbose::Bool, p::Presolve_Problem,c::Array{Float64,1}, 
         end
     end
 
-    Arows = rowvals(A')
-    Avals = nonzeros(A')
+    B = A'
+    Arows = rowvals(B)
+    Avals = nonzeros(B)
     for i = 1:p.originalm
         tmp = -1
-        for c in nzrange(A',i)
+        for c in nzrange(B,i)
             j = Arows[c]
             rcval = rc(i,j,p.originaln)
             add_aij_transpose!(v,p,i,j,tmp,Avals[c])
@@ -602,9 +603,11 @@ function singleton_row!(verbose::Bool, p::Presolve_Problem, row::Presolve_Row)
 
     xj = bval/matval
     add_to_stack!(LinearDependency(j,xj),p.independentvar,p.pstack)
-
     remove_row!(v,p,row)
     p.activeconstr[row.i] = false
+    if(!haskey(p.dictcol,j))
+        error("dictcol key error")
+    end
     aij = p.dictcol[j].aij
     while(aij != nothing)
         r = aij.row
