@@ -1,30 +1,80 @@
+workspace()
+
 using MathProgBase
 using GLPKMathProgInterface
 
-#export presolver! (?)
+abstract Presolve_Element
 
-# generates the unique key from row,col index for creating the dictionary
-function rc(x::Int, y::Int, M::Int)
-    return (x-1)*M + y
+type Presolve_Row <: Presolve_Element
+    i :: Int
+    b_val :: Float64
+    aij :: Union{Presolve_Element,Nothing}
+    prev :: Presolve_Row
+    next :: Presolve_Row
+    is_active :: Bool
+    active_prev :: Presolve_Row
+    active_next :: Presolve_Row
+    function Presolve_Row()
+        n = new()
+        n.i = -1
+        n.b_val = 0.0
+        n.is_active = true
+        n.aij = nothing
+        n.prev = n
+        n.next = n
+        n.active_prev = n
+        n.active_next = n
+        n
+    end
 end
 
-function roughly(x::Float64, y::Float64)
-    if(abs(x-y) < 1e-3)
-        return true
-    else
-        return false
+type Presolve_Col <: Presolve_Element
+    j :: Int
+    c_val :: Float64
+    aij :: Union{Presolve_Element,Nothing}
+    prev :: Presolve_Col
+    next :: Presolve_Col
+    is_independent :: Bool
+    ind_prev :: Presolve_Col
+    ind_next :: Presolve_Col
+    function Presolve_Col()
+        n = new()
+        n.j = -1
+        n.c_val = 0.0
+        n.is_independent = true
+        n.aij = nothing
+        n.prev = n
+        n.next = n
+        n.ind_prev = n
+        n.ind_next = n
+        n
+    end
+end
+
+type Presolve_Matrix <: Presolve_Element
+    row :: Presolve_Row
+    col :: Presolve_Col
+    val :: Float64
+    row_prev :: Presolve_Matrix
+    row_next :: Presolve_Matrix
+    col_prev :: Presolve_Matrix
+    col_next :: Presolve_Matrix
+    function Presolve_Matrix()
+        n = new()
+        row = Presolve_Row()
+        col = Presolve_Col()
+        val = 0.0
+        row_prev = n
+        row_next = n
+        col_prev = n
+        col_next = n
+        n
     end
 end
 
 # A stack is needed to record information on redundancies removed
 abstract PresolveStack
 
-`A LinearDependency element represents -
-x_index = val + \sum x[vec1[i]] * vec2[i]
-if variable is fixed to a value then vec1,vec2 are null.
-if variable is fixed to a linear dependency then
-vec1 contains the indices of the elements in the constraint row that was removed.
-vec2 contains the corresponding ratio of A matrix values.`
 type LinearDependency <: PresolveStack
     index :: Int
     vec1 :: Vector{Int}
@@ -36,6 +86,599 @@ type LinearDependency <: PresolveStack
         vec2 = Array{Float64,1}()
         new(ind,vec1,vec2,val)
     end
+
+    function LinearDependency(ind::Int, vec1::Vector{Int}, vec2::Vector{Float64}, val::Number)
+        new(ind,vec1,vec2,val)
+    end
+
+end
+
+
+# Type that will hold the details about the presolve problem we are constructing. The dictionary is made here.
+type Presolve_Problem
+    currentc :: Array{Float64,1}
+    currentb :: Array{Float64,1}
+    currentlb :: Array{Float64,1}
+    currentub :: Array{Float64,1}
+    currentylb :: Array{Float64,1}
+    currentyub :: Array{Float64,1}
+    currentzlb :: Array{Float64,1}
+    currentzub :: Array{Float64,1}
+    independentvar :: BitArray{1}
+    activeconstr :: BitArray{1}
+    pstack :: Array{PresolveStack,1}
+    originalm :: Int64
+    originaln :: Int64
+    rowcounter :: Array{Float64,1}
+    colcounter :: Array{Float64,1}
+    g :: Array{Float64,1}
+    h :: Array{Float64,1}
+
+    # new thingies
+    dictrow :: Dict{Int64,Presolve_Row}
+    dictcol :: Dict{Int64,Presolve_Col}
+    dictaij :: Dict{Int64,Presolve_Matrix}
+
+    rowptr :: Presolve_Row
+    colptr :: Presolve_Col
+    rowque :: Presolve_Row
+    colque :: Presolve_Col
+
+    finalm :: Int
+    finaln :: Int
+    finalrows :: Array{Int,1}
+    finalcols :: Array{Int,1}
+    #   Constructor that creates a Presolve_Problem
+    function Presolve_Problem(verbose::Bool,m::Int,n::Int)
+        verbose && println("-----------INSIDE PRESOLVE CONSTRUCTOR------------")
+        originalm,originaln = m,n
+
+        #   SETUP
+        independentvar = trues(originaln)
+        activeconstr = trues(originalm)
+        pstack = Array{PresolveStack,1}()
+        rowcounter = zeros(originalm)
+        colcounter = zeros(originaln)
+        g = fill(-Inf,originalm)
+        h = fill(+Inf,originalm)
+        ylb = fill(-Inf,originalm)
+        yub = fill(+Inf,originalm)
+        zlb = fill(-Inf,originaln)
+        zub = fill(+Inf,originaln)
+        c = zeros(originaln)
+        b = zeros(originalm)
+        lb = zeros(originalm)
+        ub = zeros(originalm)
+
+    #   SETUP for new variables
+        dictrow = Dict{Int64,Presolve_Row}()
+        dictcol = Dict{Int64,Presolve_Col}()
+        dictaij = Dict{Int64,Presolve_Matrix}()
+
+        rowptr = Presolve_Row()
+        colptr = Presolve_Col()
+        rowque = Presolve_Row()
+        colque = Presolve_Col()
+
+        finalm = originalm
+        finaln = originaln
+        finalrows = fill(-1,originalm)
+        finalcols = fill(-1,originaln)
+
+        new(c,b,lb,ub,ylb,yub,zlb,zub,independentvar,activeconstr,pstack,originalm,originaln,rowcounter,colcounter,g,h,dictrow,dictcol,dictaij,rowptr,colptr,rowque,colque,finalm,finaln,finalrows,finalcols)
+    end
+end
+
+function add_row!(p::Presolve_Problem, i::Int, bval::Float64)
+    println("Adding row : $(i)")
+
+    row = Presolve_Row()
+    row.i = i
+    row.b_val = bval
+    row.aij = nothing
+    row.is_active = false
+    if(i!=1)
+        row.prev = p.dictrow[i-1]
+        row.prev.next = row
+    else
+        row.prev = row
+        p.rowptr = row
+    end
+    row.next = row
+    enque_row!(p,row)
+    p.dictrow[i] = row
+end
+
+function enque_row!(p::Presolve_Problem, row::Presolve_Row)
+    println("Queueing row : $(row.i)")
+
+    if(row.is_active == false)
+        row.is_active = true
+        row.active_prev = row.prev
+        row.active_next = row
+        if(p.rowque.i == -1)
+            p.rowque = row
+        end
+        if(row.active_prev != row)
+            row.active_prev.active_next = row
+        end
+    end
+end
+
+function deque_row!(p::Presolve_Problem, row::Presolve_Row)
+    if(row.is_active == true)
+        row.is_active = false
+        if(row.active_prev == row)
+            p.rowque = row.active_next
+        else
+            row.active_prev.active_next = row.active_next
+        end
+        if(row.active_next != row)
+            row.active_next.active_prev = row.active_prev
+        end
+    end
+end
+
+function add_col!(p::Presolve_Problem, j::Int, cval::Float64)
+    println("Adding col : $(j)")
+
+    col = Presolve_Col()
+    col.j = j
+    col.c_val = cval
+    col.aij = nothing
+    col.is_independent = false
+    if(j!=1)
+        col.prev = p.dictcol[j-1]
+        col.prev.next = col
+    else
+        col.prev = col
+        p.colptr = col
+    end
+    col.next = col
+    enque_col!(p,col)
+    p.dictcol[j] = col
+end
+
+function enque_col!(p::Presolve_Problem, col::Presolve_Col)
+    println("Queueing col : $(col.j)")
+
+    if(col.is_independent == false)
+        col.ind_prev = col.prev
+        col.is_independent = true
+        col.ind_next = col
+        if(p.colque.j == -1)
+            p.colque = col
+        end
+        if(col.ind_prev != col)
+            col.ind_prev.ind_next = col
+        end
+    end
+end
+
+function deque_col!(p::Presolve_Problem, col::Presolve_Col)
+    if(col.is_independent == true)
+        col.is_independent = false
+        if(col.ind_prev == col)
+            p.colque = col.ind_next
+        else
+            col.ind_prev.ind_next = col.ind_next
+        end
+        if(col.ind_next != col)
+            col.ind_next.ind_prev = col.ind_prev
+        end
+    end
+end
+
+function add_aij_normal!(p::Presolve_Problem, row_id::Int, col_id::Int, row_prev_id::Int, val::Float64)
+    println("Adding mat element : $(row_id),$(col_id)")
+
+    aij = Presolve_Matrix()
+    aij.row = p.dictrow[row_id]
+    aij.col = p.dictcol[col_id]
+    aij.val = val
+    aij.row_prev = aij
+    aij.row_next = aij
+    aij.col_next = aij
+    aij.col_prev = aij
+
+    if(row_prev_id != -1)
+        prev_key = rc(row_prev_id,col_id,p.originaln)
+        p.dictaij[prev_key].col_next = aij
+        aij.col_prev = p.dictaij[prev_key]
+    end
+    #can also be done by checking if row_prev == -1
+    if(p.dictcol[col_id].aij == nothing)
+        p.dictcol[col_id].aij = aij
+    end
+
+    key = rc(row_id,col_id,p.originaln)
+    p.dictaij[key] = aij
+end
+
+function add_aij_transpose!(p::Presolve_Problem, row_id::Int, col_id::Int, col_prev_id::Int, val::Float64)
+    aij = p.dictaij[rc(row_id,col_id,p.originaln)]
+
+    if(col_prev_id != -1)
+        prev_key = rc(row_id,col_prev_id,p.originaln)
+        p.dictaij[prev_key].row_next = aij
+        aij.row_prev = p.dictaij[prev_key]
+    end
+
+    if(p.dictrow[row_id].aij == nothing)
+        p.dictrow[row_id].aij = aij
+    end
+end
+
+function remove_row!(p::Presolve_Problem, row::Presolve_Row)
+    deque_row!(p,row)
+
+    while(row.aij != nothing)
+        println("INSIDE------ and aij is $(row.aij.row.i),$(row.aij.col.j)")
+        tmp = row.aij
+        key = rc(tmp.row.i,tmp.col.j,p.originaln)
+        #enque_col!(p,tmp.col)
+        row.aij = tmp.row_next
+
+        if(tmp.col_prev == tmp)
+            if(tmp.col_next == tmp)
+                tmp.col.aij = nothing
+            else
+                tmp.col.aij = tmp.col_next
+                tmp.col_next.col_prev = tmp.col_next
+            end
+        else
+            if(tmp.col_next == tmp)
+                tmp.col_prev.col_next = tmp.col_prev
+            else
+                tmp.col_prev.col_next = tmp.col_next
+            end
+        end
+
+        delete!(p.dictaij,key)
+
+        if(row.aij == tmp)
+            row.aij = nothing
+        end
+        tmp = nothing
+    end
+
+    if(row.prev == row)
+        if(row.next != row)
+            p.rowptr = row.next
+            row.next.prev = row.next
+        else
+            p.rowptr = Presolve_Row()
+        end
+    else
+        if(row.next != row)
+            row.prev.next = row.next
+            row.next.prev = row.prev
+        else
+            row.prev.next = row.prev
+        end
+    end
+
+    delete!(p.dictrow,row.i)
+end
+
+function remove_col!(p::Presolve_Problem, col::Presolve_Col)
+    println("REMOVE COLUMN CALL")
+    deque_col!(p,col)
+
+    while(col.aij != nothing)
+        tmp = col.aij
+        key = rc(tmp.row.i,tmp.col.j,p.originaln)
+        #enque_row!(p,tmp.row)
+        col.aij = tmp.col_next
+
+        if(tmp.row_prev == tmp)
+            if(tmp.row_next == tmp)
+                tmp.row.aij = nothing
+            else
+        #        println("here 1 ")
+                tmp.row.aij = tmp.row_next
+                tmp.row_next.row_prev = tmp.row_next
+            end
+        else
+            if(tmp.row_next == tmp)
+                tmp.row_prev.row_next = tmp.row_prev
+            else
+                tmp.row_prev.row_next = tmp.row_next
+            end
+        end
+
+        delete!(p.dictaij,key)
+
+        if(col.aij == tmp)
+            col.aij = nothing
+        end
+        tmp = nothing
+    end
+
+    if(col.prev == col)
+        if(col.next != col)
+            p.colptr = col.next
+            col.next.prev = col.next
+        else
+            p.colptr = Presolve_Col()
+        end
+    else
+        if(col.next != col)
+            col.prev.next = col.next
+            col.next.prev = col.prev
+        else
+            col.prev.next = col.prev
+        end
+    end
+    delete!(p.dictcol,col.j)
+end
+
+function make_presolve!(p::Presolve_Problem,c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::Array{Float64,1}, lb::Array{Float64,1}, ub::Array{Float64,1})
+#   checks to ensure input problem is valid.
+    m,n = size(A)
+    p.originalm != m && error("Wrong size of b wrt A")
+    p.originaln != n && error("Wrong size of c wrt A")
+    p.originaln != length(lb) && error("Wrong size of lb wrt A")
+    p.originaln != length(ub) && error("Wrong size of ub wrt A")
+
+    p.currentc = c
+    p.currentb = b
+    p.currentlb = lb
+    p.currentub = ub
+    println("Row SETUP ----- ")
+    for i in 1:p.originalm
+        add_row!(p,i,b[i])
+    end
+
+    println("COL SETUP -----")
+    for j in 1:p.originaln
+        add_col!(p,j,c[j])
+    end
+
+    #   Iterating through the non-zeros of sparse matrix A to construct the dictionary
+    Arows = rowvals(A)
+    println("MAT ELEMENT SETUP -----")
+    Avals = nonzeros(A)
+    for j = 1:p.originaln
+        tmp = -1
+        for i in nzrange(A,j)
+            r = Arows[i]
+            rcval = rc(r,j,p.originaln)
+            #dictA[rcval] = Avals[i]
+            p.rowcounter[r] += 1
+            p.colcounter[j] += 1
+            add_aij_normal!(p,r,j,tmp,Avals[i])
+            tmp = r
+        end
+    end
+
+    Arows = rowvals(A')
+    Avals = nonzeros(A')
+    for i = 1:p.originalm
+        tmp = -1
+        for c in nzrange(A',i)
+            j = Arows[c]
+            rcval = rc(i,j,p.originaln)
+            add_aij_transpose!(p,i,j,tmp,Avals[c])
+            tmp = j
+        end
+    end
+end
+
+function print_info(p::Presolve_Problem)
+    println("Row Information--------------------------------------")
+    for key in keys(p.dictrow)
+        println("-----------")
+        row = p.dictrow[key]
+        @show row.i
+        @show row.b_val
+        if(row.aij != nothing)
+            @show row.aij.row.i
+            @show row.aij.col.j
+            @show row.aij.val
+        end
+        @show row.prev.i
+        @show row.next.i
+        @show row.is_active
+        @show row.active_prev.i
+        @show row.active_next.i
+        #println("Id : $(row.i)")
+        #println("b_val : $row.b_val")
+    end
+
+    println("Col Information-------------------------------------------")
+    for key in keys(p.dictcol)
+        println("-----------")
+        col = p.dictcol[key]
+        @show col.j
+        @show col.c_val
+        if(col.aij != nothing)
+            @show col.aij.row.i
+            @show col.aij.col.j
+            @show col.aij.val
+        end
+        @show col.prev.j
+        @show col.next.j
+        @show col.is_independent
+        @show col.ind_prev.j
+        @show col.ind_next.j
+        #println("Id : $(row.i)")
+        #println("b_val : $row.b_val")
+    end
+
+    println("MAT ELEMENT Information---------------------------")
+    for key in keys(p.dictaij)
+        println("-----------")
+        aij = p.dictaij[key]
+        @show aij.row.i
+        @show aij.col.j
+        @show aij.val
+
+        @show aij.row_prev.row.i, aij.row_prev.col.j, aij.row_prev.val
+        @show aij.row_next.row.i, aij.row_next.col.j, aij.row_next.val
+        @show aij.col_prev.row.i, aij.col_prev.col.j, aij.col_prev.val
+        @show aij.col_next.row.i, aij.col_next.col.j, aij.col_next.val
+        #println("Id : $(row.i)")
+        #println("b_val : $row.b_val")
+    end
+end
+
+function presolver!(verbose::Bool,c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::Array{Float64,1}, lb::Array{Float64,1}, ub::Array{Float64,1})
+    v = verbose
+    v && println("Making presolve")
+    p = Presolve_Problem(v,length(b),length(c))
+    make_presolve!(p,c,A,b,lb,ub)
+
+    println("AFTER MAKE PRESOLVE -------------")
+    #print_info(p)
+    #remove_col!(p,p.dictcol[2])
+    #print_info(p)
+    #remove_row!(p,p.dictrow[1])
+    #print_info(p)
+
+    println("TIME FOR PRESOLVE ...............................")
+    row = Presolve_Row()
+    col = Presolve_Col()
+    tmp = p.rowque
+
+    while(tmp != nothing)
+        row = tmp
+        deque_row!(p,row)
+        if(row.aij == nothing)
+            println("EMPTY ROW FOUND AT $(row.i)")
+            empty_row!(p,row,v)
+        else
+            if(row.aij.row_next == row.aij)
+                println("SINGETONE ROW FOUND AT $(row.i)")
+                singleton_row!(p,row,v)
+            else
+                println("happy for now")
+                #forcing_constraints!(p,row,v)
+            end
+        end
+        if(tmp.next == tmp)
+            tmp = nothing
+        else
+            tmp = tmp.next
+        end
+    end
+
+    v && println("trying make new")
+    c,A,b,lb,ub = make_new(p::Presolve_Problem,v)
+    @show c
+    @show A
+    @show b
+    @show lb
+    @show ub
+    return c,A,b,lb,ub,p.independentvar,p.pstack
+end
+
+    # detecting and removing empty rows.
+function empty_row!(p::Presolve_Problem, row::Presolve_Row, v::Bool)
+    if(!roughly(row.b_val,0.0))
+        error("Empty Row Infeasibility at row $row.i and b[i] is - $(row.b_val)")
+    else
+        remove_row!(p,row)
+        p.activeconstr[row.i] = false
+    end
+
+    v && println("Exiting Empty Row")
+end
+
+    # SINGLETON ROW
+function singleton_row!(p::Presolve_Problem, row::Presolve_Row, v::Bool)
+    i = row.aij.row.i
+    j = row.aij.col.j
+    matval = row.aij.val
+    bval = row.aij.row.b_val
+
+    xj = bval/matval
+    add_to_stack!(LinearDependency(j,xj),p.independentvar,p.pstack)
+
+    remove_row!(p,row)
+    p.activeconstr[row.i] = false
+    aij = p.dictcol[j].aij
+    while(aij != nothing)
+        r = aij.row
+        r.b_val -= xj*aij.val
+        if(aij.col_next != aij)
+            aij = aij.col_next
+        else
+            aij = nothing
+        end
+    end
+    remove_col!(p,p.dictcol[j])
+end
+
+    # to make c,A,sense,b,l,u
+function make_new(p::Presolve_Problem, v::Bool)
+    n = 0
+    newc = Array{Float64,1}()
+    col = p.colptr
+    if(col.j != -1)
+        println("CONSTRUCTING newc")
+        while(col != nothing)
+            @show col.j
+            push!(newc,col.c_val)
+            n = n + 1
+            p.finalcols[col.j] = n
+
+            if(col.next == col)
+                col = nothing
+            else
+                col = col.next
+            end
+        end
+    end
+    @show n
+
+    m = 0
+    newb = Array{Float64,1}()
+    newlb = Array{Float64,1}()
+    newub = Array{Float64,1}()
+    row = p.rowptr
+    if(row.i != -1)
+        while(row != nothing)
+            push!(newb,row.b_val)
+            push!(newlb,p.currentlb[row.i])
+            push!(newub,p.currentub[row.i])
+            m = m + 1
+            p.finalrows[row.i] = m
+            if(row.next == row)
+                row = nothing
+            else
+                row = row.next
+            end
+        end
+    end
+    @show m
+
+    I = Array{Int64,1}()
+    J = Array{Int64,1}()
+    Val = Array{Float64,1}()
+    col = p.colptr
+    if(col.j != -1)
+        while(col != nothing)
+            tmp = col.aij
+            while(tmp != nothing)
+                push!(J,p.finalcols[tmp.col.j])
+                push!(I,p.finalrows[tmp.row.i])
+                push!(Val,tmp.val)
+                if(tmp.row_next == tmp)
+                    tmp = nothing
+                else
+                    tmp = tmp.row_next
+                end
+            end
+            if(col.next == col)
+                col = nothing
+            else
+                col = col.next
+            end
+        end
+    end
+    newA = sparse(I,J,Val,m,n)
+    return newc,newA,newb,newlb,newub
 end
 
 # function that will add the LinearDependency element to the stack.
@@ -51,8 +694,12 @@ end
 function post_solve!(post_solvedX::Array{Float64,1}, l::LinearDependency)
     post_solvedX[l.index] = l.value
 
+    @show length(l.vec1)
+    @show post_solvedX
+
     for i in 1:length(l.vec1)
         post_solvedX[l.index] += l.vec2[i]*post_solvedX[l.vec1[i]]
+        println("made postsolved at $(l.index) to value $(post_solvedX[l.index])")
     end
 end
 
@@ -66,393 +713,57 @@ function return_postsolved(x::Array{Float64,1}, independentvar::BitArray{1}, pst
     end
 
     for i in reverse(collect(1:length(pstack)))
+        @show pstack[i]
         post_solve!(postsolvedX,pstack[i])
     end
     return postsolvedX
 end
 
-# Type that will hold the details about the presolve problem we are constructing. The dictionary is made here.
-type Presolve_Problem
-    currentc :: Array{Float64,1}
-    dictA :: Dict{Float64,Float64}
-    currentb :: Array{Float64,1}
-    currentlb :: Array{Float64,1}
-    currentub :: Array{Float64,1}
-    #rowindices :: Array{Array{Int64,1},1}
-    #colindices :: Array{Array{Int64,1},1}
-    independentvar :: BitArray{1}
-    activeconstr :: BitArray{1}
-    pstack :: Array{PresolveStack,1}
-    originalm :: Int64
-    originaln :: Int64
-    bitmat :: BitArray{2}
-    rowcounter :: Array{Float64,1}
-    colcounter :: Array{Float64,1}
 
-    #   Constructor that creates a Presolve_Problem
-    function Presolve_Problem(c::Array{Float64,1},A::SparseMatrixCSC{Float64,Int64},b::Array{Float64,1},lb::Array{Float64,1},ub::Array{Float64,1})
-    #   println("-----------INSIDE PRESOLVE CONSTRUCTOR------------")
-        originalm,originaln = size(A)
-
-    #   checks to ensure input problem is valid.
-        originalm != length(b) && error("Wrong size of b wrt A")
-        originaln != length(lb) && error("Wrong size of lb wrt A")
-        originaln != length(ub) && error("Wrong size of ub wrt A")
-        originaln != length(c) && error("Wrong size of c wrt A")
-
-    #   SETUP
-        independentvar = trues(originaln)
-        activeconstr = trues(originalm)
-        pstack = Array{PresolveStack,1}()
-        dictA = Dict{Float64,Float64}()
-        rowcounter = zeros(originalm)
-        colcounter = zeros(originaln)
-        #rowindices = Array{Int,1}[Int[] for i=1:originalm]
-        #colindices = Array{Int,1}[Int[] for i=1:originaln]
-        bitmat = falses(originalm,originaln)
-
-    #   Iterating through the non-zeros of sparse matrix A to construct the dictionary
-        Arows = rowvals(A)
-        Avals = nonzeros(A)
-        for j = 1:originaln
-            for i in nzrange(A,j)
-                r = Arows[i]
-                v = Avals[i]
-                rcval = rc(r,j,originaln)
-                dictA[rcval] = v
-                #push!(rowindices[r],j)
-                #push!(colindices[j],r)
-                rowcounter[r] += 1
-                colcounter[j] += 1
-                bitmat[r,j] = true
-            end
-        end
-
-        #new(c,dictA,b,lb,ub,rowindices,colindices,independentvar,activeconstr,pstack,originalm,originaln,bitmat)
-        new(c,dictA,b,lb,ub,independentvar,activeconstr,pstack,originalm,originaln,bitmat,rowcounter,colcounter)
+function is_zero(i::Float64)
+    if(abs(i-0.0) <= 1e-3)
+        return true
+    else
+        return false
     end
 end
 
-function presolver!(c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::Array{Float64,1}, lb::Array{Float64,1}, ub::Array{Float64,1})
-    #println("Making presolve")
-    p = Presolve_Problem(c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::Array{Float64,1}, lb::Array{Float64,1}, ub::Array{Float64,1})
-
-    #counter = 0
-    #while(counter >= 0)
-        # println("Empty row call")
-        # detects empty rows, throws infeasibilty error or marks it for removal
-        er = empty_rows!(p::Presolve_Problem)
-        #@show er
-        # println("Empty col call")
-        # detects emtpy col, throws unbounded error or marks it for removal
-        ec = empty_cols!(p::Presolve_Problem)
-        #@show ec
-        # println("fixed variables call")
-        #detects fixed variables, throws infeasiblity error or marks it for removal
-        fv = fixed_variables!(p::Presolve_Problem)
-        #@show fv
-        #println("remove fv")
-        # removes all fixed variable from the current copy of data.
-        #remfv = remove_fixed!(p::Presolve_Problem)
-        #@show remfv
-        #println("singleton row call")
-        # detects singleton rows
-        sr = singleton_rows!(p::Presolve_Problem)
-        #sr = false
-        #@show sr
-        #println("to next iteration")
-    #    if(!(er||ec||fv||sr))
-    #        break
-    #    end
-    #    counter+=1
-    #end
-
-    #println("trying make new")
-    #@time newc,newA,newb,newlb,newub = make_new(p::Presolve_Problem)
-    c,A,b,lb,ub = make_new(p::Presolve_Problem)
-    return c,A,b,lb,ub,p.independentvar,p.pstack
-    #return newc,newA,newb,newlb,newub,p.independentvar,p.pstack
+function is_equal(a::Array{Float64,1}, b::Array{Float64,1})
+    (length(a) != length(b)) && error("trying to determine equality of arrays of different sizes")
+    for i in 1:length(a)
+        if(is_zero(a[i]-b[i]) == false)
+            return false
+        end
+    end
+    return true
 end
 
-    # detecting and removing empty rows.
-function empty_rows!(p::Presolve_Problem)
-    empty_row = false
-    for i in 1:p.originalm
-        if(p.activeconstr[i] == false)
-            continue
-        end
-        #if(length(p.rowindices[i])==0)
-        if(p.rowcounter[i] == 0)
-            #println("Detected Empty Row at $i")
-            !(roughly(p.currentb[i],0.0)) && error("Empty Row Infeasibility at row $i and b[i] is - $(p.currentb[i])")
-            p.activeconstr[i] = false
-            empty_row = true
-		end
+function is_lb_Unbounded(lb::Float64)
+    if(lb == -Inf)
+        return true
+    else
+        return false
     end
-    #println("Exiting Empty Row and returning $empty_row")
-    return empty_row
 end
 
-    # detecting and removing empty cols.
-function empty_cols!(p::Presolve_Problem)
-    empty_col = false
-    for j in 1:p.originaln
-        if(p.independentvar[j] == false)
-            continue
-        end
-        #if(length(p.colindices[j])==0)
-        if(p.colcounter[j] == 0)
-                #println("Detected Empty col / Unrestricted variable at $j")
-            (p.currentc[j] != 0)*(p.currentlb[j] == -Inf64) && error("Problem is unbounded.")
-            p.independentvar[j] = false
-            empty_col = true
-        end
+
+function is_ub_Unbounded(ub::Float64)
+    if(ub == +Inf)
+        return true
+    else
+        return false
     end
-    #println("Exiting Empty col and returning $empty_col")
-    return empty_col
 end
 
-    # detecting an infeasible or fixed variable
-function fixed_variables!(p::Presolve_Problem)
-    detect_fixed = false
-    for j in 1:p.originaln
-        if(p.independentvar[j] == false)
-            continue
-        end
-        (p.currentlb[j] > p.currentub[j]) && error("Infeasible bounds at $j")
-        if(p.currentlb[j] == p.currentub[j])
-            add_to_stack!(LinearDependency(j,p.currentlb[j]),p.independentvar,p.pstack)
-            detect_fixed = true
-        end
-    end
-    #println("Exiting fixed variable and returning $detect_fixed")
-    return detect_fixed
+# generates the unique key from row,col index for creating the dictionary
+function rc(x::Int, y::Int, M::Int)
+    return (x-1)*M + y
 end
 
-    # Removing Fixed Variables
-function remove_fixed!(p::Presolve_Problem)
-    variable_remove = false
-    for j in length(p.independentvar)
-        if(p.independentvar[j])
-            if((p.currentlb[j] != -Inf64) && p.currentlb[j] == p.currentub[j])
-                #println("Found a fixed variable at $j")
-                tmp = p.currentlb[j]
-                add_to_stack!(LinearDependency(j,tmp),p.independentvar,p.pstack)
-                #TODO : substitution into objective function
-
-                #substitution into matrix
-                for k in 1:N
-                    for i in 1:length(p.rowindices[k])
-                        if(p.rowindices[k][i]==j)
-                            if length(p.rowindices[k])==1
-                                #only x_j variable in this row
-                                if((tmp - p.currentb[k]/p.dictA[rc(k,j)]) != 0)
-                                    error("Infeasible Problem")
-                                end
-                                p.currentb[k] -= p.dictA[rc(k,j)]*tmp
-                                splice!(p.rowindices[k],i)
-                                delete!(p.dictA,rc(k,j));
-                                break
-                            end
-                        end
-                        if p.rowindices[k][i] > j
-                                break
-                        end
-                end
-            end
-            variable_remove = true
-            p.colindices[j]=Vector{Int64}[]
-            end
-        end
+function roughly(x::Float64, y::Float64)
+    if(abs(x-y) < 1e-3)
+        return true
+    else
+        return false
     end
-    #println("Exiting variable remove and returning $variable_remove")
-    return variable_remove
-end
-
-    # SINGLETON ROW
-function singleton_rows!(p::Presolve_Problem)
-    singleton_row = false
-    #srows = falses(p.originalm)
-    svariable = zeros(p.originaln)
-
-    for i in 1:p.originalm
-        if(p.activeconstr[i] == false)
-            continue
-        end
-        #if(length(p.rowindices[i])==1)
-        if(p.rowcounter[i] == 1)
-            #println("found a row singleton at row $i")
-            #j = p.rowindices[i][1]
-            j = find(p.bitmat[i,:])[1]
-            if(p.independentvar[j] == false)
-                continue
-            end
-            aij = p.dictA[rc(i,j,p.originaln)]
-            aij == 0 && error("Unexpected Zero")
-            xj = p.currentb[i]/aij
-            add_to_stack!(LinearDependency(j,xj),p.independentvar,p.pstack)
-            p.activeconstr[i] = false
-            singleton_row = true
-                    #    srows[i] = true
-            svariable[j] = xj
-         end
-    end
-
-    k = find(p.bitmat)
-
-    for ind in 1:length(k)
-        i = k[ind] % p.originalm == 0 ? p.originalm : k[ind]%p.originalm
-        j = Int((k[ind] - i)/p.originalm + 1)
-        key = rc(i,j,p.originaln)
-        if(svariable[j]!=0)
-            p.currentb[i] -= svariable[j]*p.dictA[key]
-            delete!(p.dictA,key)
-            p.bitmat[i,j] = false
-            p.rowcounter[i] -= 1
-            #splice!(p.rowindices[i],j)
-        end
-    end
-    return singleton_row
-end
-
-    # to remove singleton columns
-function remove_singleton_cols(p::Presolve_Problem)
-    singleton_col = false
-    for j in 1:originaln
-        if(length(colindices[j])==1)
-            nnzrow = colindices[1]
-            if(length(rowindices[nnzrow])==1)
-                #variable is fixed, will be removed next iteration
-                continue
-            end
-            aij = dictA[rc(nnzrow,j)]
-            cj = c[j]
-            lbj = lb[j]
-            ubj = ub[j]
-            is_LB_Unbounded = is_lb_Unbounded(lbj)
-            is_UB_Unbounded = is_ub_Unbounded(ubj)
-
-            if(is_LB_Unbounded || is_UB_Unbounded)
-                if(is_LB_Unbounded)
-                    if(is_UB_Unbounded)
-                        zlb[j] = 0
-                        zub[j] = 0
-                        ylb[nnzrow] = cj/aij
-                        yub[nnzrow] = cj/aij
-                    elseif aij>0
-                        zub[j] = 0
-                        ylb[nnzrow] = cij/aij
-                    else
-                        zub[j] = 0
-                        yub[nnzrow] = cij/aij
-                    end
-                else
-                    if(is_UB_Unbounded)
-                        if(aij>0)
-                            zlb[j]=0
-                            yub[nnzrow]=cj/aij
-                        else
-                            zlb[j]=0
-                            ylb[nnzrow]=cj/aij
-                        end
-                    end
-                end
-
-                if(is_LB_Unbounded && is_UB_Unbounded)
-                    #free column singletons
-                    cnt = length(rowindices[nnzrow])-1
-                    vec1 = vec2 = Vector{Int}()
-                    #for nonzero rows.
-                    for i in 1:currentm
-                        #continue from here
-
-                    end
-
-
-                end
-            end
-        end
-    end
-    return singleton_col
-end
-
-function check_progress(currentc,dictA,curerntb,currentlb,currentub,rowindices,colindices)
-    #checking rows
-    #TODO .. remove rowindices,colindices usage
-    for i in 1:N
-        for nnz in 1:length(rowindices[i])
-            dictA[rc(i,nnz)] == 0 && error("Zero erro in row")
-        end
-    end
-
-    # checking columns
-    for j in 1:M
-        for nnz in 1:length(colindices[j])
-            dictA[rc(nnz,j)] == 0 && error("Zero error in col")
-        end
-    end
-
-    # checking Aij
-    for key in keys(dictA)
-        j = key%M == 0 ? 4 : key%M
-        i = Int64((key -j)/M + 1)
-        if(dictA[key] != 0)
-            if(!in(rowindices[i]),j)
-                error("$j not in row $i")
-            end
-            if(!in(colindices[j]),i)
-                error("$i not in col $j")
-            end
-        end
-    end
-
-    # think of other helpful tests
-end
-
-    # to make c,A,sense,b,l,u
-function make_new(p::Presolve_Problem)
-    newc = Array{Float64,1}()
-    for j in 1:p.originaln
-        if(p.independentvar[j])
-            push!(newc,p.currentc[j])
-        end
-    end
-
-    newb = Array{Float64,1}()
-    for j in 1:p.originalm
-        if(p.activeconstr[j])
-            push!(newb,p.currentb[j])
-        end
-    end
-
-    newrows = find(p.activeconstr)
-    newcols = find(p.independentvar)
-
-    # constructing a sparse matrix
-    #@show len = length(p.dictA)
-    I = Array{Int64,1}()
-    J = Array{Int64,1}()
-    Val = []
-
-    for rowiter in 1:length(newrows)
-        for coliter in 1:length(newcols)
-            if(haskey(p.dictA,rc(newrows[rowiter],newcols[coliter],p.originaln)))
-                push!(I,rowiter)
-                push!(J,coliter)
-                push!(Val,p.dictA[rc(newrows[rowiter],newcols[coliter],p.originaln)])
-            end
-        end
-    end
-    newA = sparse(I,J,Val,length(newrows),length(newcols))
-
-    newlb = zeros(length(newcols))
-    for coliter in 1:length(newcols)
-        newlb[coliter] = p.currentlb[newcols[coliter]]
-    end
-
-    newub = zeros(length(newcols))
-    for coliter in 1:length(newcols)
-        newub[coliter] = p.currentub[newcols[coliter]]
-    end
-    return newc,newA,newb,newlb,newub
 end
