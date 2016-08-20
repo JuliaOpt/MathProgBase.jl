@@ -13,9 +13,9 @@ function make_lp(m::Int, n::Int, s::Float64)
     x = rand((1:1000),n)
     A = sprand(m,n,s)
     b = A*x
-    #lb = float(copy(x))
+    lb = float(copy(x))
     #ub = 1000000*ones(n)
-    lb = fill(-Inf,n)
+    #lb = fill(-Inf,n)
     ub = fill(Inf,n)
     return m,n,c,A,b,lb,ub,x
 end
@@ -38,10 +38,10 @@ function make_lp(m::Int, n::Int, s::Float64, nice::Bool)
      end
     A = sparse(a)
     b = A*x
-    lb = fill(-Inf,n)
+    #lb = fill(-Inf,n)
     ub = fill(Inf,n)
 
-#    lb = float(copy(x))
+    lb = float(copy(x))
 #    ub = 10.0*ones(n)
     return m,n,c,A,b,lb,ub,x
 end
@@ -62,7 +62,7 @@ function correctness_test(in1::Int, in2::Int, in3::Float64, in4::Bool)
     j=1
     tol = 1e-3
 
-    while(i<= 5)
+    while(i<= 100)
         @show i,j
         println("---------STARTING ITERATION $i---------")
         m,n,c,A,b,lb,ub,x = make_lp(in1,in2,in3,true)
@@ -92,8 +92,8 @@ function correctness_test(in1::Int, in2::Int, in3::Float64, in4::Bool)
         #ans = fill(0.0,length(x))
         if(length(find(independentvar))!=0)
             #presol = linprog(newc, newA, '=', newb,newlb,newub, GLPKSolverLP(presolve=false))
-            #presol = linprog(newc, newA, '=', newb,newlb,newub)
-            presol = linprog(newc, newA, '=', newb)
+            presol = linprog(newc, newA, '=', newb,newlb,newub)
+            #presol = linprog(newc, newA, '=', newb, -Inf, Inf)
             in4 && println(newc)
             in4 && println(newA)
             in4 && println(newb)
@@ -213,12 +213,12 @@ end
 function do_tests(correctness::Bool, time::Bool)
     if(correctness)
         #correctness_tests
-        correctness_test(10,10,0.3,true)
+        correctness_test(5,5,0.3,true)
     end
 
     if(time)
         # Time-Profile tests
-        time_test(10,10,0.3,false)
+        time_test(10,10,0.5,false)
         println("AGAIN")
         time_test(100,100,0.01,false)
         println("AGAIN")
@@ -230,15 +230,15 @@ function do_tests(correctness::Bool, time::Bool)
     end
 end
 
-println("-------------------RANDOMIZED CORRECTNESS TESTS-----------------")
-do_tests(true,false)
+#println("-------------------RANDOMIZED CORRECTNESS TESTS-----------------")
+#do_tests(true,false)
 #noob_test()
 
-#time_test(1,1,0.3,false)
+time_test(1,1,0.3,false)
 #Profile.clear()
 
-#println("-------------------RANDOMIZED TIME TESTS---------------------")
-#do_tests(false,true)
+println("-------------------RANDOMIZED TIME TESTS---------------------")
+do_tests(false,true)
 #@profile do_tests(false,true)
 
 #Profile.print(format=:flat)

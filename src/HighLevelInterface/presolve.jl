@@ -169,8 +169,9 @@ type Presolve_Problem
     end
 end
 
-function add_row!(p::Presolve_Problem, i::Int, bval::Float64)
-    println("Adding row : $(i)")
+function add_row!(verbose::Bool, p::Presolve_Problem, i::Int, bval::Float64)
+    v = verbose
+    v && println("Adding row : $(i)")
 
     row = Presolve_Row()
     row.i = i
@@ -185,12 +186,13 @@ function add_row!(p::Presolve_Problem, i::Int, bval::Float64)
         p.rowptr = row
     end
     row.next = row
-    enque_row!(p,row)
+    enque_row!(v,p,row)
     p.dictrow[i] = row
 end
 
-function enque_row!(p::Presolve_Problem, row::Presolve_Row)
-    println("Queueing row : $(row.i)")
+function enque_row!(verbose::Bool, p::Presolve_Problem, row::Presolve_Row)
+    v = verbose
+    v && println("Queueing row : $(row.i)")
 
     if(row.is_active == false)
         row.is_active = true
@@ -205,7 +207,8 @@ function enque_row!(p::Presolve_Problem, row::Presolve_Row)
     end
 end
 
-function deque_row!(p::Presolve_Problem, row::Presolve_Row)
+function deque_row!(verbose::Bool, p::Presolve_Problem, row::Presolve_Row)
+    v = verbose
     if(row.is_active == true)
         row.is_active = false
         if(row.active_prev == row)
@@ -219,8 +222,9 @@ function deque_row!(p::Presolve_Problem, row::Presolve_Row)
     end
 end
 
-function add_col!(p::Presolve_Problem, j::Int, cval::Float64)
-    println("Adding col : $(j)")
+function add_col!(verbose::Bool, p::Presolve_Problem, j::Int, cval::Float64)
+    v = verbose
+    v && println("Adding col : $(j)")
 
     col = Presolve_Col()
     col.j = j
@@ -235,12 +239,13 @@ function add_col!(p::Presolve_Problem, j::Int, cval::Float64)
         p.colptr = col
     end
     col.next = col
-    enque_col!(p,col)
+    enque_col!(v,p,col)
     p.dictcol[j] = col
 end
 
-function enque_col!(p::Presolve_Problem, col::Presolve_Col)
-    println("Queueing col : $(col.j)")
+function enque_col!(verbose::Bool, p::Presolve_Problem, col::Presolve_Col)
+    v = verbose
+    v && println("Queueing col : $(col.j)")
 
     if(col.is_independent == false)
         col.ind_prev = col.prev
@@ -255,7 +260,8 @@ function enque_col!(p::Presolve_Problem, col::Presolve_Col)
     end
 end
 
-function deque_col!(p::Presolve_Problem, col::Presolve_Col)
+function deque_col!(verbose::Bool, p::Presolve_Problem, col::Presolve_Col)
+    v = verbose
     if(col.is_independent == true)
         col.is_independent = false
         if(col.ind_prev == col)
@@ -269,8 +275,9 @@ function deque_col!(p::Presolve_Problem, col::Presolve_Col)
     end
 end
 
-function add_aij_normal!(p::Presolve_Problem, row_id::Int, col_id::Int, row_prev_id::Int, val::Float64)
-    println("Adding mat element : $(row_id),$(col_id)")
+function add_aij_normal!(verbose::Bool, p::Presolve_Problem, row_id::Int, col_id::Int, row_prev_id::Int, val::Float64)
+    v = verbose
+    v && println("Adding mat element : $(row_id),$(col_id)")
 
     aij = Presolve_Matrix()
     aij.row = p.dictrow[row_id]
@@ -295,7 +302,8 @@ function add_aij_normal!(p::Presolve_Problem, row_id::Int, col_id::Int, row_prev
     p.dictaij[key] = aij
 end
 
-function add_aij_transpose!(p::Presolve_Problem, row_id::Int, col_id::Int, col_prev_id::Int, val::Float64)
+function add_aij_transpose!(verbose::Bool, p::Presolve_Problem, row_id::Int, col_id::Int, col_prev_id::Int, val::Float64)
+    v = verbose
     aij = p.dictaij[rc(row_id,col_id,p.originaln)]
 
     if(col_prev_id != -1)
@@ -309,11 +317,12 @@ function add_aij_transpose!(p::Presolve_Problem, row_id::Int, col_id::Int, col_p
     end
 end
 
-function remove_row!(p::Presolve_Problem, row::Presolve_Row)
-    deque_row!(p,row)
+function remove_row!(verbose::Bool, p::Presolve_Problem, row::Presolve_Row)
+    v = verbose
+    deque_row!(v,p,row)
 
     while(row.aij != nothing)
-        println("INSIDE------ and aij is $(row.aij.row.i),$(row.aij.col.j)")
+        v && println("INSIDE------ and aij is $(row.aij.row.i),$(row.aij.col.j)")
         tmp = row.aij
         key = rc(tmp.row.i,tmp.col.j,p.originaln)
         #enque_col!(p,tmp.col)
@@ -361,9 +370,10 @@ function remove_row!(p::Presolve_Problem, row::Presolve_Row)
     delete!(p.dictrow,row.i)
 end
 
-function remove_col!(p::Presolve_Problem, col::Presolve_Col)
-    println("REMOVE COLUMN CALL")
-    deque_col!(p,col)
+function remove_col!(verbose::Bool, p::Presolve_Problem, col::Presolve_Col)
+    v = verbose
+    v && println("REMOVE COLUMN CALL")
+    deque_col!(v,p,col)
 
     while(col.aij != nothing)
         tmp = col.aij
@@ -413,8 +423,9 @@ function remove_col!(p::Presolve_Problem, col::Presolve_Col)
     delete!(p.dictcol,col.j)
 end
 
-function make_presolve!(p::Presolve_Problem,c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::Array{Float64,1}, lb::Array{Float64,1}, ub::Array{Float64,1})
+function make_presolve!(verbose::Bool, p::Presolve_Problem,c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::Array{Float64,1}, lb::Array{Float64,1}, ub::Array{Float64,1})
 #   checks to ensure input problem is valid.
+    v = verbose
     m,n = size(A)
     p.originalm != m && error("Wrong size of b wrt A")
     p.originaln != n && error("Wrong size of c wrt A")
@@ -425,19 +436,19 @@ function make_presolve!(p::Presolve_Problem,c::Array{Float64,1}, A::SparseMatrix
     p.currentb = b
     p.currentlb = lb
     p.currentub = ub
-    println("Row SETUP ----- ")
+    v && println("Row SETUP ----- ")
     for i in 1:p.originalm
-        add_row!(p,i,b[i])
+        add_row!(v,p,i,b[i])
     end
 
-    println("COL SETUP -----")
+    v && println("COL SETUP -----")
     for j in 1:p.originaln
-        add_col!(p,j,c[j])
+        add_col!(v,p,j,c[j])
     end
 
     #   Iterating through the non-zeros of sparse matrix A to construct the dictionary
     Arows = rowvals(A)
-    println("MAT ELEMENT SETUP -----")
+    v && println("MAT ELEMENT SETUP -----")
     Avals = nonzeros(A)
     for j = 1:p.originaln
         tmp = -1
@@ -447,7 +458,7 @@ function make_presolve!(p::Presolve_Problem,c::Array{Float64,1}, A::SparseMatrix
             #dictA[rcval] = Avals[i]
             p.rowcounter[r] += 1
             p.colcounter[j] += 1
-            add_aij_normal!(p,r,j,tmp,Avals[i])
+            add_aij_normal!(v,p,r,j,tmp,Avals[i])
             tmp = r
         end
     end
@@ -459,7 +470,7 @@ function make_presolve!(p::Presolve_Problem,c::Array{Float64,1}, A::SparseMatrix
         for c in nzrange(A',i)
             j = Arows[c]
             rcval = rc(i,j,p.originaln)
-            add_aij_transpose!(p,i,j,tmp,Avals[c])
+            add_aij_transpose!(v,p,i,j,tmp,Avals[c])
             tmp = j
         end
     end
@@ -527,32 +538,32 @@ function presolver!(verbose::Bool,c::Array{Float64,1}, A::SparseMatrixCSC{Float6
     v = verbose
     v && println("Making presolve")
     p = Presolve_Problem(v,length(b),length(c))
-    make_presolve!(p,c,A,b,lb,ub)
+    make_presolve!(v,p,c,A,b,lb,ub)
 
-    println("AFTER MAKE PRESOLVE -------------")
+    v && println("AFTER MAKE PRESOLVE -------------")
     #print_info(p)
     #remove_col!(p,p.dictcol[2])
     #print_info(p)
     #remove_row!(p,p.dictrow[1])
     #print_info(p)
 
-    println("TIME FOR PRESOLVE ...............................")
+    v && println("TIME FOR PRESOLVE ...............................")
     row = Presolve_Row()
     col = Presolve_Col()
     tmp = p.rowque
 
     while(tmp != nothing)
         row = tmp
-        deque_row!(p,row)
+        deque_row!(v,p,row)
         if(row.aij == nothing)
-            println("EMPTY ROW FOUND AT $(row.i)")
-            empty_row!(p,row,v)
+            v && println("EMPTY ROW FOUND AT $(row.i)")
+            empty_row!(v,p,row)
         else
             if(row.aij.row_next == row.aij)
-                println("SINGETONE ROW FOUND AT $(row.i)")
-                singleton_row!(p,row,v)
+                v && println("SINGETONE ROW FOUND AT $(row.i)")
+                singleton_row!(v,p,row)
             else
-                println("happy for now")
+                v && println("happy for now")
                 #forcing_constraints!(p,row,v)
             end
         end
@@ -564,21 +575,17 @@ function presolver!(verbose::Bool,c::Array{Float64,1}, A::SparseMatrixCSC{Float6
     end
 
     v && println("trying make new")
-    c,A,b,lb,ub = make_new(p::Presolve_Problem,v)
-    @show c
-    @show A
-    @show b
-    @show lb
-    @show ub
+    c,A,b,lb,ub = make_new(v,p)
     return c,A,b,lb,ub,p.independentvar,p.pstack
 end
 
     # detecting and removing empty rows.
-function empty_row!(p::Presolve_Problem, row::Presolve_Row, v::Bool)
+function empty_row!(verbose::Bool, p::Presolve_Problem, row::Presolve_Row)
+    v = verbose
     if(!roughly(row.b_val,0.0))
         error("Empty Row Infeasibility at row $row.i and b[i] is - $(row.b_val)")
     else
-        remove_row!(p,row)
+        remove_row!(v,p,row)
         p.activeconstr[row.i] = false
     end
 
@@ -586,7 +593,8 @@ function empty_row!(p::Presolve_Problem, row::Presolve_Row, v::Bool)
 end
 
     # SINGLETON ROW
-function singleton_row!(p::Presolve_Problem, row::Presolve_Row, v::Bool)
+function singleton_row!(verbose::Bool, p::Presolve_Problem, row::Presolve_Row)
+    v = verbose
     i = row.aij.row.i
     j = row.aij.col.j
     matval = row.aij.val
@@ -595,7 +603,7 @@ function singleton_row!(p::Presolve_Problem, row::Presolve_Row, v::Bool)
     xj = bval/matval
     add_to_stack!(LinearDependency(j,xj),p.independentvar,p.pstack)
 
-    remove_row!(p,row)
+    remove_row!(v,p,row)
     p.activeconstr[row.i] = false
     aij = p.dictcol[j].aij
     while(aij != nothing)
@@ -607,19 +615,28 @@ function singleton_row!(p::Presolve_Problem, row::Presolve_Row, v::Bool)
             aij = nothing
         end
     end
-    remove_col!(p,p.dictcol[j])
+    remove_col!(v,p,p.dictcol[j])
 end
 
     # to make c,A,sense,b,l,u
-function make_new(p::Presolve_Problem, v::Bool)
+function make_new(verbose::Bool, p::Presolve_Problem)
+    v = verbose
+    v && println("INSIDE MAKE NEW ------------------")
+
     n = 0
     newc = Array{Float64,1}()
+    newlb = Array{Float64,1}()
+    newub = Array{Float64,1}()
+
     col = p.colptr
     if(col.j != -1)
-        println("CONSTRUCTING newc")
+        v && println("CONSTRUCTING newc")
         while(col != nothing)
-            @show col.j
+            v && @show col.j
             push!(newc,col.c_val)
+            push!(newlb,p.currentlb[col.j])
+            push!(newub,p.currentub[col.j])
+
             n = n + 1
             p.finalcols[col.j] = n
 
@@ -630,18 +647,15 @@ function make_new(p::Presolve_Problem, v::Bool)
             end
         end
     end
-    @show n
+    v && @show n
+
 
     m = 0
     newb = Array{Float64,1}()
-    newlb = Array{Float64,1}()
-    newub = Array{Float64,1}()
     row = p.rowptr
     if(row.i != -1)
         while(row != nothing)
             push!(newb,row.b_val)
-            push!(newlb,p.currentlb[row.i])
-            push!(newub,p.currentub[row.i])
             m = m + 1
             p.finalrows[row.i] = m
             if(row.next == row)
@@ -651,7 +665,11 @@ function make_new(p::Presolve_Problem, v::Bool)
             end
         end
     end
-    @show m
+    v && @show m
+
+    v && println(p.finalcols)
+    v && println(p.finalrows)
+
 
     I = Array{Int64,1}()
     J = Array{Int64,1}()
@@ -661,13 +679,15 @@ function make_new(p::Presolve_Problem, v::Bool)
         while(col != nothing)
             tmp = col.aij
             while(tmp != nothing)
+                v && @show tmp.row.i , tmp.col.j
+                v && @show tmp.val
                 push!(J,p.finalcols[tmp.col.j])
                 push!(I,p.finalrows[tmp.row.i])
                 push!(Val,tmp.val)
-                if(tmp.row_next == tmp)
+                if(tmp.col_next == tmp)
                     tmp = nothing
                 else
-                    tmp = tmp.row_next
+                    tmp = tmp.col_next
                 end
             end
             if(col.next == col)
@@ -694,12 +714,12 @@ end
 function post_solve!(post_solvedX::Array{Float64,1}, l::LinearDependency)
     post_solvedX[l.index] = l.value
 
-    @show length(l.vec1)
-    @show post_solvedX
+    #@show length(l.vec1)
+    #@show post_solvedX
 
     for i in 1:length(l.vec1)
         post_solvedX[l.index] += l.vec2[i]*post_solvedX[l.vec1[i]]
-        println("made postsolved at $(l.index) to value $(post_solvedX[l.index])")
+        #println("made postsolved at $(l.index) to value $(post_solvedX[l.index])")
     end
 end
 
@@ -713,7 +733,7 @@ function return_postsolved(x::Array{Float64,1}, independentvar::BitArray{1}, pst
     end
 
     for i in reverse(collect(1:length(pstack)))
-        @show pstack[i]
+        #@show pstack[i]
         post_solve!(postsolvedX,pstack[i])
     end
     return postsolvedX
