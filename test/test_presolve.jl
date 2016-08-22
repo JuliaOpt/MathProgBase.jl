@@ -107,7 +107,7 @@ function correctness_test(in1::Int, in2::Int, in3::Float64, in4::Bool)
                 i += 1
                 break
             end
-            presol.status != :Optimal && error("ERROR BRO - Input feasible problem with an optimal solution but after presolving solver status is not optimal")
+            presol.status != :Optimal && error("ERROR - Input feasible problem with an optimal solution but after presolving solver status is not optimal")
             #ans = presol.sol
         end
         #@show pstack
