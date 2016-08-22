@@ -222,11 +222,11 @@ function do_tests(correctness::Bool, time::Bool)
         # Time-Profile tests
         #time_test(10,10,0.5,false)
         #println("AGAIN")
-        #time_test(100,100,0.01,false)
+        time_test(100,100,0.01,false)
         #println("AGAIN")
         #time_test(1000,1000,0.001,false)
         #println("AGAIN")
-        time_test(10000,10000,0.0001,false)
+        #time_test(10000,10000,0.0001,false)
         #println("AGAIN")
         #time_test(100000,100000,0.00001,false)
     end

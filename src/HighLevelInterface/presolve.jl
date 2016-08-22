@@ -1,20 +1,67 @@
 workspace()
 
+`
+This is an implementation of LP Presolving based on ideas from Andersen & Andersen paper - http://www.turma-aguia.com/davi/doc/Andersen.pdf
+Presolving removes redundancies from the original problem given by the user and constructs a smaller equivalent problem
+which is then fed to the solver.
+The input to the presolver! function is the data fed into the linprog() function of MathProgBase API.
+It returns the presolved problem along with a "Presolve" stack which contains information on each redundancy that was removed.
+This was the objective of a 2016 Google Summer of Code project under Julia-Opt.
+A blog describing the progress and issues can be found here - https://ramcha24.github.io/gsoc
+Author : Ramchandran (https://github.com/ramcha24)
+Mentor : Madeleiene Udell (https://github.com/madeleineudell/)
+All queries and comments are welcome`
+
 using MathProgBase
-using GLPKMathProgInterface
+
+`
+--- Introduction ---
+The optimization problem being solved is of the form -
+    min c*x
+    s.t A*x = b
+        lb <= x <= ub
+
+    where x, c, lb, ub are n-dimensional vectors. b is a m-dimensional vector.
+    A is a m x n constraint co-efficient matrix (usually spase)
+
+The information we store about the problem is logically divided into - rows (m-dims), columns (n-dims) and constraint matrix (m x n dims)
+
+Presolve_Element is the overall abstract type for storing the information about the LP problem.
+The three subtypes are Presolve_Row , Presolve_Col , Presolve_Matrix
+`
+
+`
+--- Active Rows and Independent Columns ---
+The Presolve_Row and Presolve_Col data types defined below holds two doubly linked lists within it.
+First - the normal previous and next references for rows(cols) of constraint matrix.
+Second - a doubly linked list that signifies "active" rows ("independent cols"). This is explained here.
+
+Active row means that row constraint is still to be processed.
+Independent col means that corresponding variabls xj is still independent of other variables and we havent tested it yet.
+
+Initially all rows are made "active" and all columns are made "Independent". The following is a description for rows. A similar workflow is adopted for columns.
+In the function presolver! every row which is initially active is traversed and we first "deactivate" or "deque" them
+After they are dequed from the active queue, they are then analyzed for possible redundancie.
+If we are able to detect a redundancy we will appropriately remove the row.
+If no redundancies can be detected, they have only been dequed and can still be accessed by the normal prev and next references.
+At the end of the presolver! call, there are no active rows.
+We make the new optimization problem by using the prev and next references among the rows and columns that havent been deleted yet.
+`
 
 abstract Presolve_Element
 
 type Presolve_Row <: Presolve_Element
-    i :: Int
-    b_val :: Float64
-    aij :: Union{Presolve_Element,Nothing}
-    prev :: Presolve_Row
-    next :: Presolve_Row
-    is_active :: Bool
-    active_prev :: Presolve_Row
-    active_next :: Presolve_Row
+    # Each row represents a constraint row i
+    i :: Int                                # Row number in the original problem.
+    b_val :: Float64                        # b[i] in the original problem.
+    aij :: Union{Presolve_Element,Nothing}  # Reference to the first non-zero matrix entry in row i. aij = nothing indicates empty row.
+    prev :: Presolve_Row                    # Reference to previous row in the original problem. Row 5 holds ref to Row 4 etc
+    next :: Presolve_Row                    # Reference to next row in the original problem. Row 5 holds ref to Row 6 etc
+    is_active :: Bool                       # true if the row is in the active doubly linked list. false otherwise.
+    active_prev :: Presolve_Row             # if in the active doubly linked list, reference to the previous row in the active doubly linked list.
+    active_next :: Presolve_Row             # if in the active doubly linked list, reference to the next row in the active doubly linked list.
     function Presolve_Row()
+        # Constructor that creates a default row which has an invalid row.i value.
         n = new()
         n.i = -1
         n.b_val = 0.0
@@ -29,15 +76,19 @@ type Presolve_Row <: Presolve_Element
 end
 
 type Presolve_Col <: Presolve_Element
-    j :: Int
-    c_val :: Float64
-    aij :: Union{Presolve_Element,Nothing}
-    prev :: Presolve_Col
-    next :: Presolve_Col
-    is_independent :: Bool
-    ind_prev :: Presolve_Col
-    ind_next :: Presolve_Col
+    # Each column represents a variable xj
+    j :: Int                                # Col number in the original problem.
+    c_val :: Float64                        # c[j] in the original problem.
+    lb :: Float64                           # lb[j] in the original problem
+    ub :: Float64                           # ub[j] in the original problem
+    aij :: Union{Presolve_Element,Nothing}  # Reference to the first non-zero matrix entry in col j. aij = nothing indicates empty col.
+    prev :: Presolve_Col                    # Reference to previous Col in the original problem. Col 5 holds ref to Col 4 etc
+    next :: Presolve_Col                    # Reference to next Col in the original problem. Col 5 holds ref to Col 6 etc
+    is_independent :: Bool                  # true if the Col is in the independent doubly linked list. false otherwise.
+    ind_prev :: Presolve_Col                # if in the independent doubly linked list, reference to the previous Col in the independent doubly linked list.
+    ind_next :: Presolve_Col                # if in the independent doubly linked list, reference to the next Col in the independent doubly linked list.
     function Presolve_Col()
+        # Constructor that creates a default row which has an invalid row.i value.
         n = new()
         n.j = -1
         n.c_val = 0.0
@@ -52,13 +103,13 @@ type Presolve_Col <: Presolve_Element
 end
 
 type Presolve_Matrix <: Presolve_Element
-    row :: Presolve_Row
-    col :: Presolve_Col
-    val :: Float64
-    row_prev :: Presolve_Matrix
-    row_next :: Presolve_Matrix
-    col_prev :: Presolve_Matrix
-    col_next :: Presolve_Matrix
+    row :: Presolve_Row                     # the row associated with element aij. for example, a(4,5) will hold row 4.
+    col :: Presolve_Col                     # the col associated with element aij. for example, a(4,5) will hold col 5.
+    val :: Float64                          # the matrix value in the constraint matrix
+    row_prev :: Presolve_Matrix             # reference to the previous aij element along the same row.
+    row_next :: Presolve_Matrix             # reference to the next aij element along the same row.
+    col_prev :: Presolve_Matrix             # reference to the previous aij element along the same col.
+    col_next :: Presolve_Matrix             # reference to the next aij element along the same col.
     function Presolve_Matrix()
         n = new()
         row = Presolve_Row()
@@ -72,110 +123,143 @@ type Presolve_Matrix <: Presolve_Element
     end
 end
 
-# A stack is needed to record information on redundancies removed
-abstract PresolveStack
+`
+--- Presolve Stack ---
+There are multiple redundancies possible , we combine those that are similar and can be resolved together
+into a subtype of the abstract type Presolve_Stack.
+As of now we have implemented Linear_Dependency which can help resolve - singleton rows, singleton columns and forcing constraints
 
-type LinearDependency <: PresolveStack
-    index :: Int
-    vec1 :: Vector{Int}
-    vec2 :: Vector{Float64}
-    value :: Float64
+The overall abstract type is called "Presolve_Stack" as we need to do the post-solving in the reverse order
+and hence we refer to it as a stack for the LIFO logic.
 
-    function LinearDependency(ind::Int, val::Number)
+Each subtype contains only as much information as is required for the postsolving.
+`
+
+abstract Presolve_Stack
+
+`
+--- Linear Dependency ---
+Here we detect that a variable xj is linearly  dependent on some other variables by the equation -
+xj = constant + ∑ xvalues * linear co-efficients
+
+Consider a column singleton in column 5 and the corresponding element being a(4,5) (let dimensions be m,n = 6,6)
+Suppose the fourth row of the constraint matrix looks like this -
+                                b
+4th row :   1 4 0 2 3 -1        10
+
+This represents the equation -
+1*x_1 + 4*x_2 + 0*x_3 + 2*x_4 + 3*x_5 + (-1)*x_6 = 10.
+
+We can substitute x5 out of the problem as x5  = 10/3 - (1/3)*x_1 - (4/3)*x2 - (0/3)*x3 - (2/3)*x4 - (-1/3)*x6
+
+We view this as
+x[index] = value + ∑ x[vec1[i]]*vec2[i]
+where,
+index here is 5 for x_5
+value here is 10/3
+vec1 here is [1,2,4,6] (not 3 as coefficient of 3 is 0)
+vec2 here is [-1/3, -4/3, -2/3, 1/3]
+
+For a row singleton vec1 and vec2 are empty.
+`
+
+type Linear_Dependency <: Presolve_Stack
+    index :: Int                            # index of the variable that is being presolved wrt original problem.
+    vec1 :: Vector{Int}                     # indices of the variables that x[index] is dependent on
+    vec2 :: Vector{Float64}                 # corresponding co-efficients of dependency. See above for an example
+    value :: Float64                        # constant value of the Linear Dependence equation
+
+    function Linear_Dependency(ind::Int, val::Number)
         vec1 = Array{Int,1}()
         vec2 = Array{Float64,1}()
         new(ind,vec1,vec2,val)
     end
 
-    function LinearDependency(ind::Int, vec1::Vector{Int}, vec2::Vector{Float64}, val::Number)
+    function Linear_Dependency(ind::Int, vec1::Vector{Int}, vec2::Vector{Float64}, val::Number)
         new(ind,vec1,vec2,val)
     end
 
 end
 
+`
+--- Presolve Problem ---
+We take the original problem and work with internally before reporting back the smaller resultant problem.
+our internal workspace consist of problem type Presolve_Problem which holds information in the way we want for our internal functions.
+This is never accessed by the user and its scope is the presolver! function call.
 
-# Type that will hold the details about the presolve problem we are constructing. The dictionary is made here.
+We have a constructor which initializes the variables to default values. A function make_presolve which
+`
+
 type Presolve_Problem
-    currentc :: Array{Float64,1}
-    currentb :: Array{Float64,1}
-    currentlb :: Array{Float64,1}
-    currentub :: Array{Float64,1}
-    currentylb :: Array{Float64,1}
-    currentyub :: Array{Float64,1}
-    currentzlb :: Array{Float64,1}
-    currentzub :: Array{Float64,1}
+    # The dimensions of the original problem
+    originalm :: Int64                      # number of rows in original problem
+    originaln :: Int64                      # number of cols in original problem
+
+    # Linked List storage
+    dictrow :: Dict{Int64,Presolve_Row}     # Rows of the original problem.
+    dictcol :: Dict{Int64,Presolve_Col}     # Cols of the original problem.
+    dictaij :: Dict{Int64,Presolve_Matrix}  # Non-zero entries of the constraint matrix
+    rowptr :: Presolve_Row                  # Reference to the first valid row. Will be updated as rows are deleted.
+    colptr :: Presolve_Col                  # Reference to the first valid col. Will be updated as cols are deleted.
+    rowque :: Presolve_Row                  # Reference to the first active row. Will be updated as rows are dequed.
+    colque :: Presolve_Col                  # Reference to the first independent col. Will be updated as cols are dequed.
+
+    # Boolean status fields
     independentvar :: BitArray{1}
     activeconstr :: BitArray{1}
-    pstack :: Array{PresolveStack,1}
-    originalm :: Int64
-    originaln :: Int64
+
+    # counter variables for aij elements in row/col. Can be done away with probably.
     rowcounter :: Array{Float64,1}
     colcounter :: Array{Float64,1}
-    g :: Array{Float64,1}
-    h :: Array{Float64,1}
 
-    # new thingies
-    dictrow :: Dict{Int64,Presolve_Row}
-    dictcol :: Dict{Int64,Presolve_Col}
-    dictaij :: Dict{Int64,Presolve_Matrix}
+    # the stack that will be fed into the postsolver.
+    pstack :: Array{Presolve_Stack,1}
 
-    rowptr :: Presolve_Row
-    colptr :: Presolve_Col
-    rowque :: Presolve_Row
-    colque :: Presolve_Col
-
-    finalm :: Int
-    finaln :: Int
+    # map from the index of the inital rows to final rows. -1 if they are deleted.
     finalrows :: Array{Int,1}
     finalcols :: Array{Int,1}
-    #   Constructor that creates a Presolve_Problem
+
+    # Constructor that creates a Presolve_Problem
     function Presolve_Problem(verbose::Bool,m::Int,n::Int)
         verbose && println("-----------INSIDE PRESOLVE CONSTRUCTOR------------")
+
         originalm,originaln = m,n
-
-        #   SETUP
-        independentvar = trues(originaln)
-        activeconstr = trues(originalm)
-        pstack = Array{PresolveStack,1}()
-        rowcounter = zeros(originalm)
-        colcounter = zeros(originaln)
-        g = fill(-Inf,originalm)
-        h = fill(+Inf,originalm)
-        ylb = fill(-Inf,originalm)
-        yub = fill(+Inf,originalm)
-        zlb = fill(-Inf,originaln)
-        zub = fill(+Inf,originaln)
-        c = zeros(originaln)
-        b = zeros(originalm)
-        lb = zeros(originalm)
-        ub = zeros(originalm)
-
-    #   SETUP for new variables
         dictrow = Dict{Int64,Presolve_Row}()
         dictcol = Dict{Int64,Presolve_Col}()
         dictaij = Dict{Int64,Presolve_Matrix}()
-
         rowptr = Presolve_Row()
         colptr = Presolve_Col()
         rowque = Presolve_Row()
         colque = Presolve_Col()
-
-        finalm = originalm
-        finaln = originaln
-        finalrows = fill(-1,originalm)
+        independentvar = trues(originaln)
+        activeconstr = trues(originalm)
+        rowcounter = zeros(originalm)
+        colcounter = zeros(originaln)
+        pstack = Array{Presolve_Stack,1}()
+        finalrows = fill(-1,originalm)              # Initially everything is -1.
         finalcols = fill(-1,originaln)
 
-        new(c,b,lb,ub,ylb,yub,zlb,zub,independentvar,activeconstr,pstack,originalm,originaln,rowcounter,colcounter,g,h,dictrow,dictcol,dictaij,rowptr,colptr,rowque,colque,finalm,finaln,finalrows,finalcols)
+        new(originalm,originaln,dictrow,dictcol,dictaij,rowptr,colptr,rowque,colque,independentvar,activeconstr,rowcounter,colcounter,pstack,finalrows,finalcols)
     end
 end
 
-function add_row!(verbose::Bool, p::Presolve_Problem, i::Int, bval::Float64)
+`
+--- Row and Column Operations ---
+There are four functions for each - add, enque, deque and remove.
+There are separate functions for enque and deque intentionally.
+There are times we want to remove a row from the active list but not remove it from the problem.
+Julia doesnt have NULL. Thus, self-referencing indicates end of the list in either direction.
+Initially, the aij pointers are assigned "nothing". They are updated later by the add_aij functions.
+`
+
+# Creates row i with b[i] value b_val and adds it to Presolve_Problem p.
+function add_row!(verbose::Bool, p::Presolve_Problem, i::Int, b_val::Float64)
     v = verbose
     v && println("Adding row : $(i)")
 
     row = Presolve_Row()
     row.i = i
-    row.b_val = bval
+    row.b_val = b_val
     row.aij = nothing
     row.is_active = false
     if(i!=1)
@@ -190,6 +274,7 @@ function add_row!(verbose::Bool, p::Presolve_Problem, i::Int, bval::Float64)
     p.dictrow[i] = row
 end
 
+# places the specified row in the active list.
 function enque_row!(verbose::Bool, p::Presolve_Problem, row::Presolve_Row)
     v = verbose
     v && println("Queueing row : $(row.i)")
@@ -207,8 +292,11 @@ function enque_row!(verbose::Bool, p::Presolve_Problem, row::Presolve_Row)
     end
 end
 
+# removes the specified row from the active list.
 function deque_row!(verbose::Bool, p::Presolve_Problem, row::Presolve_Row)
     v = verbose
+    v && println("Dequeueing row : $(row.i)")
+
     if(row.is_active == true)
         row.is_active = false
         if(row.active_prev == row)
@@ -222,13 +310,16 @@ function deque_row!(verbose::Bool, p::Presolve_Problem, row::Presolve_Row)
     end
 end
 
-function add_col!(verbose::Bool, p::Presolve_Problem, j::Int, cval::Float64)
+# Creates col j with c[i] value c_val and adds it to Presolve_Problem p.
+function add_col!(verbose::Bool, p::Presolve_Problem, j::Int, c_val::Float64, lb::Float64, ub::Float64)
     v = verbose
     v && println("Adding col : $(j)")
 
     col = Presolve_Col()
     col.j = j
-    col.c_val = cval
+    col.c_val = c_val
+    col.lb = lb
+    col.ub = ub
     col.aij = nothing
     col.is_independent = false
     if(j!=1)
@@ -243,6 +334,7 @@ function add_col!(verbose::Bool, p::Presolve_Problem, j::Int, cval::Float64)
     p.dictcol[j] = col
 end
 
+# places the specified col in the independent list.
 function enque_col!(verbose::Bool, p::Presolve_Problem, col::Presolve_Col)
     v = verbose
     v && println("Queueing col : $(col.j)")
@@ -260,8 +352,11 @@ function enque_col!(verbose::Bool, p::Presolve_Problem, col::Presolve_Col)
     end
 end
 
+# removes the specified col from the independent list.
 function deque_col!(verbose::Bool, p::Presolve_Problem, col::Presolve_Col)
     v = verbose
+    v && println("Dequeueing col : $(col.j)")
+
     if(col.is_independent == true)
         col.is_independent = false
         if(col.ind_prev == col)
@@ -272,48 +367,6 @@ function deque_col!(verbose::Bool, p::Presolve_Problem, col::Presolve_Col)
         if(col.ind_next != col)
             col.ind_next.ind_prev = col.ind_prev
         end
-    end
-end
-
-function add_aij_normal!(verbose::Bool, p::Presolve_Problem, row_id::Int, col_id::Int, row_prev_id::Int, val::Float64)
-    v = verbose
-    v && println("Adding mat element : $(row_id),$(col_id)")
-
-    aij = Presolve_Matrix()
-    aij.row = p.dictrow[row_id]
-    aij.col = p.dictcol[col_id]
-    aij.val = val
-    aij.row_prev = aij
-    aij.row_next = aij
-    aij.col_next = aij
-    aij.col_prev = aij
-
-    if(row_prev_id != -1)
-        prev_key = rc(row_prev_id,col_id,p.originaln)
-        p.dictaij[prev_key].col_next = aij
-        aij.col_prev = p.dictaij[prev_key]
-    end
-    #can also be done by checking if row_prev == -1
-    if(p.dictcol[col_id].aij == nothing)
-        p.dictcol[col_id].aij = aij
-    end
-
-    key = rc(row_id,col_id,p.originaln)
-    p.dictaij[key] = aij
-end
-
-function add_aij_transpose!(verbose::Bool, p::Presolve_Problem, row_id::Int, col_id::Int, col_prev_id::Int, val::Float64)
-    v = verbose
-    aij = p.dictaij[rc(row_id,col_id,p.originaln)]
-
-    if(col_prev_id != -1)
-        prev_key = rc(row_id,col_prev_id,p.originaln)
-        p.dictaij[prev_key].row_next = aij
-        aij.row_prev = p.dictaij[prev_key]
-    end
-
-    if(p.dictrow[row_id].aij == nothing)
-        p.dictrow[row_id].aij = aij
     end
 end
 
@@ -423,19 +476,82 @@ function remove_col!(verbose::Bool, p::Presolve_Problem, col::Presolve_Col)
     delete!(p.dictcol,col.j)
 end
 
+`
+--- Matrix Element Operations ---
+Matrix elements have only two functions - add_aij_normal and add_aij_transpose
+They are never separately removed outside of removing rows or columns.
+The input is a sparse matrix stored in the CSC format.
+It can efficiently be accessed only in a column major order.
+We need our matrix elements to act as two doubly linked lists.
+One along the row and one along the column.
+add_aij_normal creates the links along the column.
+add_aij_transpose creates the links along the row.
+
+We traverse the CSC matrix twice. First in the regular column major order and call add_aij_normal.
+The second time we traverse the transpose(A) in column major order and call add_aij_transpose.
+Note that the matrix element is already created by the time we call the second function.
+`
+
+function add_aij_normal!(verbose::Bool, p::Presolve_Problem, row_id::Int, col_id::Int, row_prev_id::Int, val::Float64)
+    v = verbose
+    v && println("Adding mat element (normal): $(row_id),$(col_id)")
+
+    aij = Presolve_Matrix()
+    aij.row = p.dictrow[row_id]
+    aij.col = p.dictcol[col_id]
+    aij.val = val
+    aij.row_prev = aij
+    aij.row_next = aij
+    aij.col_next = aij
+    aij.col_prev = aij
+
+    if(row_prev_id != -1)
+        prev_key = rc(row_prev_id,col_id,p.originaln)
+        p.dictaij[prev_key].col_next = aij
+        aij.col_prev = p.dictaij[prev_key]
+    end
+    #can also be done by checking if row_prev == -1
+    if(p.dictcol[col_id].aij == nothing)
+        p.dictcol[col_id].aij = aij
+    end
+
+    key = rc(row_id,col_id,p.originaln)
+    p.dictaij[key] = aij
+end
+
+function add_aij_transpose!(verbose::Bool, p::Presolve_Problem, row_id::Int, col_id::Int, col_prev_id::Int, val::Float64)
+    v = verbose
+    v && println("Adding mat element (transpose): $(row_id),$(col_id)")
+
+    aij = p.dictaij[rc(row_id,col_id,p.originaln)]
+    if(col_prev_id != -1)
+        prev_key = rc(row_id,col_prev_id,p.originaln)
+        p.dictaij[prev_key].row_next = aij
+        aij.row_prev = p.dictaij[prev_key]
+    end
+
+    if(p.dictrow[row_id].aij == nothing)
+        p.dictrow[row_id].aij = aij
+    end
+end
+
+`
+--- Presolve Setup and Cleanup ---
+make_presolve       : Sets up the linked list connections.
+print_info          : Prints all the linked list information. Useful for debugging.
+make_new            : Converts the final presolve problem data into the format of the original problem
+`
+
+# The function make_presolve! "makes" the links between the necessary row or col or matrix elements
 function make_presolve!(verbose::Bool, p::Presolve_Problem,c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::Array{Float64,1}, lb::Array{Float64,1}, ub::Array{Float64,1})
-#   checks to ensure input problem is valid.
     v = verbose
     m,n = size(A)
+    # checks to ensure input problem is valid.
     p.originalm != m && error("Wrong size of b wrt A")
     p.originaln != n && error("Wrong size of c wrt A")
     p.originaln != length(lb) && error("Wrong size of lb wrt A")
     p.originaln != length(ub) && error("Wrong size of ub wrt A")
 
-    p.currentc = c
-    p.currentb = b
-    p.currentlb = lb
-    p.currentub = ub
     v && println("Row SETUP ----- ")
     for i in 1:p.originalm
         add_row!(v,p,i,b[i])
@@ -443,10 +559,10 @@ function make_presolve!(verbose::Bool, p::Presolve_Problem,c::Array{Float64,1}, 
 
     v && println("COL SETUP -----")
     for j in 1:p.originaln
-        add_col!(v,p,j,c[j])
+        add_col!(v,p,j,c[j],lb[j],ub[j])
     end
 
-    #   Iterating through the non-zeros of sparse matrix A to construct the dictionary
+    # Iterating through the non-zeros of sparse matrix A to construct the dictionary
     Arows = rowvals(A)
     v && println("MAT ELEMENT SETUP -----")
     Avals = nonzeros(A)
@@ -477,6 +593,7 @@ function make_presolve!(verbose::Bool, p::Presolve_Problem,c::Array{Float64,1}, 
     end
 end
 
+# For Debugging.
 function print_info(p::Presolve_Problem)
     println("Row Information--------------------------------------")
     for key in keys(p.dictrow)
@@ -494,8 +611,6 @@ function print_info(p::Presolve_Problem)
         @show row.is_active
         @show row.active_prev.i
         @show row.active_next.i
-        #println("Id : $(row.i)")
-        #println("b_val : $row.b_val")
     end
 
     println("Col Information-------------------------------------------")
@@ -514,8 +629,6 @@ function print_info(p::Presolve_Problem)
         @show col.is_independent
         @show col.ind_prev.j
         @show col.ind_next.j
-        #println("Id : $(row.i)")
-        #println("b_val : $row.b_val")
     end
 
     println("MAT ELEMENT Information---------------------------")
@@ -530,118 +643,29 @@ function print_info(p::Presolve_Problem)
         @show aij.row_next.row.i, aij.row_next.col.j, aij.row_next.val
         @show aij.col_prev.row.i, aij.col_prev.col.j, aij.col_prev.val
         @show aij.col_next.row.i, aij.col_next.col.j, aij.col_next.val
-        #println("Id : $(row.i)")
-        #println("b_val : $row.b_val")
     end
 end
 
-function presolver!(verbose::Bool,c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::Array{Float64,1}, lb::Array{Float64,1}, ub::Array{Float64,1})
-    v = verbose
-    v && println("Making presolve")
-    p = Presolve_Problem(v,length(b),length(c))
-    make_presolve!(v,p,c,A,b,lb,ub)
-
-    v && println("AFTER MAKE PRESOLVE -------------")
-    #print_info(p)
-    #remove_col!(p,p.dictcol[2])
-    #print_info(p)
-    #remove_row!(p,p.dictrow[1])
-    #print_info(p)
-
-    v && println("TIME FOR PRESOLVE ...............................")
-    row = Presolve_Row()
-    col = Presolve_Col()
-    tmp = p.rowque
-
-    while(tmp != nothing)
-        row = tmp
-        deque_row!(v,p,row)
-        if(row.aij == nothing)
-            v && println("EMPTY ROW FOUND AT $(row.i)")
-            empty_row!(v,p,row)
-        else
-            if(row.aij.row_next == row.aij)
-                v && println("SINGETONE ROW FOUND AT $(row.i)")
-                singleton_row!(v,p,row)
-            else
-                v && println("happy for now")
-                #forcing_constraints!(p,row,v)
-            end
-        end
-        if(tmp.next == tmp)
-            tmp = nothing
-        else
-            tmp = tmp.next
-        end
-    end
-
-    v && println("trying make new")
-    c,A,b,lb,ub = make_new(v,p)
-    return c,A,b,lb,ub,p.independentvar,p.pstack
-end
-
-    # detecting and removing empty rows.
-function empty_row!(verbose::Bool, p::Presolve_Problem, row::Presolve_Row)
-    v = verbose
-    if(!roughly(row.b_val,0.0))
-        error("Empty Row Infeasibility at row $row.i and b[i] is - $(row.b_val)")
-    else
-        remove_row!(v,p,row)
-        p.activeconstr[row.i] = false
-    end
-
-    v && println("Exiting Empty Row")
-end
-
-    # SINGLETON ROW
-function singleton_row!(verbose::Bool, p::Presolve_Problem, row::Presolve_Row)
-    v = verbose
-    i = row.aij.row.i
-    j = row.aij.col.j
-    matval = row.aij.val
-    bval = row.aij.row.b_val
-
-    xj = bval/matval
-    add_to_stack!(LinearDependency(j,xj),p.independentvar,p.pstack)
-    remove_row!(v,p,row)
-    p.activeconstr[row.i] = false
-    if(!haskey(p.dictcol,j))
-        error("dictcol key error")
-    end
-    aij = p.dictcol[j].aij
-    while(aij != nothing)
-        r = aij.row
-        r.b_val -= xj*aij.val
-        if(aij.col_next != aij)
-            aij = aij.col_next
-        else
-            aij = nothing
-        end
-    end
-    remove_col!(v,p,p.dictcol[j])
-end
-
-    # to make c,A,sense,b,l,u
+# Constructs the reduced problem
 function make_new(verbose::Bool, p::Presolve_Problem)
     v = verbose
-    v && println("INSIDE MAKE NEW ------------------")
 
-    n = 0
+    currentn = 0
     newc = Array{Float64,1}()
     newlb = Array{Float64,1}()
     newub = Array{Float64,1}()
 
     col = p.colptr
     if(col.j != -1)
-        v && println("CONSTRUCTING newc")
+        v && println("Constructing newc,newlb,newub")
         while(col != nothing)
             v && @show col.j
             push!(newc,col.c_val)
-            push!(newlb,p.currentlb[col.j])
-            push!(newub,p.currentub[col.j])
+            push!(newlb,col.lb)
+            push!(newub,col.ub)
 
-            n = n + 1
-            p.finalcols[col.j] = n
+            currentn = currentn + 1
+            p.finalcols[col.j] = currentn
 
             if(col.next == col)
                 col = nothing
@@ -650,17 +674,17 @@ function make_new(verbose::Bool, p::Presolve_Problem)
             end
         end
     end
-    v && @show n
+    v && @show currentn
 
-
-    m = 0
+    currentm = 0
     newb = Array{Float64,1}()
     row = p.rowptr
     if(row.i != -1)
+        v && println("Constructing newb")
         while(row != nothing)
             push!(newb,row.b_val)
-            m = m + 1
-            p.finalrows[row.i] = m
+            currentm = currentm + 1
+            p.finalrows[row.i] = currentm
             if(row.next == row)
                 row = nothing
             else
@@ -668,17 +692,17 @@ function make_new(verbose::Bool, p::Presolve_Problem)
             end
         end
     end
-    v && @show m
+    v && @show currentm
 
     v && println(p.finalcols)
     v && println(p.finalrows)
-
 
     I = Array{Int64,1}()
     J = Array{Int64,1}()
     Val = Array{Float64,1}()
     col = p.colptr
     if(col.j != -1)
+        v && println("Constructing the new A matrix")
         while(col != nothing)
             tmp = col.aij
             while(tmp != nothing)
@@ -700,12 +724,105 @@ function make_new(verbose::Bool, p::Presolve_Problem)
             end
         end
     end
-    newA = sparse(I,J,Val,m,n)
+    newA = sparse(I,J,Val,currentm,currentn)
     return newc,newA,newb,newlb,newub
 end
 
-# function that will add the LinearDependency element to the stack.
-function add_to_stack!(l::LinearDependency, independentvar::BitArray{1}, pstack::Array{PresolveStack,1})
+`
+--- Presolver Core ---
+empty_row!          : Processes the empty row. Removes it or reports an Infeasibility
+presolver!          : Traverses the active list of rows and detects if redundancies are found. Call approporiate functions to handle redundancies.
+singleton_row!      : Processes the singleton row. Deletes the row and makes changes to the constraint matrix appropriately
+other functions will be added here in the future.
+`
+
+function presolver!(verbose::Bool,c::Array{Float64,1}, A::SparseMatrixCSC{Float64,Int64}, b::Array{Float64,1}, lb::Array{Float64,1}, ub::Array{Float64,1})
+    v = verbose
+    v && println("Making the Presolve Problem")
+    p = Presolve_Problem(v,length(b),length(c))
+    make_presolve!(v,p,c,A,b,lb,ub)
+
+    v && println("PRESOLVE ROUTINES...............................")
+    row = Presolve_Row()
+    col = Presolve_Col()
+    tmp = p.rowque
+
+    while(tmp != nothing)
+        row = tmp
+        deque_row!(v,p,row)
+        if(row.aij == nothing)
+            empty_row!(v,p,row)
+        else
+            if(row.aij.row_next == row.aij)
+                singleton_row!(v,p,row)
+            else
+                v && println("happy for now")
+                #forcing_constraints!(p,row,v)
+            end
+        end
+        if(tmp.next == tmp)
+            tmp = nothing
+        else
+            tmp = tmp.next
+        end
+    end
+
+    v && println("Making the reduced Problem")
+    c,A,b,lb,ub = make_new(v,p)
+    return c,A,b,lb,ub,p.independentvar,p.pstack
+end
+
+function empty_row!(verbose::Bool, p::Presolve_Problem, row::Presolve_Row)
+    v = verbose
+    v && println("EMPTY ROW FOUND AT $(row.i)")
+
+    if(!roughly(row.b_val,0.0))
+        error("Empty Row Infeasibility at row $row.i and b[i] is - $(row.b_val)")
+    else
+        remove_row!(v,p,row)
+        p.activeconstr[row.i] = false
+    end
+
+    v && println("Exiting Empty Row")
+end
+
+function singleton_row!(verbose::Bool, p::Presolve_Problem, row::Presolve_Row)
+    v = verbose
+    v && println("SINGETONE ROW FOUND AT $(row.i)")
+
+    i = row.aij.row.i
+    j = row.aij.col.j
+    matval = row.aij.val
+    b_val = row.aij.row.b_val
+
+    xj = b_val/matval
+    add_to_stack!(Linear_Dependency(j,xj),p.independentvar,p.pstack)
+    remove_row!(v,p,row)
+    p.activeconstr[row.i] = false
+    if(!haskey(p.dictcol,j))
+        error("dictcol key error")
+    end
+    aij = p.dictcol[j].aij
+    while(aij != nothing)
+        r = aij.row
+        r.b_val -= xj*aij.val
+        if(aij.col_next != aij)
+            aij = aij.col_next
+        else
+            aij = nothing
+        end
+    end
+    remove_col!(v,p,p.dictcol[j])
+end
+
+`
+--- PostSolving Utilities ---
+add_to_stack!       : function that will add the Linear_Dependency element to the stack.
+post_solve!         : function that will post solve one Linear_Dependency element.
+return_postsolved   : function that will take in the solution from solver for reduced problem and returns solution for original problem
+`
+
+function add_to_stack!(l::Linear_Dependency, independentvar::BitArray{1}, pstack::Array{Presolve_Stack,1})
     if (length(l.vec1) != length(l.vec2))
         error("vector1 size not equal to vector 2 size for LD element")
     end
@@ -713,12 +830,8 @@ function add_to_stack!(l::LinearDependency, independentvar::BitArray{1}, pstack:
     push!(pstack,l)
 end
 
-# function that will post solve one LinearDependency element.
-function post_solve!(post_solvedX::Array{Float64,1}, l::LinearDependency)
+function post_solve!(post_solvedX::Array{Float64,1}, l::Linear_Dependency)
     post_solvedX[l.index] = l.value
-
-    #@show length(l.vec1)
-    #@show post_solvedX
 
     for i in 1:length(l.vec1)
         post_solvedX[l.index] += l.vec2[i]*post_solvedX[l.vec1[i]]
@@ -726,8 +839,7 @@ function post_solve!(post_solvedX::Array{Float64,1}, l::LinearDependency)
     end
 end
 
-# the x that is fed in has to be the solution obtained from the Solver.
-function return_postsolved(x::Array{Float64,1}, independentvar::BitArray{1}, pstack :: Array{PresolveStack,1})
+function return_postsolved(x::Array{Float64,1}, independentvar::BitArray{1}, pstack :: Array{Presolve_Stack,1})
     postsolvedX = zeros(length(independentvar))
     newcols = find(independentvar)
 
@@ -736,12 +848,14 @@ function return_postsolved(x::Array{Float64,1}, independentvar::BitArray{1}, pst
     end
 
     for i in reverse(collect(1:length(pstack)))
-        #@show pstack[i]
         post_solve!(postsolvedX,pstack[i])
     end
     return postsolvedX
 end
 
+`
+--- Miscellaneous Utilities ---
+`
 
 function is_zero(i::Float64)
     if(abs(i-0.0) <= 1e-3)
