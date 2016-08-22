@@ -186,8 +186,7 @@ end
 We take the original problem and work with internally before reporting back the smaller resultant problem.
 our internal workspace consist of problem type Presolve_Problem which holds information in the way we want for our internal functions.
 This is never accessed by the user and its scope is the presolver! function call.
-
-We have a constructor which initializes the variables to default values. A function make_presolve which
+We have a constructor which initializes the variables to default values.
 `
 
 type Presolve_Problem

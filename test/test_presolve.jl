@@ -232,6 +232,28 @@ function do_tests(correctness::Bool, time::Bool)
     end
 end
 
+function checkapi(in1::Int, in2::Int, in3::Float64, in4::Bool)
+    tol = 1e-3
+    println("-------Testing the API--------")
+    m,n,c,A,b,lb,ub,x = make_lp(in1,in2,in3,in4)
+    @show m,n
+
+    tolerance = tol * ones(n)
+    println("GLPK Presolve")
+    @time begin
+        answer = linprog(c,A,'=',b,lb,ub,GLPKSolverLP(presolve=true))
+        answer.status != :Optimal && error("Input feasible problem with an optimal solution but solver status is not optimal")
+    end
+println("My Presolve")
+
+@time begin
+        answer = linprog(c,A,'=',b,lb,ub,GLPKSolverLP(presolve=false),presolve=true)
+        answer.status != :Optimal && error("Input feasible problem with an optimal solution but solver status is not optimal")
+    end
+    @show size(newA)
+
+end
+
 #println("-------------------RANDOMIZED CORRECTNESS TESTS-----------------")
 #do_tests(true,false)
 #noob_test()
@@ -247,4 +269,6 @@ do_tests(false,true)
 using ProfileView
 ProfileView.view()
 ProfileView.svgwrite("profile_results2.svg")
-#`
+
+
+#checkapi(10,10,0.5,false)
