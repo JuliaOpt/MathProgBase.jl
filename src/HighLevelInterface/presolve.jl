@@ -1,4 +1,4 @@
-workspace()
+#workspace()
 
 `
 This is an implementation of LP Presolving based on ideas from Andersen & Andersen paper - http://www.turma-aguia.com/davi/doc/Andersen.pdf
