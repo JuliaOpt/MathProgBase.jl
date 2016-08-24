@@ -30,7 +30,6 @@ export AbstractLinearQuadraticModel
     getconstrsolution
     getreducedcosts
     getconstrduals
-    getvartype
     getinfeasibilityray
     getunboundedray
     getsimplexiter, rewrap
