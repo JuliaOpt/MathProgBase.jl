@@ -22,10 +22,11 @@ type NonlinearToLPQPBridge <: AbstractLinearQuadraticModel
     numvar::Int
     numconstr::Int
     warmstart::Vector{Float64}
+    vartypes::Vector{Symbol}
 end
 
 function NonlinearToLPQPBridge(m::AbstractNonlinearModel)
-    return NonlinearToLPQPBridge(m,nothing,(Int[],Int[],Float64[]),QuadConstr[],0,0,Float64[])
+    return NonlinearToLPQPBridge(m,nothing,(Int[],Int[],Float64[]),QuadConstr[],0,0,Float64[],Symbol[])
 end
 
 export NonlinearToLPQPBridge
@@ -64,6 +65,9 @@ function optimize!(model::NonlinearToLPQPBridge)
     end
 
     loadproblem!(model.nlpmodel, model.numvar, model.numconstr, l, u, lb, ub, sense, LPQPEvaluator(model))
+    if any(model.vartypes .!= :Cont)
+        setvartype!(model.nlpmodel, model.vartypes)
+    end
     optimize!(model.nlpmodel)
 end
 
@@ -77,6 +81,8 @@ numconstr(model::NonlinearToLPQPBridge) = model.numconstr
 
 numlinconstr(model::NonlinearToLPQPBridge) = size(model.LPdata[1],1)
 numquadconstr(model::NonlinearToLPQPBridge) = length(model.Qconstr)
+
+setvartype!(model::NonlinearToLPQPBridge,vartypes::Vector{Symbol}) = (model.vartypes = vartypes)
 
 function getconstrsolution(model::NonlinearToLPQPBridge)
     x = getsolution(model)
