@@ -72,6 +72,11 @@ export AbstractMathProgSolver
     loadproblem!
 end
 
+# solver parameters, may be implemented by AbstractMathProgModel or AbstractMathProgSolver
+@define_interface begin
+    settimelimit!
+end
+
 
 include("LinearQuadratic.jl")
 include("callbacks.jl")

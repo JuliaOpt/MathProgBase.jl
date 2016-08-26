@@ -116,3 +116,13 @@ All abstract model types inherit from the abstract type ``AbstractMathProgModel`
 .. function:: getvartype(m::AbstractMathProgModel)
 
     Returns a vector indicating the types of each variable, with values described above.
+
+It is the philosophy of MathProgBase to not abstract over most solver parameters, because very few are universal, and we do not want to make it difficult for users who already familiar with the parameters of their solver of choice. However, in certain situations an abstraction over parameters is needed, for example, in meta-solvers which must adjust parameters of a subsolver inside a loop. Parameters set using these methods should override any parameters provided in a solver-dependent way. Solvers/models may chose to implement the following methods:
+
+.. function:: settimelimit!(m::Union{AbstractMathProgSolver,AbstractMathProgModel}, t::Float64)
+
+    If the solve is not completed to optimality tolerances
+    within ``t`` seconds, the solver should return
+    immediately with status ``:UserLimit``.
+
+If these parameter-setting methods are called on an ``AbstractMathProgSolver``, then they should apply to all new models created from the solver (but not existing models). If they are called on an ``AbstractMathProgModel``, they should apply to that model only.
