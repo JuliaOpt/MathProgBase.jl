@@ -71,7 +71,7 @@ function optimize!(model::NonlinearToLPQPBridge)
     optimize!(model.nlpmodel)
 end
 
-for f in [:status, :getsolution, :getobjval, :getreducedcosts]
+for f in [:status, :getsolution, :getobjval, :getobjbound, :getreducedcosts]
     @eval $f(model::NonlinearToLPQPBridge) = $f(model.nlpmodel)
 end
 
