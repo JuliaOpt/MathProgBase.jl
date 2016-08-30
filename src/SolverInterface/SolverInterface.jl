@@ -47,7 +47,7 @@ end
 abstract AbstractMathProgModel
 export AbstractMathProgModel
 
-# immutable type which we dispatch solvers on 
+# immutable type which we dispatch solvers on
 abstract AbstractMathProgSolver
 export AbstractMathProgSolver
 
@@ -75,6 +75,7 @@ end
 # solver parameters, may be implemented by AbstractMathProgModel or AbstractMathProgSolver
 @define_interface begin
     settimelimit!
+    setdisplayoutput!
 end
 
 
