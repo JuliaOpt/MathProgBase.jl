@@ -2,7 +2,7 @@
 SolverInterface module
 ----------------------
 
-The high-level functions ``linprog``, ``mixintprog``, and ``quadprog`` are  
+The high-level functions ``linprog``, ``mixintprog``, and ``quadprog`` are
 are written on top of a solver-independent low-level interface defined in the
 ``SolverInterface`` module. This is also the abstraction layer that modeling languages
 `JuMP <https://github.com/JuliaOpt/JuMP.jl>`_ and
@@ -17,8 +17,8 @@ and the data structures which the solver takes natively as input.
 
 Solvers are divided into three categories (some solvers belong to multiple categories):
 
-- ``LinearQuadratic``: These are solvers which solve linear and quadratic programming problems and accept data as matrices which define the linear and quadratic components of the constraints and objective function. Some of these solvers support warm-starting when certain data are changed or when constraints are added (e.g., by reusing the previous optimal basis from the simplex method). These include classical mixed-integer linear programming solvers with support for callbacks. Some solvers support adding second-order conic constraints through specially formatted quadratic constraints. Examples of solvers in this category are `Cbc <https://github.com/JuliaOpt/Cbc.jl>`_, `Clp <https://github.com/JuliaOpt/Clp.jl>`_, `CPLEX <https://github.com/JuliaOpt/CPLEX.jl>`_, `GLPK <https://github.com/JuliaOpt/GLPK.jl>`_, `Gurobi <https://github.com/JuliaOpt/Gurobi.jl>`_, and `Mosek <https://github.com/JuliaOpt/Mosek.jl>`_. 
-- ``Conic``: These are solvers which solve conic programming problems; these are problems with linear objectives where affine functions of decision variables are restricted to fall within certain convex cones (e.g., the second-order cone, positive semidefinite cone, and exponential cone). The input format for these solves are the matrices and vectors defining the affine functions and the list of cones. Examples of solvers in this category are `ECOS <https://github.com/JuliaOpt/ECOS.jl>`_, `Mosek <https://github.com/JuliaOpt/Mosek.jl>`_, and `SCS <https://github.com/JuliaOpt/SCS.jl>`_. 
+- ``LinearQuadratic``: These are solvers which solve linear and quadratic programming problems and accept data as matrices which define the linear and quadratic components of the constraints and objective function. Some of these solvers support warm-starting when certain data are changed or when constraints are added (e.g., by reusing the previous optimal basis from the simplex method). These include classical mixed-integer linear programming solvers with support for callbacks. Some solvers support adding second-order conic constraints through specially formatted quadratic constraints. Examples of solvers in this category are `Cbc <https://github.com/JuliaOpt/Cbc.jl>`_, `Clp <https://github.com/JuliaOpt/Clp.jl>`_, `CPLEX <https://github.com/JuliaOpt/CPLEX.jl>`_, `GLPK <https://github.com/JuliaOpt/GLPK.jl>`_, `Gurobi <https://github.com/JuliaOpt/Gurobi.jl>`_, and `Mosek <https://github.com/JuliaOpt/Mosek.jl>`_.
+- ``Conic``: These are solvers which solve conic programming problems; these are problems with linear objectives where affine functions of decision variables are restricted to fall within certain convex cones (e.g., the second-order cone, positive semidefinite cone, and exponential cone). The input format for these solves are the matrices and vectors defining the affine functions and the list of cones. Examples of solvers in this category are `ECOS <https://github.com/JuliaOpt/ECOS.jl>`_, `Mosek <https://github.com/JuliaOpt/Mosek.jl>`_, and `SCS <https://github.com/JuliaOpt/SCS.jl>`_.
 - ``Nonlinear``: These are traditional derivative-based nonlinear solvers which require derivative evaluation oracles, as well as solvers which require access to the algebraic representation of a problem (when available). Examples of solvers in this category are `AmplNLWriter <https://github.com/JuliaOpt/AmplNLWriter.jl>`_, `CoinOptServices <https://github.com/JuliaOpt/CoinOptServices.jl>`_, `Ipopt <https://github.com/JuliaOpt/Ipopt.jl>`_, `KNITRO <https://github.com/JuliaOpt/KNITRO.jl>`_, `Mosek <https://github.com/JuliaOpt/Mosek.jl>`_, and `NLopt <https://github.com/JuliaOpt/NLopt.jl>`_.
 
 
@@ -48,7 +48,7 @@ All abstract model types inherit from the abstract type ``AbstractMathProgModel`
 
 .. function:: getobjval(m::AbstractMathProgModel)
 
-    Returns the objective value of the solution found by the solver. In particular, this may be 
+    Returns the objective value of the solution found by the solver. In particular, this may be
     the objective value for the best feasible solution if optimality is not attained or proven.
 
 .. function:: optimize!(m::AbstractMathProgModel)
@@ -70,8 +70,8 @@ All abstract model types inherit from the abstract type ``AbstractMathProgModel`
 
 .. function:: getobjgap(m::AbstractMathProgModel)
 
-    Returns the final relative optimality gap as optimization terminated. That is, it returns 
-    :math:`\frac{|b-f|}{|f|}`, where :math:`b` is the best bound and :math:`f` is the best 
+    Returns the final relative optimality gap as optimization terminated. That is, it returns
+    :math:`\frac{|b-f|}{|f|}`, where :math:`b` is the best bound and :math:`f` is the best
     feasible objective value.
 
 .. function:: getrawsolver(m::AbstractMathProgModel)
@@ -109,8 +109,8 @@ All abstract model types inherit from the abstract type ``AbstractMathProgModel`
 
 .. function:: setvartype!(m::AbstractMathProgModel, v::Vector{Symbol})
 
-    Sets the types of the variables to those indicated by the vector ``v``. Valid 
-    types are ``:Int`` for integer, ``:Cont`` for continuous, ``:Bin`` for binary, 
+    Sets the types of the variables to those indicated by the vector ``v``. Valid
+    types are ``:Int`` for integer, ``:Cont`` for continuous, ``:Bin`` for binary,
     ``:SemiCont`` for `semicontinuous <http://orinanobworld.blogspot.com/2011/03/semicontinuous-variables.html>`_, and ``:SemiInt`` for `semi-integer <http://www.gams.com/mccarl/mccarlhtml/semi-integer_variables.htm>`_.
 
 .. function:: getvartype(m::AbstractMathProgModel)
@@ -124,5 +124,9 @@ It is the philosophy of MathProgBase to not abstract over most solver parameters
     If the solve is not completed to optimality tolerances
     within ``t`` seconds, the solver should return
     immediately with status ``:UserLimit``.
+
+.. function:: setdisplayoutput!(m::Union{AbstractMathProgSolver,AbstractMathProgModel}, flag::Bool)
+
+    If ``flag=false`` then the solver should be set to the minimum display level. If ``flag=true`` then the default level is retained.
 
 If these parameter-setting methods are called on an ``AbstractMathProgSolver``, then they should apply to all new models created from the solver (but not existing models). If they are called on an ``AbstractMathProgModel``, they should apply to that model only.
