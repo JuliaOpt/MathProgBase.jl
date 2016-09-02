@@ -117,16 +117,14 @@ All abstract model types inherit from the abstract type ``AbstractMathProgModel`
 
     Returns a vector indicating the types of each variable, with values described above.
 
-It is the philosophy of MathProgBase to not abstract over most solver parameters, because very few are universal, and we do not want to make it difficult for users who already familiar with the parameters of their solver of choice. However, in certain situations an abstraction over parameters is needed, for example, in meta-solvers which must adjust parameters of a subsolver inside a loop. Parameters set using these methods should override any parameters provided in a solver-dependent way. Solvers/models may chose to implement the following methods:
+It is the philosophy of MathProgBase to not abstract over most solver parameters, because very few are universal, and we do not want to make it difficult for users who already familiar with the parameters of their solver of choice. However, in certain situations an abstraction over parameters is needed, for example, in meta-solvers which must adjust parameters of a subsolver inside a loop. Parameters set using these methods should override any parameters provided in a solver-dependent way. Solvers/models may chose to implement the following method:
 
-.. function:: settimelimit!(m::Union{AbstractMathProgSolver,AbstractMathProgModel}, t::Float64)
+.. function:: setparameters!(m::Union{AbstractMathProgSolver,AbstractMathProgModel}; kwargs...)
 
-    If the solve is not completed to optimality tolerances
-    within ``t`` seconds, the solver should return
-    immediately with status ``:UserLimit``.
+    Sets solver-independent parameters via keyword arguments. Curent valid parameters are ``TimeLimit`` and ``Silent``.
+    ``TimeLimit`` (``Float64``): If the solve is not completed to optimality tolerances within the given number of seconds, the solver
+    should return immediately with status ``:UserLimit``.
+    ``Silent`` (``Bool``): If set to true, the solver should disable any output to the console. If set to false, the parameter
+    has no effect.
 
-.. function:: setdisplayoutput!(m::Union{AbstractMathProgSolver,AbstractMathProgModel}, flag::Bool)
-
-    If ``flag=false`` then the solver should be set to the minimum display level. If ``flag=true`` then the default level is retained.
-
-If these parameter-setting methods are called on an ``AbstractMathProgSolver``, then they should apply to all new models created from the solver (but not existing models). If they are called on an ``AbstractMathProgModel``, they should apply to that model only.
+If these parameter-setting methods are called on an ``AbstractMathProgSolver``, then they should apply to all new models created from the solver (but not existing models). If they are called on an ``AbstractMathProgModel``, they should apply to that model only. Unrecognized parameters (those not listed above) should be ignored or trigger a warning message.
