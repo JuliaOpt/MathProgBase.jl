@@ -169,6 +169,29 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     @test status(m) == :Optimal
     @test_approx_eq getobjval(m) 200.0
     @test_approx_eq getsolution(m) [ 100.0, -100.0 ]
+
+    # Test issue #40 from Gurobi.jl
+    # min  x
+    # s.t. x >= 0
+    #      x >= 3
+    m = LinearQuadraticModel(solver)
+    loadproblem!(m, [1.0 1.0]', [-Inf], [Inf], [1.0], [0.0, 3.0], [Inf, Inf], :Min)
+    optimize!(m)
+    for i = 1:length(getconstrLB(m))
+        @test getconstrLB(m)[i] <= getconstrsolution(m)[i]
+        @test getconstrsolution(m)[i] <= getconstrUB(m)[i]
+    end
+
+    # min  x
+    # s.t. x <= 0
+    #      x <= 3
+    m = LinearQuadraticModel(solver)
+    loadproblem!(m, [1.0 1.0]', [-Inf], [Inf], [1.0], [-Inf, -Inf], [0.0, 3.0], :Max)
+    optimize!(m)
+    for i = 1:length(getconstrLB(m))
+        @test getconstrLB(m)[i] <= getconstrsolution(m)[i]
+        @test getconstrsolution(m)[i] <= getconstrUB(m)[i]
+    end
 end
 
 
@@ -184,8 +207,8 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver)
 
     m = LinearQuadraticModel(solver)
     # Min  x - y
-    # s.t. 0.0 <= x <= 0.0 
-    #      0.0 <= y <= 0.0 
+    # s.t. 0.0 <= x <= 0.0
+    #      0.0 <= y <= 0.0
     # x,y unbounded
     loadproblem!(m, [ 1.0 0.0 ; 0.0 1.0 ], [-Inf, -Inf], [Inf,Inf], [1.0, -1.0], [0.0,0.0], [0.0,0.0], :Min)
 
@@ -196,7 +219,7 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver)
 
     # Min  x - y
     # s.t. 0.0 <= x <= 100.0
-    #      0.0 <= y <= 100.0 
+    #      0.0 <= y <= 100.0
     # x,y unbounded
     setconstrUB!(m,[100.0,100.0])
     optimize!(m)
@@ -206,7 +229,7 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver)
 
     # Min  x - y
     # s.t. -100.0 <= x <= 100.0
-    #      -100.0 <= y <= 100.0 
+    #      -100.0 <= y <= 100.0
     # x,y unbounded
     setconstrLB!(m,[-100.0,-100.0])
     optimize!(m)
