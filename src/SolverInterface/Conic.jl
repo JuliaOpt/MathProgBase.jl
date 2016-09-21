@@ -8,4 +8,5 @@ export AbstractConicModel
     getdual
     getvardual
     supportedcones
+    setbvec!
 end

@@ -78,6 +78,10 @@ Not all solvers are expected to support all types of cones. However, when a simp
     :math:`s \in K_2^*` corresponding to the variable cones. This vector
     should be equal to :math:`c+A^Ty` up to algorithmic convergence tolerances.
 
+.. function:: setbvec!(m::AbstractConicModel, b)
+
+    Update the vector :math:`b` for the next solve.
+
 .. function:: supportedcones(m::AbstractMathProgSolver)
 
     If the solver implements ``ConicModel``, returns a list of cones supported.
