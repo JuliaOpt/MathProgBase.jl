@@ -18,8 +18,6 @@ function expandvec(x,len::Integer)
     end
 end
 
-
-
 function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver)
     m = LinearQuadraticModel(solver)
     nrow,ncol = size(A)
@@ -29,7 +27,7 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
     rowubtmp = expandvec(rowub, nrow)
     lb = expandvec(lb, ncol)
     ub = expandvec(ub, ncol)
-    
+
     # rowlb is allowed to be vector of senses
     if eltype(rowlbtmp) == Char
         realtype = eltype(rowubtmp)
@@ -58,7 +56,7 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
         rowlb = rowlbtmp
         rowub = rowubtmp
     end
-    
+
     loadproblem!(m, A, lb, ub, c, rowlb, rowub, :Min)
     optimize!(m)
     stat = status(m)
@@ -88,8 +86,29 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
     end
 end
 
+function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver, presolve::Bool)
+    if(presolve == false)
+        return linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver)
+    else
+        newc,newA,newb,newlb,newub,independentvar,pstack = presolver!(false,c,A,b,lb,ub)
+        ans = Array{Float64,1}()
+        fully_presolved = true
+        if(length(find(independentvar))!=0)
+            presolve = linprog(newc, newA, '=', newb,newlb,newub)
+            ans = presolve.sol
+            fully_presolved = false
+        end
+        finalsol = return_postsolved(ans,independentvar,pstack)
+        objval = finalsol * c
+        if(fully_presolved)
+            stat = :Optimal
+            return LinprogSolution(stat,objval,finalsol,Dict())
+        else
+            return LinprogSolution(presolve.stat,objval,finalsol,presolve.attrs)
+        end
+    end
+end
+
 linprog(c,A,rowlb,rowub, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver) = linprog(c,A,rowlb,rowub,0,Inf, solver)
 
 export linprog
-
-
