@@ -75,7 +75,7 @@ Not all solvers are expected to support all types of cones. However, when a simp
 .. function:: getvardual(m::AbstractConicModel)
 
     If the solve was successful, returns the optimal dual solution vector
-    :math:`s \in K_2^*` corresponding to the variable cones. This vector
+    :math:`y \in K_2^*` corresponding to the variable cones. This vector
     should be equal to :math:`c+A^Ty` up to algorithmic convergence tolerances.
 
 .. function:: setbvec!(m::AbstractConicModel, b)
