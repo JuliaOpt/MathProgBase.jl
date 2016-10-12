@@ -148,14 +148,3 @@ The ``solvelp`` function returns an instance of the type::
         sol
         attrs
     end
-
-where ``status`` is a termination status symbol, one of ``:Optimal``, ``:Infeasible``, ``:Unbounded``, ``:UserLimit`` (iteration limit or timeout), ``:Error`` (and maybe others).
-
-If ``status`` is ``:Optimal``, the other members have the following values:
-
-* ``objval`` -- optimal objective value
-* ``sol`` -- primal solution vector
-* ``attrs`` -- a dictionary that may contain other relevant attributes such as:
-
-  - ``redcost`` -- dual multipliers for active variable bounds (zero if inactive)
-  - ``lambda`` -- dual multipliers for active linear constraints (equalities are always active)
