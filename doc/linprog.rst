@@ -159,9 +159,3 @@ If ``status`` is ``:Optimal``, the other members have the following values:
 
   - ``redcost`` -- dual multipliers for active variable bounds (zero if inactive)
   - ``lambda`` -- dual multipliers for active linear constraints (equalities are always active)
-
-If ``status`` is ``:Infeasible``, the ``attrs`` member will contain an ``infeasibilityray`` if available; similarly for ``:Unbounded`` problems, ``attrs`` will contain an ``unboundedray`` if available.
-
-..
-  - ``colbasis`` -- optimal simplex basis statuses for the variables (columns) if available. Possible values are ``:NonbasicAtLower``, ``:NonbasicAtUpper``, ``:Basic``, and ``:Superbasic`` (not yet implemented by any solvers)
-  - ``rowbasis`` -- optimal simplex basis statuses for the constraints (rows) if available (not yet implemented by any solvers)
