@@ -20,18 +20,18 @@ where:
 *    ``l`` is the vector of lower bounds on the variables
 *    ``u`` is the vector of upper bounds on the variables, and
 *    ``solver`` is an *optional* parameter specifying the desired solver, see :ref:`choosing solvers <choosing-solvers>`. If this parameter is not provided, the default solver is used.
- 
+
 A scalar is accepted for the ``b``, ``sense``, ``l``, and ``u`` arguments, in which case its value is replicated. The values ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound.
 
 .. note::
-    Linear programming solvers extensively exploit the sparsity of the constraint matrix ``A``. While both dense and sparse matrices are accepted, for large-scale problems sparse matrices should be provided if permitted by the problem structure.  
+    Linear programming solvers extensively exploit the sparsity of the constraint matrix ``A``. While both dense and sparse matrices are accepted, for large-scale problems sparse matrices should be provided if permitted by the problem structure.
 
 A shortened version is defined as::
 
     linprog(c, A, sense, b, solver) = linprog(c, A, sense, b, 0, Inf, solver)
 
 The ``linprog`` function returns an instance of the type::
-    
+
     type LinprogSolution
         status
         objval
@@ -66,7 +66,7 @@ For example, we can solve the two-dimensional problem (see ``test/linprog.jl``):
 by::
 
     using MathProgBase
-    
+
     sol = linprog([-1,0],[2 1],'<',1.5)
     if sol.status == :Optimal
         println("Optimal objective value is $(sol.objval)")
@@ -94,9 +94,57 @@ where:
 *    ``l`` is the vector of lower bounds on the variables
 *    ``u`` is the vector of upper bounds on the variables, and
 *    ``solver`` is an *optional* parameter specifying the desired solver, see :ref:`choosing solvers <choosing-solvers>`. If this parameter is not provided, the default solver is used.
- 
+
 A scalar is accepted for the ``l``, ``u``, ``lb``, and ``ub`` arguments, in which case its value is replicated. The values ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound. Equality constraints are specified by setting the row lower and upper bounds to the same value.
 
 A shortened version is defined as::
 
     linprog(c, A, lb, ub, solver) = linprog(c, A, lb, ub, 0, Inf, solver)
+
+.. note::
+    The function ``linprog`` calls two independent functions for building and solving the linear programming problem, namely ``buildlp`` and ``solvelp``.
+
+.. function:: buildlp(c, A, sense, b, l, u, solver)
+
+Builds the linear programming problem as defined in ``linprog`` and accepts the following arguments:
+
+*    ``c`` is the objective vector, always in the sense of minimization
+*    ``A`` is the constraint matrix
+*    ``sense`` is a vector of constraint sense characters ``'<'``, ``'='``, and ``'>'``
+*    ``b`` is the right-hand side vector
+*    ``l`` is the vector of lower bounds on the variables
+*    ``u`` is the vector of upper bounds on the variables, and
+*    ``solver`` is an *optional* parameter specifying the desired solver, see :ref:`choosing solvers <choosing-solvers>`. If this parameter is not provided, the default solver is used.
+
+A scalar is accepted for the ``b``, ``sense``, ``l``, and ``u`` arguments, in which case its value is replicated. The values ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound.
+
+.. function:: buildlp(c, A, lb, ub, l, u, solver)
+
+This variant of ``buildlp`` allows to specify two-sided linear constraints (also known as range constraints) similar to ``linprog``, and accepts the following arguments:
+
+*    ``c`` is the objective vector, always in the sense of minimization
+*    ``A`` is the constraint matrix
+*    ``lb`` is the vector of row lower bounds
+*    ``ub`` is the vector of row upper bounds
+*    ``l`` is the vector of lower bounds on the variables
+*    ``u`` is the vector of upper bounds on the variables, and
+*    ``solver`` is an *optional* parameter specifying the desired solver, see :ref:`choosing solvers <choosing-solvers>`. If this parameter is not provided, the default solver is used.
+
+A scalar is accepted for the ``l``, ``u``, ``lb``, and ``ub`` arguments, in which case its value is replicated. The values ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound. Equality constraints are specified by setting the row lower and upper bounds to the same value.
+
+The ``buildlp`` function returns an ``AbstractLinearQuadraticModel`` that can be input to ```solvelp``` in order to obtain a solution.
+
+.. function:: solvelp(m)
+
+Solves the linear programming problem as defined in ``linprog``` and accepts the following argument:
+
+*    ``m`` is an ``AbstractLinearQuadraticModel`` (e.g., as returned by ``buildlp``).
+
+The ``solvelp`` function returns an instance of the type::
+
+    type LinprogSolution
+        status
+        objval
+        sol
+        attrs
+    end

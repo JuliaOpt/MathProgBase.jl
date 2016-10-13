@@ -18,9 +18,7 @@ function expandvec(x,len::Integer)
     end
 end
 
-
-
-function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver)
+function buildlp(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver)
     m = LinearQuadraticModel(solver)
     nrow,ncol = size(A)
 
@@ -29,7 +27,7 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
     rowubtmp = expandvec(rowub, nrow)
     lb = expandvec(lb, ncol)
     ub = expandvec(ub, ncol)
-    
+
     # rowlb is allowed to be vector of senses
     if eltype(rowlbtmp) == Char
         realtype = eltype(rowubtmp)
@@ -58,8 +56,13 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
         rowlb = rowlbtmp
         rowub = rowubtmp
     end
-    
+
     loadproblem!(m, A, lb, ub, c, rowlb, rowub, :Min)
+
+    return m
+end
+
+function solvelp(m)
     optimize!(m)
     stat = status(m)
     if stat == :Optimal
@@ -88,8 +91,13 @@ function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
     end
 end
 
+function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver)
+    m = buildlp(c, A, rowlb, rowub, lb, ub, solver)
+    return solvelp(m)
+end
+
 linprog(c,A,rowlb,rowub, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver) = linprog(c,A,rowlb,rowub,0,Inf, solver)
 
-export linprog
+buildlp(c,A,rowlb,rowub, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver) = buildlp(c,A,rowlb,rowub,0,Inf, solver)
 
-
+export linprog, buildlp, solvelp
