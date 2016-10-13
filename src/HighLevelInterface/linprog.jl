@@ -98,4 +98,6 @@ end
 
 linprog(c,A,rowlb,rowub, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver) = linprog(c,A,rowlb,rowub,0,Inf, solver)
 
-export linprog
+buildlp(c,A,rowlb,rowub, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver) = buildlp(c,A,rowlb,rowub,0,Inf, solver)
+
+export linprog, buildlp, solvelp
