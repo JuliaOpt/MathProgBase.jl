@@ -5,18 +5,21 @@ const LPsolvers = [(:Clp,:ClpSolver),
                    (:GLPKMathProgInterface,:GLPKSolverLP),
                    (:Gurobi,:GurobiSolver),
                    (:CPLEX,:CplexSolver),
-                   (:Mosek,:MosekSolver)]
+                   (:Mosek,:MosekSolver),
+                   (:Xpress,:XpressSolver)]
 
 const MIPsolvers = [(:Cbc,:CbcSolver),
                     (:GLPKMathProgInterface,:GLPKSolverMIP),
                     (:Gurobi,:GurobiSolver),
                     (:CPLEX,:CplexSolver),
-                    (:Mosek,:MosekSolver)]
+                    (:Mosek,:MosekSolver),
+                    (:Xpress,:XpressSolver)]
 
 const QPsolvers = [(:Gurobi,:GurobiSolver),
                    (:CPLEX,:CplexSolver),
                    (:Mosek,:MosekSolver),
-                   (:Ipopt,:IpoptSolver)]
+                   (:Ipopt,:IpoptSolver),
+                   (:Xpress,:XpressSolver)]
 
 const SDPsolvers = [(:Mosek,:MosekSolver),
                     (:SCS,:SCSSolver)]
