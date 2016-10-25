@@ -16,7 +16,6 @@ export AbstractLinearQuadraticModel
     setobj!
     addvar!
     addconstr!
-    setwarmstart!
     addsos1!
     addsos2!
     writeproblem
