@@ -156,13 +156,6 @@ to indicate equality constraints.
 
     Returns the cumulative number of barrier iterations during the optimization process.
 
-.. function:: setwarmstart!(m::AbstractLinearQuadraticModel, v)
-
-    Provide an initial solution ``v`` to the solver, as supported. To leave values undefined, set them
-    to ``NaN``. MIP solvers should ignore provided solutions that are infeasible or
-    cannot be completed to a feasible solution. Nonlinear solvers may use provided
-    solutions as starting points even if infeasible.
-
 Integer Programming
 ^^^^^^^^^^^^^^^^^^^
 
