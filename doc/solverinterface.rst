@@ -128,3 +128,11 @@ It is the philosophy of MathProgBase to not abstract over most solver parameters
     has no effect.
 
 If these parameter-setting methods are called on an ``AbstractMathProgSolver``, then they should apply to all new models created from the solver (but not existing models). If they are called on an ``AbstractMathProgModel``, they should apply to that model only. Unrecognized parameters (those not listed above) should be ignored or trigger a warning message.
+
+.. function:: setwarmstart!(m::AbstractMathProgModel, v)
+
+    Provide an initial solution ``v`` to the solver, as supported. To leave values undefined, set them
+    to ``NaN``. MIP solvers should ignore provided solutions that are infeasible or
+    cannot be completed to a feasible solution. Nonlinear solvers may use provided
+    solutions as starting points even if infeasible.
+
