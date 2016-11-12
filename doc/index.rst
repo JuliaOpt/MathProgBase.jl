@@ -27,5 +27,6 @@ Contents
     lpqcqp.rst
     conic.rst
     nlp.rst
+    callbacks.rst
 
 
