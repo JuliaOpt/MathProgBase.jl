@@ -12,9 +12,10 @@ type LPQPtoConicBridge <: AbstractConicModel
     b
     constr_cones
     var_cones
+    cbvec::Vector{Float64}
 end
 
-LPQPtoConicBridge(m::AbstractLinearQuadraticModel) = LPQPtoConicBridge(m, nothing, nothing, nothing, nothing, nothing)
+LPQPtoConicBridge(m::AbstractLinearQuadraticModel) = LPQPtoConicBridge(m, nothing, nothing, nothing, nothing, nothing, Float64[])
 
 export LPQPtoConicBridge
 
@@ -157,6 +158,7 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
     end
 
     loadproblem!(m.lpqpmodel, Alin, l, u, c, lb, ub, :Min)
+    m.cbvec = zeros(length(c))
 
     # Add conic constraints
 
@@ -197,4 +199,67 @@ setvartype!(model::LPQPtoConicBridge, vtype) = setvartype!(model.lpqpmodel, vtyp
 
 for f in methods_by_tag[:rewrap]
     @eval $f(model::LPQPtoConicBridge) = $f(model.lpqpmodel)
+end
+
+type LPQPWrapperCallbackData <: MathProgCallbackData
+    lpqpcb::MathProgCallbackData
+    solvec::Vector{Float64}
+end
+
+wrapcb(f,m::LPQPtoConicBridge) = cb -> f(LPQPWrapperCallbackData(cb,m.cbvec))
+
+function setlazycallback!(m::LPQPtoConicBridge, f)
+    if applicable(setlazycallback!, m.lpqpmodel, f)
+        setlazycallback!(m.lpqpmodel, wrapcb(f,m))
+    else
+        error("Solver does not support lazy callbacks")
+    end
+end
+
+function setcutcallback!(m::LPQPtoConicBridge, f)
+    if applicable(setcutcallback!, m.lpqpmodel, f)
+        setcutcallback!(m.lpqpmodel, wrapcb(f,m))
+    else
+        error("Solver does not support cut callbacks")
+    end
+end
+
+# TODO: Extra work needs to be done to properly implement the heuristic callback because we should fill in the values for the variables that we added.
+function setheuristiccallback!(m::LPQPtoConicBridge, f)
+    if applicable(setheuristiccallback!, m.lpqpmodel, f)
+        setheuristiccallback!(m.lpqpmodel, wrapcb(f,m))
+    else
+        error("Solver does not support heuristic callbacks")
+    end
+end
+
+function setinfocallback!(m::LPQPtoConicBridge, f)
+    if applicable(setinfocallback!, m.lpqpmodel, f)
+        setinfocallback!(m.lpqpmodel, wrapcb(f,m))
+    else
+        error("Solver does not support info callbacks")
+    end
+end
+
+for f in [:cbgetmipsolution,:cbgetlpsolution,:cbgetobj,
+          :cbgetbestbound,:cbgetexplorednodes,
+          :cbgetstate,:cbaddsolution!]
+    @eval ($f)(cb::LPQPWrapperCallbackData) = ($f)(cb.lpqpcb)
+end
+
+for f in [:cbgetmipsolution,:cbgetlpsolution]
+    @eval function ($f)(cb::LPQPWrapperCallbackData,output)
+        ($f)(cb.lpqpcb,cb.solvec)
+        copy!(output,1,cb.solvec,1,length(output))
+    end
+end
+
+for f in [:cbaddcut!,:cbaddcutlocal!,:cbaddlazy!,:cbaddlazylocal!]
+    @eval function ($f)(cb::LPQPWrapperCallbackData,varidx,varcoef,sense,rhs)
+        return ($f)(cb.lpqpcb,varidx,varcoef,sense,rhs)
+    end
+end
+
+function cbsetsolutionvalue!(cb::LPQPWrapperCallbackData, varidx, value)
+    return cbsetsolutionvalue!(cb.lpqpcb,varidx,value)
 end
