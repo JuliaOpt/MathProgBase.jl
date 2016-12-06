@@ -1,7 +1,6 @@
 using Base.Test
 using MathProgBase
 
-
 # Here the type represents the complete instance, but it
 # could also store instance data.
 type HS071 <: MathProgBase.AbstractNLPEvaluator
@@ -269,7 +268,7 @@ end
 
 function MathProgBase.initialize(d::Rosenbrock, requested_features::Vector{Symbol})
     for feat in requested_features
-        if !(feat in [:Grad, :Jac, :Hess])
+        if !(feat in [:Grad, :Hess])
             error("Unsupported feature $feat")
             # TODO: implement Jac-vec and Hess-vec products
             # for solvers that need them
@@ -277,7 +276,7 @@ function MathProgBase.initialize(d::Rosenbrock, requested_features::Vector{Symbo
     end
 end
 
-MathProgBase.features_available(d::Rosenbrock) = [:Grad, :Jac, :Hess]
+MathProgBase.features_available(d::Rosenbrock) = [:Grad, :Hess]
 
 MathProgBase.eval_f(d::Rosenbrock, x) = (1-x[1])^2 + 100*(x[2]-x[1]^2)^2
 
@@ -288,16 +287,11 @@ function MathProgBase.eval_grad_f(d::Rosenbrock, grad_f, x)
     grad_f[2] = 200*(x[2]-x[1]^2)
 end
 
-MathProgBase.jac_structure(d::Rosenbrock) = Int[],Int[]
 MathProgBase.hesslag_structure(d::Rosenbrock) = [1,2,2],[1,1,2]
-
-
-MathProgBase.eval_jac_g(d::Rosenbrock, J, x) = nothing
-
 
 function MathProgBase.eval_hesslag(d::Rosenbrock, H, x, σ, μ)
     # Again, only lower left triangle
-    
+
     H[1] = σ*(2+100*(8x[1]^2-4*(x[2]-x[1]^2))) # d/dx^2
     H[2] = -σ*400*x[1]  # d/dxdy
     H[3] = σ*200 # d/dy^2
