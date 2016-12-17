@@ -2,7 +2,7 @@ using Base.Test
 using MathProgBase
 using MathProgBase.SolverInterface
 
-function linprogsolvertest(solver::AbstractMathProgSolver)
+function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefault(Float64))
 
     m = LinearQuadraticModel(solver)
 
@@ -22,11 +22,11 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
 
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) -1
-    @test_approx_eq getsolution(m) [1.0, 0.0]
-    @test_approx_eq getconstrsolution(m) [1.0]
-    @test_approx_eq getconstrduals(m) [-1.0]
-    @test_approx_eq getreducedcosts(m) [0.0, 1.0]
+    @test_approx_eq_eps getobjval(m) -1 eps
+    @test_approx_eq_eps getsolution(m) [1.0, 0.0] eps
+    @test_approx_eq_eps getconstrsolution(m) [1.0] eps
+    @test_approx_eq_eps getconstrduals(m) [-1.0] eps
+    @test_approx_eq_eps getreducedcosts(m) [0.0, 1.0] eps
 
     setsense!(m, :Max)
     # max x
@@ -34,11 +34,11 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     optimize!(m)
 
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) 1
-    @test_approx_eq getsolution(m) [1.0, 0.0]
-    @test_approx_eq getconstrsolution(m) [1.0]
-    @test_approx_eq getconstrduals(m) [1.0]
-    @test_approx_eq getreducedcosts(m) [0.0, -1.0]
+    @test_approx_eq_eps getobjval(m) 1 eps
+    @test_approx_eq_eps getsolution(m) [1.0, 0.0] eps
+    @test_approx_eq_eps getconstrsolution(m) [1.0] eps
+    @test_approx_eq_eps getconstrduals(m) [1.0] eps
+    @test_approx_eq_eps getreducedcosts(m) [0.0, -1.0] eps
 
     # add new variable to get:
     # max x + 2z
@@ -52,17 +52,17 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     optimize!(m)
 
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) 2
-    @test_approx_eq getsolution(m) [0.0, 0.0, 1.0]
-    @test_approx_eq getconstrsolution(m) [1.0]
-    @test_approx_eq getconstrduals(m) [2.0]
-    @test_approx_eq getreducedcosts(m) [-1.0, -2.0, 0.0]
+    @test_approx_eq_eps getobjval(m) 2 eps
+    @test_approx_eq_eps getsolution(m) [0.0, 0.0, 1.0] eps
+    @test_approx_eq_eps getconstrsolution(m) [1.0] eps
+    @test_approx_eq_eps getconstrduals(m) [2.0] eps
+    @test_approx_eq_eps getreducedcosts(m) [-1.0, -2.0, 0.0] eps
 
     setvarLB!(m, [-1.0,0.0,0.0])
     optimize!(m)
 
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) 3
+    @test_approx_eq_eps getobjval(m) 3 eps
 
     # fix z to zero
     setvarLB!(m, [0.0,0.0,0.0])
@@ -70,17 +70,17 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     optimize!(m)
 
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) 1
+    @test_approx_eq_eps getobjval(m) 1 eps
 
     setconstrUB!(m, [2.0])
     setconstrLB!(m, [2.0])
     optimize!(m)
-    @test_approx_eq getobjval(m) 2
+    @test_approx_eq_eps getobjval(m) 2 eps
 
     setobj!(m, [1.0, 2.0, 0.0])
     optimize!(m)
-    @test_approx_eq getobjval(m) 4
-    @test_approx_eq getsolution(m) [0.0, 2.0, 0.0]
+    @test_approx_eq_eps getobjval(m) 4 eps
+    @test_approx_eq_eps getsolution(m) [0.0, 2.0, 0.0] eps
 
 
     # we now have:
@@ -93,10 +93,10 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     optimize!(m)
 
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) 3
-    @test_approx_eq getsolution(m) [1.0, 1.0, 0.0]
-    @test_approx_eq getconstrduals(m) [1.5, -0.5]
-    @test_approx_eq getreducedcosts(m) [0.0, 0.0, -1.5]
+    @test_approx_eq_eps getobjval(m) 3 eps
+    @test_approx_eq_eps getsolution(m) [1.0, 1.0, 0.0] eps
+    @test_approx_eq_eps getconstrduals(m) [1.5, -0.5] eps
+    @test_approx_eq_eps getreducedcosts(m) [0.0, 0.0, -1.5] eps
 
 
     # test addvar! interface
@@ -121,11 +121,11 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
 
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) -1
-    @test_approx_eq getsolution(m) [1.0, 0.0]
-    @test_approx_eq getconstrsolution(m) [1.0]
-    @test_approx_eq getconstrduals(m) [-1.0]
-    @test_approx_eq getreducedcosts(m) [0.0, 1.0]
+    @test_approx_eq_eps getobjval(m) -1 eps
+    @test_approx_eq_eps getsolution(m) [1.0, 0.0] eps
+    @test_approx_eq_eps getconstrsolution(m) [1.0] eps
+    @test_approx_eq_eps getconstrduals(m) [-1.0] eps
+    @test_approx_eq_eps getreducedcosts(m) [0.0, 1.0] eps
 
 
     ####################################
@@ -147,8 +147,8 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     optimize!(m)
 
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) 0.0
-    @test_approx_eq getsolution(m) [ 0.0, 0.0 ]
+    @test_approx_eq_eps getobjval(m) 0.0 eps
+    @test_approx_eq_eps getsolution(m) [ 0.0, 0.0 ] eps
 
     # Min  x - y
     # s.t. 100.0 <= x
@@ -157,8 +157,8 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     setconstrLB!(m,[100.0,-Inf])
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) 100.0
-    @test_approx_eq getsolution(m) [ 100.0, 0.0 ]
+    @test_approx_eq_eps getobjval(m) 100.0 eps
+    @test_approx_eq_eps getsolution(m) [ 100.0, 0.0 ] eps
 
     # Min  x - y
     # s.t. 100.0 <= x
@@ -167,8 +167,8 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     setconstrUB!(m,[Inf,-100.0])
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) 200.0
-    @test_approx_eq getsolution(m) [ 100.0, -100.0 ]
+    @test_approx_eq_eps getobjval(m) 200.0 eps
+    @test_approx_eq_eps getsolution(m) [ 100.0, -100.0 ] eps
 
     # Test issue #40 from Gurobi.jl
     # min  x
@@ -178,8 +178,8 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     loadproblem!(m, [1.0 1.0]', [-Inf], [Inf], [1.0], [0.0, 3.0], [Inf, Inf], :Min)
     optimize!(m)
     for i = 1:length(getconstrLB(m))
-        @test getconstrLB(m)[i] <= getconstrsolution(m)[i]
-        @test getconstrsolution(m)[i] <= getconstrUB(m)[i]
+        @test getconstrLB(m)[i] <= getconstrsolution(m)[i] + eps
+        @test getconstrsolution(m)[i] <= getconstrUB(m)[i] + eps
     end
 
     # min  x
@@ -189,8 +189,8 @@ function linprogsolvertest(solver::AbstractMathProgSolver)
     loadproblem!(m, [1.0 1.0]', [-Inf], [Inf], [1.0], [-Inf, -Inf], [0.0, 3.0], :Max)
     optimize!(m)
     for i = 1:length(getconstrLB(m))
-        @test getconstrLB(m)[i] <= getconstrsolution(m)[i]
-        @test getconstrsolution(m)[i] <= getconstrUB(m)[i]
+        @test getconstrLB(m)[i] <= getconstrsolution(m)[i] + eps
+        @test getconstrsolution(m)[i] <= getconstrUB(m)[i] + eps
     end
 end
 
