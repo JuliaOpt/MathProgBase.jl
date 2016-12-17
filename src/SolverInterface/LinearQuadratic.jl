@@ -38,7 +38,7 @@ export AbstractLinearQuadraticModel
 end
 
 # default addvar!, not adding to any existing constraints
-addvar!(m::AbstractMathProgModel, collb, colub, objcoef) = addvar!(m, [], [], collb, colub, objcoef)
+addvar!(m::AbstractMathProgModel, collb, colub, objcoef) = addvar!(m, Int[], [], collb, colub, objcoef)
 
 # Quadratic methods
 
