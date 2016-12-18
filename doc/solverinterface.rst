@@ -57,8 +57,8 @@ All abstract model types inherit from the abstract type ``AbstractMathProgModel`
 
 .. function:: status(m::AbstractMathProgModel)
 
-    Returns the termination status after solving. Possible values include ``:Optimal``,
-    ``:Infeasible``, ``:Unbounded``, ``:UserLimit`` (iteration limit or timeout), and ``:Error``.
+    Returns the termination status after solving (i.e., the reason why the solver terminated). Possible values include ``:Optimal``,
+    ``:Infeasible``, ``:Unbounded``, ``:DualityFailure``, ``:UserLimit`` (iteration limit or timeout), and ``:Error``.
     Solvers may return other statuses, for example, when presolve indicates that the model is
     either infeasible or unbounded, but did not determine which.
 
