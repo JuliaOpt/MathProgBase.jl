@@ -16,7 +16,7 @@ type ConicToLPQPBridge <: AbstractLinearQuadraticModel
     SOCconstrs::Vector{Vector{Int}} # x'x <= y^2, y is first index in vector
 end
 
-ConicToLPQPBridge(s::AbstractConicModel) = ConicToLPQPBridge(s, sparse(Int[],Int[],Float64[]), Float64[], Float64[], Float64[], Float64[], Float64[], :Uninitialized, Int[], Array(Vector{Int},0))
+ConicToLPQPBridge(s::AbstractConicModel) = ConicToLPQPBridge(s, sparse(Int[],Int[],Float64[]), Float64[], Float64[], Float64[], Float64[], Float64[], :Min, Int[], Array(Vector{Int},0))
 
 export ConicToLPQPBridge
 
@@ -170,6 +170,9 @@ function optimize!(wrap::ConicToLPQPBridge)
 end
 
 getsolution(wrap::ConicToLPQPBridge) = getsolution(wrap.m)
+function getconstrsolution(wrap::ConicToLPQPBridge)
+    wrap.A * getsolution(wrap.m)
+end
 status(wrap::ConicToLPQPBridge) = status(wrap.m)
 function getobjval(wrap::ConicToLPQPBridge)
     if wrap.sense == :Max
@@ -203,4 +206,42 @@ function getconstrduals(wrap::ConicToLPQPBridge)
         scale!(constrduals,-1.0)
     end
     return constrduals
+end
+
+numconstr(wrap::ConicToLPQPBridge) = size(wrap.A, 1)
+numvar(wrap::ConicToLPQPBridge) = size(wrap.A, 2)
+getvarLB(wrap::ConicToLPQPBridge) = wrap.collb
+getvarUB(wrap::ConicToLPQPBridge) = wrap.colub
+getconstrLB(wrap::ConicToLPQPBridge) = wrap.rowlb
+getconstrUB(wrap::ConicToLPQPBridge) = wrap.rowub
+getobj(wrap::ConicToLPQPBridge) = wrap.obj
+getsense(wrap::ConicToLPQPBridge) = wrap.sense
+function setvarLB!(wrap::ConicToLPQPBridge, l)
+    wrap.collb = l
+end
+function setvarUB!(wrap::ConicToLPQPBridge, u)
+    wrap.colub = u
+end
+function setconstrLB!(wrap::ConicToLPQPBridge, lb)
+    wrap.rowlb = lb
+end
+function setconstrUB!(wrap::ConicToLPQPBridge, ub)
+    wrap.rowub = ub
+end
+function setobj!(wrap::ConicToLPQPBridge, obj)
+    wrap.obj = obj
+end
+function setsense!(wrap::ConicToLPQPBridge, sense)
+    wrap.sense = sense
+end
+function addvar!{T<:Integer}(wrap::ConicToLPQPBridge, constridx::AbstractArray{T}, constrcoef, l, u, objcoef)
+    wrap.A = [wrap.A sparsevec(constridx, constrcoef, size(wrap.A, 1))]
+    push!(wrap.collb, l)
+    push!(wrap.colub, u)
+    push!(wrap.obj, objcoef)
+end
+function addconstr!{T<:Integer}(wrap::AbstractLinearQuadraticModel, varidx::AbstractArray{T}, coef, lb, ub)
+    wrap.A = [wrap.A; sparsevec(varidx, coef, size(wrap.A, 2))']
+    push!(wrap.rowlb, lb)
+    push!(wrap.rowub, ub)
 end
