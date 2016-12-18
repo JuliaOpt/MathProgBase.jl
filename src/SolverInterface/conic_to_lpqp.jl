@@ -240,7 +240,7 @@ function addvar!{T<:Integer}(wrap::ConicToLPQPBridge, constridx::AbstractArray{T
     push!(wrap.colub, u)
     push!(wrap.obj, objcoef)
 end
-function addconstr!{T<:Integer}(wrap::AbstractLinearQuadraticModel, varidx::AbstractArray{T}, coef, lb, ub)
+function addconstr!{T<:Integer}(wrap::ConicToLPQPBridge, varidx::AbstractArray{T}, coef, lb, ub)
     wrap.A = [wrap.A; sparsevec(varidx, coef, size(wrap.A, 2))']
     push!(wrap.rowlb, lb)
     push!(wrap.rowub, ub)
