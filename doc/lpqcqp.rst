@@ -93,6 +93,9 @@ to indicate equality constraints.
     objective coefficient ``objcoef``. This is equivalent to calling the
     above method with empty arrays for the constraint coefficients.
 
+.. function:: delvars!(m::AbstractLinearQuadraticModel, idxs)
+
+    Removes the variables with indexes in the vector idxs.
 
 .. function:: addconstr!(m::AbstractLinearQuadraticModel, varidx, coef, lb, ub)
 
@@ -101,6 +104,16 @@ to indicate equality constraints.
     are specified in a sparse format: the ``coef`` vector contains the nonzero
     coefficients, and the ``varidx`` vector contains the indices of the corresponding
     variables.
+
+.. function:: delconstrs!(m::AbstractLinearQuadraticModel, idxs)
+
+    Removes the constraints with indexes in the vector idxs.
+
+.. function:: chgcoeffs!(m::AbstractLinearQuadraticModel, cidxs, vidxs, val)
+
+    Changes multiple coefficients in the A matrix. Coefficients to be changed are the ones with 
+    constraint, variables and values indexed, respectively, in the vectors cidxs, vidxs and val.
+    All the vectors must have the same size.
 
 .. function:: numlinconstr(m::AbstractLinearQuadraticModel)
 
