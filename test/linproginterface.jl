@@ -290,7 +290,7 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver)
     #   Modifying lower bound works
     #   Modifying upper bound works
     #   Setting upper and lower bound to same value works
-    #
+    
 
     m = LinearQuadraticModel(solver)
     # Min  x - y
