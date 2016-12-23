@@ -71,7 +71,6 @@ export AbstractMathProgSolver
     getvartype
     loadproblem!
     setwarmstart!
-    copy
 end
 
 # solver parameters, may be implemented by AbstractMathProgModel or AbstractMathProgSolver
