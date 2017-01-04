@@ -111,7 +111,7 @@ to indicate equality constraints.
 
 .. function:: delconstrs!(m::AbstractLinearQuadraticModel, idxs)
 
-    Removes the constraints with indexes in the vector idxs.The remaining constraints in the model
+    Removes the constraints with indices in the vector idxs. The remaining constraints in the model
     are renumbered. Let, for example, before deletion there be six constraints with indices 
     1, 2, 3, 4, 5, 6, suppose we delete indices 1, 2, and 4, then there will be 3 constraints remaining
     in the model, those which were previously numbered 3, 5, and 6. Now these 3 have indices
