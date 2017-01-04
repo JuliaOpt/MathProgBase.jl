@@ -239,8 +239,8 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
     #        x >= 0, y >= 0
     #
     #   solution: x = 0, y = 2, objv = 2
-    if applicable(chgcoeffs!, m, [1], [2],  [2.])
-        chgcoeffs!(m, [1], [2],  [2.])
+    if applicable(changecoeffs!, m, [1], [2],  [2.])
+        changecoeffs!(m, [1], [2],  [2.])
         optimize!(m)
         @test status(m) == :Optimal
         @test_approx_eq_eps getobjval(m) 2.0 eps

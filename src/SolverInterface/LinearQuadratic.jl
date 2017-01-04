@@ -14,7 +14,7 @@ export AbstractLinearQuadraticModel
     setconstrLB!
     setconstrUB!
     setobj!
-    chgcoeffs!
+    changecoeffs!
     addvar!
     delvars!
     addconstr!

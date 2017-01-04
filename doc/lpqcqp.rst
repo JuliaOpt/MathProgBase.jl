@@ -117,7 +117,7 @@ to indicate equality constraints.
     in the model, those which were previously numbered 3, 5, and 6. Now these 3 have indices
     1, 2 and 3.
 
-.. function:: chgcoeffs!(m::AbstractLinearQuadraticModel, cidxs, vidxs, val)
+.. function:: changecoeffs!(m::AbstractLinearQuadraticModel, cidxs, vidxs, val)
 
     Changes multiple coefficients in the A matrix. Coefficients to be changed are the ones with 
     constraint, variables and values indexed, respectively, in the vectors cidxs, vidxs and val.
