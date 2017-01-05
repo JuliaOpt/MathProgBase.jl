@@ -7,6 +7,7 @@
 
 type LPQPtoConicBridge <: AbstractConicModel
     lpqpmodel::AbstractLinearQuadraticModel
+    qcp::Bool
     c
     A
     b
@@ -18,7 +19,7 @@ type LPQPtoConicBridge <: AbstractConicModel
     cbvec2::Vector{Float64}
 end
 
-LPQPtoConicBridge(m::AbstractLinearQuadraticModel) = LPQPtoConicBridge(m, nothing, nothing, nothing, nothing, nothing, nothing, nothing, Float64[], Float64[])
+LPQPtoConicBridge(m::AbstractLinearQuadraticModel) = LPQPtoConicBridge(m, false, nothing, nothing, nothing, nothing, nothing, nothing, nothing, Float64[], Float64[])
 
 export LPQPtoConicBridge
 
@@ -142,6 +143,8 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
         ubaux = lbaux
         lb = [lb; lbaux]
         ub = [ub; ubaux]
+    else
+        m.Asoc = nothing
     end
 
     if length(rsocconstr_idx) > 0
@@ -158,6 +161,8 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
         ubaux = lbaux
         lb = [lb; lbaux]
         ub = [ub; ubaux]
+    else
+        m.Arsoc = nothing
     end
 
     loadproblem!(m.lpqpmodel, Alin, l, u, c, lb, ub, :Min)
@@ -168,8 +173,10 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
 
     for (cone, idx) in var_cones
         if cone == :SOC
+            m.qcp = true
             addquadconstr!(m.lpqpmodel, Int[], Float64[], vcat(idx), vcat(idx), [-1.0; ones(length(idx)-1)], '<', 0.0)
         elseif cone == :SOCRotated
+            m.qcp = true
             idx1 = idx[1]
             idx2 = idx[2]
             idxrest = idx[3:end]
@@ -181,11 +188,13 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
     krsoc = 1
     for (cone,idx) in constr_cones
         if cone == :SOC
+            m.qcp = true
             idx1 = num_orig + ksoc
             idxrest = (num_orig+ksoc+1):(num_orig+ksoc+length(idx)-1)
             addquadconstr!(m.lpqpmodel, Int[], Float64[], [idx1; idxrest], [idx1; idxrest], [-1.0;ones(length(idxrest))], '<', 0.0)
             ksoc += length(idx)
         elseif cone == :SOCRotated
+            m.qcp = true
             idx1 = num_orig + length(socconstr_idx) + krsoc
             idx2 = num_orig + length(socconstr_idx) + krsoc + 1
             idxrest = (idx2+1):(idx1+length(idx)-1)
@@ -240,7 +249,9 @@ for f in [:optimize!, :status, :getsolution, :getobjval, :getvartype]
 end
 
 function getdual(model::LPQPtoConicBridge)
-    if status(model.lpqpmodel) == :Infeasible
+    if model.qcp
+        error("getdual not supported for SOC and SOCRotated cones")
+    elseif status(model.lpqpmodel) == :Infeasible
         # Needed to pass LIN3 of coniclineartest
         # "-infeasibility ray" is not guaranteed to be dual feasible but
         # "-getconstrduals - λ getinfeasibilityray" is dual feasible for any λ
@@ -251,7 +262,11 @@ function getdual(model::LPQPtoConicBridge)
 end
 
 function getvardual(model::LPQPtoConicBridge)
-    getreducedcosts(model.lpqpmodel)
+    if model.qcp
+        error("getvardual not supported for SOC and SOCRotated cones")
+    else
+        getreducedcosts(model.lpqpmodel)
+    end
 end
 
 setvartype!(model::LPQPtoConicBridge, vtype) = setvartype!(model.lpqpmodel, vtype)
