@@ -239,6 +239,21 @@ for f in [:optimize!, :status, :getsolution, :getobjval, :getvartype]
     @eval $f(model::LPQPtoConicBridge) = $f(model.lpqpmodel)
 end
 
+function getdual(model::LPQPtoConicBridge)
+    if status(model.lpqpmodel) == :Infeasible
+        # Needed to pass LIN3 of coniclineartest
+        # "-infeasibility ray" is not guaranteed to be dual feasible but
+        # "-getconstrduals - λ getinfeasibilityray" is dual feasible for any λ
+        -getconstrduals(model.lpqpmodel) - getinfeasibilityray(model.lpqpmodel)
+    else
+        -getconstrduals(model.lpqpmodel)
+    end
+end
+
+function getvardual(model::LPQPtoConicBridge)
+    getreducedcosts(model.lpqpmodel)
+end
+
 setvartype!(model::LPQPtoConicBridge, vtype) = setvartype!(model.lpqpmodel, vtype)
 
 for f in methods_by_tag[:rewrap]
