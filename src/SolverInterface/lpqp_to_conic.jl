@@ -10,12 +10,15 @@ type LPQPtoConicBridge <: AbstractConicModel
     c
     A
     b
+    Asoc
+    Arsoc
     constr_cones
     var_cones
     cbvec::Vector{Float64}
+    cbvec2::Vector{Float64}
 end
 
-LPQPtoConicBridge(m::AbstractLinearQuadraticModel) = LPQPtoConicBridge(m, nothing, nothing, nothing, nothing, nothing, Float64[])
+LPQPtoConicBridge(m::AbstractLinearQuadraticModel) = LPQPtoConicBridge(m, nothing, nothing, nothing, nothing, nothing, nothing, nothing, Float64[], Float64[])
 
 export LPQPtoConicBridge
 
@@ -127,14 +130,14 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
     end
 
     if length(socconstr_idx) > 0
-        Aaux = A[socconstr_idx,:]
+        m.Asoc = A[socconstr_idx,:]
         # linear constraints for aux variables
         # for each ||b - Ax|| <= c - d^Tx,
         # introduce y = b - Ax, z = c-d^Tx, and say
         # y^Ty <= z^2.
         # Ax + y = b, so we just need to append some identity columns
         Alin = [ Alin spzeros(length(linconstr_idx),length(socconstr_idx))
-        Aaux speye(length(socconstr_idx)) ]
+        m.Asoc speye(length(socconstr_idx)) ]
         lbaux = b[socconstr_idx]
         ubaux = lbaux
         lb = [lb; lbaux]
@@ -142,7 +145,7 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
     end
 
     if length(rsocconstr_idx) > 0
-        Aaux = A[rsocconstr_idx,:]
+        m.Arsoc = A[rsocconstr_idx,:]
         # same thing for rotated SOC
         # note we adjust for factor of 2:
         # rsoc has x'x <= 2pq
@@ -150,7 +153,7 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
         diagvec = ones(length(rsocconstr_idx))
         diagvec[rsoc_start_idx] = 1/sqrt(2)
         Alin = [ Alin spzeros(size(Alin,1),length(rsocconstr_idx))
-        [Aaux spzeros(size(Aaux,1),length(socconstr_idx))] spdiagm(diagvec) ]
+        [m.Arsoc spzeros(size(Aaux,1),length(socconstr_idx))] spdiagm(diagvec) ]
         lbaux = b[rsocconstr_idx]
         ubaux = lbaux
         lb = [lb; lbaux]
@@ -159,6 +162,7 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
 
     loadproblem!(m.lpqpmodel, Alin, l, u, c, lb, ub, :Min)
     m.cbvec = zeros(length(c))
+    m.cbvec2 = fill(NaN,length(c))
 
     # Add conic constraints
 
@@ -191,6 +195,46 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
     end
 end
 
+# extend a solution in the conic space to the LPQP space with extra variables
+# could be made more efficient by avoiding recomputing vectors
+function extend_solution(model::LPQPtoConicBridge,x)
+    socconstr_idx = Int[]
+    rsocconstr_idx = Int[]
+    rsoc_start_idx = Int[]
+    num_aux = 0
+    for i in 1:length(model.constr_cones)
+        cone, idxs = model.constr_cones[i]
+        if cone == :SOC
+            num_aux += length(idxs)
+            append!(socconstr_idx, idxs)
+        elseif cone == :SOCRotated
+            num_aux += length(idxs)
+            push!(rsoc_start_idx, length(rsocconstr_idx)+1)
+            push!(rsoc_start_idx, length(rsocconstr_idx)+2)
+            append!(rsocconstr_idx, idxs)
+        end
+    end
+    @assert num_aux == length(socconstr_idx) + length(rsocconstr_idx)
+
+    if length(socconstr_idx) > 0
+        soc_aux = model.b[socconstr_idx] - model.Asoc*x
+    else
+        soc_aux = eltype(x)[]
+    end
+
+    if length(rsocconstr_idx) > 0
+        Aaux = model.A[rsocconstr_idx,:]
+        diagvec = ones(length(rsocconstr_idx))
+        diagvec[rsoc_start_idx] = sqrt(2)
+        rsoc_aux = diagvec .* (model.b[rsocconstr_idx] - model.Arsoc*x)
+    else
+        rsoc_aux = eltype(x)[]
+    end
+    return [x;soc_aux;rsoc_aux]
+end
+
+setwarmstart!(model::LPQPtoConicBridge,v) = setwarmstart!(model.lpqpmodel,extend_solution(model,v))
+
 for f in [:optimize!, :status, :getsolution, :getobjval, :getvartype]
     @eval $f(model::LPQPtoConicBridge) = $f(model.lpqpmodel)
 end
@@ -203,10 +247,12 @@ end
 
 type LPQPWrapperCallbackData <: MathProgCallbackData
     lpqpcb::MathProgCallbackData
+    model::LPQPtoConicBridge
     solvec::Vector{Float64}
+    heurvec::Vector{Float64}
 end
 
-wrapcb(f,m::LPQPtoConicBridge) = cb -> f(LPQPWrapperCallbackData(cb,m.cbvec))
+wrapcb(f,m::LPQPtoConicBridge) = cb -> f(LPQPWrapperCallbackData(cb,m,m.cbvec,m.cbvec2))
 
 function setlazycallback!(m::LPQPtoConicBridge, f)
     if applicable(setlazycallback!, m.lpqpmodel, f)
@@ -224,7 +270,6 @@ function setcutcallback!(m::LPQPtoConicBridge, f)
     end
 end
 
-# TODO: Extra work needs to be done to properly implement the heuristic callback because we should fill in the values for the variables that we added.
 function setheuristiccallback!(m::LPQPtoConicBridge, f)
     if applicable(setheuristiccallback!, m.lpqpmodel, f)
         setheuristiccallback!(m.lpqpmodel, wrapcb(f,m))
@@ -243,7 +288,7 @@ end
 
 for f in [:cbgetmipsolution,:cbgetlpsolution,:cbgetobj,
           :cbgetbestbound,:cbgetexplorednodes,
-          :cbgetstate,:cbaddsolution!]
+          :cbgetstate]
     @eval ($f)(cb::LPQPWrapperCallbackData) = ($f)(cb.lpqpcb)
 end
 
@@ -261,5 +306,16 @@ for f in [:cbaddcut!,:cbaddcutlocal!,:cbaddlazy!,:cbaddlazylocal!]
 end
 
 function cbsetsolutionvalue!(cb::LPQPWrapperCallbackData, varidx, value)
-    return cbsetsolutionvalue!(cb.lpqpcb,varidx,value)
+    cb.heurvec[varidx] = value
+end
+
+function cbaddsolution!(cb::LPQPWrapperCallbackData)
+    newsol = extend_solution(cb.model,cb.solvec)
+    for i in 1:length(newsol)
+        if isfinite(newsol[i])
+            cbsetsolutionvalue!(cb.lpqpcb,i,newsol[i])
+        end
+    end
+    cbaddsolution!(cb.lpqpcb)
+    fill!(newsol,NaN)
 end
