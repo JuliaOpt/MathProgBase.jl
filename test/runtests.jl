@@ -11,7 +11,7 @@ quadprogtest()
 
 # Test conic fallback for LPs
 include("conicinterface.jl")
-coniclineartest(MathProgBase.defaultLPsolver)
+coniclineartest(MathProgBase.defaultLPsolver, duals=true)
 
 # Test LP fallback for conics
 include("linproginterface.jl")
