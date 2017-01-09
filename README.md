@@ -1,8 +1,8 @@
 # MathProgBase
 
 [![Build Status](https://travis-ci.org/JuliaOpt/MathProgBase.jl.svg?branch=master)](https://travis-ci.org/JuliaOpt/MathProgBase.jl)
-[![MathProgBase](http://pkg.julialang.org/badges/MathProgBase_0.3.svg)](http://pkg.julialang.org/?pkg=MathProgBase&ver=0.3)
-[![MathProgBase](http://pkg.julialang.org/badges/MathProgBase_0.4.svg)](http://pkg.julialang.org/?pkg=MathProgBase&ver=0.4)
+[![MathProgBase](http://pkg.julialang.org/badges/MathProgBase_0.5.svg)](http://pkg.julialang.org/?pkg=MathProgBase&ver=0.5)
+[![MathProgBase](http://pkg.julialang.org/badges/MathProgBase_0.6.svg)](http://pkg.julialang.org/?pkg=MathProgBase&ver=0.6)
 
 This package provides high-level one-shot functions for linear and mixed-intege
 programming (``linprog`` and ``mixintprog``), as well as a solver-independent
