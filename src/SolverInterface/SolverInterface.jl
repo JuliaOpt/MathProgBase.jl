@@ -1,7 +1,6 @@
 module SolverInterface
 
 using Base.Meta
-using Compat
 
 const methods_by_tag = Dict{Symbol,Vector{Symbol}}()
 
