@@ -8,7 +8,7 @@ end
 
 typealias SymbolInputVector Union{Vector{Symbol},Symbol}
 
-function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::SymbolInputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultMIPsolver)
+function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::SymbolInputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultMIPsolver())
     m = LinearQuadraticModel(solver)
     nrow,ncol = size(A)
 
@@ -59,7 +59,7 @@ function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub
     end
 end
 
-mixintprog(c,A,rowlb,rowub,vartypes,solver::AbstractMathProgSolver=defaultMIPsolver) = mixintprog(c,A,rowlb,rowub,vartypes,0,Inf,solver)
+mixintprog(c,A,rowlb,rowub,vartypes,solver::AbstractMathProgSolver=defaultMIPsolver()) = mixintprog(c,A,rowlb,rowub,vartypes,0,Inf,solver)
 
 export mixintprog
 

@@ -2,7 +2,7 @@ using Base.Test
 using MathProgBase
 using MathProgBase.SolverInterface
 
-function quadprogtest(solver=MathProgBase.defaultQPsolver)
+function quadprogtest(solver=MathProgBase.defaultQPsolver())
     println("Testing quadprog with solver ", string(typeof(solver)))
 
     sol = quadprog([0., 0., 0.],[2. 1. 0.; 1. 2. 1.; 0. 1. 2.],[1. 2. 3.; 1. 1. 0.],'>',[4., 1.],-Inf,Inf,solver)

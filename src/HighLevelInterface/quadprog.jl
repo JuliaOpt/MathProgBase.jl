@@ -6,7 +6,7 @@ type QuadprogSolution
     attrs
 end
 
-function quadprog(c::InputVector, Q::AbstractMatrix, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultQPsolver)
+function quadprog(c::InputVector, Q::AbstractMatrix, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultQPsolver())
     m = LinearQuadraticModel(solver)
     nrow,ncol = size(A)
 
@@ -56,6 +56,6 @@ function quadprog(c::InputVector, Q::AbstractMatrix, A::AbstractMatrix, rowlb::I
     end
 end
 
-quadprog(c,Q,A,rowlb,rowub,solver::AbstractMathProgSolver=defaultQPsolver) = quadprog(c,Q,A,rowlb,rowub,0,Inf,solver)
+quadprog(c,Q,A,rowlb,rowub,solver::AbstractMathProgSolver=defaultQPsolver()) = quadprog(c,Q,A,rowlb,rowub,0,Inf,solver)
 
 export quadprog
