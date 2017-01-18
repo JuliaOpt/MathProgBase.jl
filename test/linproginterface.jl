@@ -192,11 +192,98 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
         @test getconstrLB(m)[i] <= getconstrsolution(m)[i] + eps
         @test getconstrsolution(m)[i] <= getconstrUB(m)[i] + eps
     end
+
+
+    #####################################
+    # Start from simple LP
+    # Solve it
+    # Copy and solve again
+    # Chg coeff, solve, change back solve
+    # del constr and solve
+    # del var and solve
+
+    #   maximize x + y
+    #
+    #   s.t. 2 x + 1 y <= 4
+    #        1 x + 2 y <= 4
+    #        x >= 0, y >= 0
+    #
+    #   solution: x = 1.3333333, y = 1.3333333, objv = 2.66666666
+
+    m = LinearQuadraticModel(solver)
+
+    loadproblem!(m, [ 2.0 1.0 ; 1.0 2.0 ], [0.0,0.0], [Inf,Inf], [1.0, 1.0], [-Inf, -Inf], [4.0,4.0], :Max)
+
+    optimize!(m)
+    @test status(m) == :Optimal
+    @show m
+    @test_approx_eq_eps getobjval(m) 2.6666666666 eps
+    @test_approx_eq_eps getsolution(m) [1.3333333333, 1.3333333333] eps
+
+    # copy and solve again
+
+    if applicable(copy, m)
+        m2 = copy(m)
+        optimize!(m2)
+        @test status(m2) == :Optimal
+        @test_approx_eq_eps getobjval(m2) 2.6666666666 eps
+        @test_approx_eq_eps getsolution(m2) [1.3333333333, 1.3333333333] eps
+    end
+
+
+    # change coeff
+    #   maximize x + y
+    #
+    #   s.t. 2 x + 2 y <= 4
+    #        1 x + 2 y <= 4
+    #        x >= 0, y >= 0
+    #
+    #   solution: x = 0, y = 2, objv = 2
+    if applicable(changecoeffs!, m, [1], [2],  [2.])
+        changecoeffs!(m, [1], [2],  [2.])
+        optimize!(m)
+        @test status(m) == :Optimal
+        @test_approx_eq_eps getobjval(m) 2.0 eps
+        @test_approx_eq_eps getsolution(m) [0.0, 2.0] eps
+    end
+
+
+    # delconstrs and solve
+    #   maximize x + y
+    #
+    #   s.t. 1 x + 2 y <= 4
+    #        x >= 0, y >= 0
+    #
+    #   solution: x = 4, y = 0, objv = 4
+    if applicable(delconstrs!, m, [1])
+        delconstrs!(m, [1])
+        optimize!(m)
+        @test status(m) == :Optimal
+        @test_approx_eq_eps getobjval(m) 4.0 eps
+        @test_approx_eq_eps getsolution(m) [4.0, 0.0] eps
+    end
+
+    # delvars and solve
+    #   maximize y
+    #
+    #   s.t.  2 y <= 4
+    #           y >= 0
+    #
+    #   solution: y = 2, objv = 2
+    if applicable(delvars!, m, [1])
+        delvars!(m, [1])
+        optimize!(m)
+        @test status(m) == :Optimal
+        @test_approx_eq_eps getobjval(m) 2.0 eps
+        @test_approx_eq_eps getsolution(m) [2.0] eps
+    end
+
+
 end
 
 
 
-function linprogsolvertestextra(solver::AbstractMathProgSolver)
+function linprogsolvertestextra(solver::AbstractMathProgSolver; eps = Base.rtoldefault(Float64))
     ####################################
     # test setconstrLB! and setconstrUB!
     # Test that:
@@ -290,7 +377,7 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver)
     #   Modifying lower bound works
     #   Modifying upper bound works
     #   Setting upper and lower bound to same value works
-    #
+    
 
     m = LinearQuadraticModel(solver)
     # Min  x - y

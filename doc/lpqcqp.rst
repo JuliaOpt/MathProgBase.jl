@@ -93,6 +93,13 @@ to indicate equality constraints.
     objective coefficient ``objcoef``. This is equivalent to calling the
     above method with empty arrays for the constraint coefficients.
 
+.. function:: delvars!(m::AbstractLinearQuadraticModel, idxs)
+
+    Removes the variables with indices in the vector idxs. The remaining variables in the model
+    are renumbered. Let, for example, before deletion there be six variables with indices 
+    1, 2, 3, 4, 5, 6, suppose we delete indices 1, 2, and 4, then there will be 3 variables remaining
+    in the model, those which were previously numbered 3, 5, and 6. Now these 3 remaining variable
+    respectly have indices 1, 2 and 3.
 
 .. function:: addconstr!(m::AbstractLinearQuadraticModel, varidx, coef, lb, ub)
 
@@ -101,6 +108,20 @@ to indicate equality constraints.
     are specified in a sparse format: the ``coef`` vector contains the nonzero
     coefficients, and the ``varidx`` vector contains the indices of the corresponding
     variables.
+
+.. function:: delconstrs!(m::AbstractLinearQuadraticModel, idxs)
+
+    Removes the constraints with indices in the vector idxs. The remaining constraints in the model
+    are renumbered. Let, for example, before deletion there be six constraints with indices 
+    1, 2, 3, 4, 5, 6, suppose we delete indices 1, 2, and 4, then there will be 3 constraints remaining
+    in the model, those which were previously numbered 3, 5, and 6. Now these 3 remaining constraints 
+    respectly have indices 1, 2 and 3.
+
+.. function:: changecoeffs!(m::AbstractLinearQuadraticModel, cidxs, vidxs, val)
+
+    Changes multiple coefficients in the A matrix. Coefficients to be changed are the ones with 
+    constraint, variables and values indexed, respectively, in the vectors cidxs, vidxs and val.
+    All the vectors must have the same size.
 
 .. function:: numlinconstr(m::AbstractLinearQuadraticModel)
 

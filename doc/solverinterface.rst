@@ -107,6 +107,10 @@ All abstract model types inherit from the abstract type ``AbstractMathProgModel`
     with licensing restrictions on the number of concurrent runs.
     Users must discard the model object after this method is invoked.
 
+.. function:: copy(m::AbstractMathProgModel)
+
+    Copies the model m by replicating the solver internal model, callbacks are not copied.
+
 .. function:: setvartype!(m::AbstractMathProgModel, v::Vector{Symbol})
 
     Sets the types of the variables to those indicated by the vector ``v``. Valid

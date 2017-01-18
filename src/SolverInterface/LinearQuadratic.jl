@@ -14,8 +14,11 @@ export AbstractLinearQuadraticModel
     setconstrLB!
     setconstrUB!
     setobj!
+    changecoeffs!
     addvar!
+    delvars!
     addconstr!
+    delconstrs!
     addsos1!
     addsos2!
     writeproblem
