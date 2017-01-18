@@ -98,7 +98,7 @@ to indicate equality constraints.
     Removes the variables with indices in the vector idxs. The remaining variables in the model
     are renumbered. Let, for example, before deletion there be six variables with indices 
     1, 2, 3, 4, 5, 6, suppose we delete indices 1, 2, and 4, then there will be 3 variables remaining
-    in the model, those which were previously numbered 3, 5, and 6. Now these 3 remaining variable
+    in the model, those which were previously numbered 3, 5, and 6. Now these 3 remaining variables
     respectly have indices 1, 2 and 3.
 
 .. function:: addconstr!(m::AbstractLinearQuadraticModel, varidx, coef, lb, ub)
