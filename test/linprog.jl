@@ -1,7 +1,7 @@
 using Base.Test
 using MathProgBase
 
-function linprogtest(solver=MathProgBase.defaultLPsolver; objtol = 1e-7, primaltol = 1e-6)
+function linprogtest(solver=MathProgBase.defaultLPsolver(); objtol = 1e-7, primaltol = 1e-6)
     println("Testing linprog and subfunctions with solver ", string(typeof(solver)))
     # min -x
     # s.t. 2x + y <= 1.5

@@ -1,7 +1,7 @@
 using Base.Test
 using MathProgBase
 
-function mixintprogtest(solver=MathProgBase.defaultMIPsolver)
+function mixintprogtest(solver=MathProgBase.defaultMIPsolver())
     println("Testing mixintprog with solver ", string(typeof(solver)))
 
     # integer knapsack problem

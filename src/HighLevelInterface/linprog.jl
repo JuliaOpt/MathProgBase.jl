@@ -18,7 +18,7 @@ function expandvec(x,len::Integer)
     end
 end
 
-function buildlp(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver)
+function buildlp(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver())
     m = LinearQuadraticModel(solver)
     nrow,ncol = size(A)
 
@@ -91,13 +91,13 @@ function solvelp(m)
     end
 end
 
-function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver)
+function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver())
     m = buildlp(c, A, rowlb, rowub, lb, ub, solver)
     return solvelp(m)
 end
 
-linprog(c,A,rowlb,rowub, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver) = linprog(c,A,rowlb,rowub,0,Inf, solver)
+linprog(c,A,rowlb,rowub, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver()) = linprog(c,A,rowlb,rowub,0,Inf, solver)
 
-buildlp(c,A,rowlb,rowub, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver) = buildlp(c,A,rowlb,rowub,0,Inf, solver)
+buildlp(c,A,rowlb,rowub, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver()) = buildlp(c,A,rowlb,rowub,0,Inf, solver)
 
 export linprog, buildlp, solvelp
