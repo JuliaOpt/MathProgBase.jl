@@ -68,6 +68,9 @@ function optimize!(model::NonlinearToLPQPBridge)
     if any(model.vartypes .!= :Cont)
         setvartype!(model.nlpmodel, model.vartypes)
     end
+    if length(model.warmstart) > 0
+        setwarmstart!(model.nlpmodel, model.warmstart)
+    end
     optimize!(model.nlpmodel)
 end
 
@@ -83,6 +86,7 @@ numlinconstr(model::NonlinearToLPQPBridge) = size(model.LPdata[1],1)
 numquadconstr(model::NonlinearToLPQPBridge) = length(model.Qconstr)
 
 setvartype!(model::NonlinearToLPQPBridge,vartypes::Vector{Symbol}) = (model.vartypes = vartypes)
+setwarmstart!(model::NonlinearToLPQPBridge,v) = (model.warmstart = v)
 
 function getconstrsolution(model::NonlinearToLPQPBridge)
     x = getsolution(model)
