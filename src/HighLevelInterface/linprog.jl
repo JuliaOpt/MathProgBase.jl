@@ -18,7 +18,18 @@ function expandvec(x,len::Integer)
     end
 end
 
-function buildlp(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver)
+function no_lp_solver()
+    error("""
+          A linear programming solver must be specified as the final argument.
+
+          You can use any solver listed on the solvers table of http://www.juliaopt.org/ that has a checkmark in the Linear/Quadratic column.
+
+          A (free) example is Clp.jl. Once Clp is installed and imported via "using Clp", you can specify ClpSolver() as the solver.
+          Solver options are specified by using keyword arguments to ClpSolver().
+          """)
+end
+
+function buildlp(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver)
     m = LinearQuadraticModel(solver)
     nrow,ncol = size(A)
 
@@ -91,13 +102,17 @@ function solvelp(m)
     end
 end
 
-function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver)
+function linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver)
     m = buildlp(c, A, rowlb, rowub, lb, ub, solver)
     return solvelp(m)
 end
 
-linprog(c,A,rowlb,rowub, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver) = linprog(c,A,rowlb,rowub,0,Inf, solver)
+linprog(c,A,rowlb,rowub, solver::AbstractMathProgSolver) = linprog(c,A,rowlb,rowub,0,Inf, solver)
 
-buildlp(c,A,rowlb,rowub, solver::AbstractMathProgSolver = MathProgBase.defaultLPsolver) = buildlp(c,A,rowlb,rowub,0,Inf, solver)
+buildlp(c,A,rowlb,rowub, solver::AbstractMathProgSolver) = buildlp(c,A,rowlb,rowub,0,Inf, solver)
+
+# Old versions
+linprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector) = no_lp_solver()
+linprog(c,A,rowlb,rowub) = no_lp_solver()
 
 export linprog, buildlp, solvelp

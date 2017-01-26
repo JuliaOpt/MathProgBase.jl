@@ -20,7 +20,7 @@ where:
 *    ``b`` is the right-hand side vector
 *    ``l`` is the vector of lower bounds on the variables
 *    ``u`` is the vector of upper bounds on the variables, and
-*    ``solver`` is an *optional* parameter specifying the desired solver, see :ref:`choosing solvers <choosing-solvers>`. If this parameter is not provided, the default solver is used.
+*    ``solver`` specifies the desired solver, see :ref:`choosing solvers <choosing-solvers>`.
  
 A scalar is accepted for the ``b``, ``sense``, ``l``, and ``u`` arguments, in which case its value is replicated. The values ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound.
 
@@ -55,9 +55,9 @@ We can solve the three-dimensional QP (see ``test/quadprog.jl``):
 
 by::
 
-    using MathProgBase
+    using MathProgBase, Ipopt
     
-    sol = quadprog([0., 0., 0.],[2. 1. 0.; 1. 2. 1.; 0. 1. 2.],[1. 2. 3.; 1. 1. 0.],'>',[4., 1.],-Inf,Inf)
+    sol = quadprog([0., 0., 0.],[2. 1. 0.; 1. 2. 1.; 0. 1. 2.],[1. 2. 3.; 1. 1. 0.],'>',[4., 1.],-Inf,Inf, IpoptSolver())
     if sol.status == :Optimal
         println("Optimal objective value is $(sol.objval)")
         println("Optimal solution vector is: [$(sol.sol[1]), $(sol.sol[2]), $(sol.sol[3])]")

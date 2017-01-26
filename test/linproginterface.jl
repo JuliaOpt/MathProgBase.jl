@@ -216,7 +216,6 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
 
     optimize!(m)
     @test status(m) == :Optimal
-    @show m
     @test_approx_eq_eps getobjval(m) 2.6666666666 eps
     @test_approx_eq_eps getsolution(m) [1.3333333333, 1.3333333333] eps
 
