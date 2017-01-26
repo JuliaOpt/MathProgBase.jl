@@ -8,7 +8,18 @@ end
 
 typealias SymbolInputVector Union{Vector{Symbol},Symbol}
 
-function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::SymbolInputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultMIPsolver)
+function no_mip_solver()
+    error("""
+          An integer programming solver must be specified as the final argument.
+
+          You can use any solver listed on the solvers table of http://www.juliaopt.org/ that has checkmarks in both the Linear/Quadratic and Integer columns.
+
+          A (free) example is Cbc.jl. Once Cbc is installed and imported via "using Cbc", you can specify CbcSolver() as the solver.
+          Solver options are specified by using keyword arguments to CbcSolver().
+          """)
+end
+
+function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::SymbolInputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver)
     m = LinearQuadraticModel(solver)
     nrow,ncol = size(A)
 
@@ -59,7 +70,11 @@ function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub
     end
 end
 
-mixintprog(c,A,rowlb,rowub,vartypes,solver::AbstractMathProgSolver=defaultMIPsolver) = mixintprog(c,A,rowlb,rowub,vartypes,0,Inf,solver)
+mixintprog(c,A,rowlb,rowub,vartypes,solver::AbstractMathProgSolver) = mixintprog(c,A,rowlb,rowub,vartypes,0,Inf,solver)
+
+# Old versions
+mixintprog(c,A,rowlb,rowub,vartypes) = no_mip_solver()
+mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::SymbolInputVector, lb::InputVector, ub::InputVector) = no_mip_solver()
 
 export mixintprog
 

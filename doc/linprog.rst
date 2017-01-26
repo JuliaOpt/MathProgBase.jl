@@ -19,7 +19,7 @@ where:
 *    ``b`` is the right-hand side vector
 *    ``l`` is the vector of lower bounds on the variables
 *    ``u`` is the vector of upper bounds on the variables, and
-*    ``solver`` is an *optional* parameter specifying the desired solver, see :ref:`choosing solvers <choosing-solvers>`. If this parameter is not provided, the default solver is used.
+*    ``solver`` specifies the desired solver, see :ref:`choosing solvers <choosing-solvers>`.
 
 A scalar is accepted for the ``b``, ``sense``, ``l``, and ``u`` arguments, in which case its value is replicated. The values ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound.
 
@@ -65,9 +65,9 @@ For example, we can solve the two-dimensional problem (see ``test/linprog.jl``):
 
 by::
 
-    using MathProgBase
+    using MathProgBase, Clp
 
-    sol = linprog([-1,0],[2 1],'<',1.5)
+    sol = linprog([-1,0],[2 1],'<',1.5, ClpSolver())
     if sol.status == :Optimal
         println("Optimal objective value is $(sol.objval)")
         println("Optimal solution vector is: [$(sol.sol[1]), $(sol.sol[2])]")
@@ -93,7 +93,7 @@ where:
 *    ``ub`` is the vector of row upper bounds
 *    ``l`` is the vector of lower bounds on the variables
 *    ``u`` is the vector of upper bounds on the variables, and
-*    ``solver`` is an *optional* parameter specifying the desired solver, see :ref:`choosing solvers <choosing-solvers>`. If this parameter is not provided, the default solver is used.
+*    ``solver`` specifies the desired solver, see :ref:`choosing solvers <choosing-solvers>`.
 
 A scalar is accepted for the ``l``, ``u``, ``lb``, and ``ub`` arguments, in which case its value is replicated. The values ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound. Equality constraints are specified by setting the row lower and upper bounds to the same value.
 
@@ -114,7 +114,7 @@ Builds the linear programming problem as defined in ``linprog`` and accepts the 
 *    ``b`` is the right-hand side vector
 *    ``l`` is the vector of lower bounds on the variables
 *    ``u`` is the vector of upper bounds on the variables, and
-*    ``solver`` is an *optional* parameter specifying the desired solver, see :ref:`choosing solvers <choosing-solvers>`. If this parameter is not provided, the default solver is used.
+*    ``solver`` specifies the desired solver, see :ref:`choosing solvers <choosing-solvers>`.
 
 A scalar is accepted for the ``b``, ``sense``, ``l``, and ``u`` arguments, in which case its value is replicated. The values ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound.
 
@@ -128,7 +128,7 @@ This variant of ``buildlp`` allows to specify two-sided linear constraints (also
 *    ``ub`` is the vector of row upper bounds
 *    ``l`` is the vector of lower bounds on the variables
 *    ``u`` is the vector of upper bounds on the variables, and
-*    ``solver`` is an *optional* parameter specifying the desired solver, see :ref:`choosing solvers <choosing-solvers>`. If this parameter is not provided, the default solver is used.
+*    ``solver`` specifies the desired solver, see :ref:`choosing solvers <choosing-solvers>`.
 
 A scalar is accepted for the ``l``, ``u``, ``lb``, and ``ub`` arguments, in which case its value is replicated. The values ``-Inf`` and ``Inf`` are interpreted to mean that there is no corresponding lower or upper bound. Equality constraints are specified by setting the row lower and upper bounds to the same value.
 

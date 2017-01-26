@@ -1,18 +1,20 @@
-# test default solvers
+using GLPKMathProgInterface, Ipopt, ECOS
 
 include("linprog.jl")
-linprogtest()
+linprogtest(GLPKSolverLP())
 
 include("mixintprog.jl")
-mixintprogtest()
+mixintprogtest(GLPKSolverMIP())
 
 include("quadprog.jl")
-quadprogtest()
+quadprogtest(IpoptSolver())
 
-# Test conic fallback for LPs
 include("conicinterface.jl")
-coniclineartest(MathProgBase.defaultLPsolver, duals=true)
+coniclineartest(ECOSSolver(), duals=true)
+# Test conic fallback for LPs
+coniclineartest(GLPKSolverLP(), duals=true)
 
-# Test LP fallback for conics
 include("linproginterface.jl")
-linprogsolvertest(MathProgBase.defaultConicsolver)
+linprogsolvertest(GLPKSolverLP())
+# Test LP fallback for conics
+linprogsolvertest(ECOSSolver())

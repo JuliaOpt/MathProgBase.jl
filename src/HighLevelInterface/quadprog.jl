@@ -6,7 +6,18 @@ type QuadprogSolution
     attrs
 end
 
-function quadprog(c::InputVector, Q::AbstractMatrix, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver = MathProgBase.defaultQPsolver)
+function no_qp_solver()
+    error("""
+          A quadratic programming solver must be specified as the final argument.
+
+          You can use some of the solvers listed on the solvers table of http://www.juliaopt.org/ that has a checkmark the Linear/Quadratic column. See the solver's documentation to confirm that it supports quadratic objectives.
+
+          A (free) example is Ipopt.jl. Once Ipopt is installed and imported via "using Ipopt", you can specify IpoptSolver() as the solver.
+          Solver options are specified by using keyword arguments to IpoptSolver().
+          """)
+end
+
+function quadprog(c::InputVector, Q::AbstractMatrix, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver)
     m = LinearQuadraticModel(solver)
     nrow,ncol = size(A)
 
@@ -56,6 +67,12 @@ function quadprog(c::InputVector, Q::AbstractMatrix, A::AbstractMatrix, rowlb::I
     end
 end
 
-quadprog(c,Q,A,rowlb,rowub,solver::AbstractMathProgSolver=defaultQPsolver) = quadprog(c,Q,A,rowlb,rowub,0,Inf,solver)
+quadprog(c,Q,A,rowlb,rowub,solver::AbstractMathProgSolver) = quadprog(c,Q,A,rowlb,rowub,0,Inf,solver)
+
+# Old versions
+quadprog(c,Q,A,rowlb,rowub) = no_qp_solver()
+quadprog(c::InputVector, Q::AbstractMatrix, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, lb::InputVector, ub::InputVector) = no_qp_solver()
+
+
 
 export quadprog
