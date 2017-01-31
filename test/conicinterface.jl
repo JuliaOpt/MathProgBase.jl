@@ -26,17 +26,17 @@ function coniclineartest(solver::MathProgBase.AbstractMathProgSolver;duals=false
     MathProgBase.loadproblem!(m, c, A, b, [(:Zero,1:2)], [(:NonNeg, 1:3)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @test_approx_eq_eps MathProgBase.getobjval(m) -11 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[2] 0.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 2.0 tol
+    @test isapprox(MathProgBase.getobjval(m), -11, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[1], 1.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[2], 0.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[3], 2.0, atol=tol)
     if duals
         d = MathProgBase.getdual(m)
-        @test_approx_eq_eps d[1] 3.0 tol
-        @test_approx_eq_eps d[2] 1.0 tol
+        @test isapprox(d[1], 3.0, atol=tol)
+        @test isapprox(d[2], 1.0, atol=tol)
         vardual = c + A'd
         var = MathProgBase.getvardual(m)
-        @test_approx_eq_eps vardual var tol
+        @test isapprox(vardual, var, atol=tol)
     end
 
     # Problem LIN1A - same as Problem LIN1, but with variable bounds
@@ -62,20 +62,20 @@ function coniclineartest(solver::MathProgBase.AbstractMathProgSolver;duals=false
     [(:Free, 1:3)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @test_approx_eq_eps MathProgBase.getobjval(m) -11 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[2] 0.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 2.0 tol
+    @test isapprox(MathProgBase.getobjval(m), -11, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[1], 1.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[2], 0.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[3], 2.0, atol=tol)
     if duals
         d = MathProgBase.getdual(m)
-        @test_approx_eq_eps d[1]  3.0 tol
-        @test_approx_eq_eps d[2]  1.0 tol
-        @test_approx_eq_eps d[3]  0.0 tol
-        @test_approx_eq_eps d[4] -2.0 tol
-        @test_approx_eq_eps d[5]  0.0 tol
+        @test isapprox(d[1], 3.0, atol=tol)
+        @test isapprox(d[2], 1.0, atol=tol)
+        @test isapprox(d[3], 0.0, atol=tol)
+        @test isapprox(d[4], -2.0, atol=tol)
+        @test isapprox(d[5], 0.0, atol=tol)
         vardual = c + A'd
         var = MathProgBase.getvardual(m)
-        @test_approx_eq_eps vardual var tol
+        @test isapprox(vardual, var, atol=tol)
     end
 
     # Problem LIN2 - mixed free, nonneg, nonpos, zero, shuffled cones
@@ -101,16 +101,16 @@ function coniclineartest(solver::MathProgBase.AbstractMathProgSolver;duals=false
     [(:Free,1), (:NonNeg,3), (:Zero,4), (:NonPos,2)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @test_approx_eq_eps MathProgBase.getobjval(m) -82 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[1] -4.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[2] -3.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 16.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[4]  0.0 tol
+    @test isapprox(MathProgBase.getobjval(m), -82, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[1], -4.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[2], -3.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[3], 16.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[4], 0.0, atol=tol)
     if duals
         d = MathProgBase.getdual(m)
-        @test_approx_eq_eps d[1] -7.0 tol
-        @test_approx_eq_eps d[2] -2.0 tol
-        @test_approx_eq_eps d[3]  4.0 tol
+        @test isapprox(d[1], -7.0, atol=tol)
+        @test isapprox(d[2], -2.0, atol=tol)
+        @test isapprox(d[3], 4.0, atol=tol)
     end
 
     # Problem LIN2A - Problem LIN2 but with y,z variable bounds as constraints
@@ -138,18 +138,18 @@ function coniclineartest(solver::MathProgBase.AbstractMathProgSolver;duals=false
     [(:Free,1), (:NonNeg,3), (:Zero,4), (:NonPos,2)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @test_approx_eq_eps MathProgBase.getobjval(m) -82 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[1] -4.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[2] -3.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 16.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[4]  0.0 tol
+    @test isapprox(MathProgBase.getobjval(m), -82, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[1], -4.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[2], -3.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[3], 16.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[4], 0.0, atol=tol)
     if duals
         d = MathProgBase.getdual(m)
-        @test_approx_eq_eps d[1] -7.0 tol
-        @test_approx_eq_eps d[2] -2.0 tol
-        @test_approx_eq_eps d[3]  4.0 tol
-        @test_approx_eq_eps d[4]  0.0 tol
-        @test_approx_eq_eps d[5]  0.0 tol
+        @test isapprox(d[1], -7.0, atol=tol)
+        @test isapprox(d[2], -2.0, atol=tol)
+        @test isapprox(d[3], 4.0, atol=tol)
+        @test isapprox(d[4], 0.0, atol=tol)
+        @test isapprox(d[5], 0.0, atol=tol)
     end
 
     # Problem LIN3 - Infeasible LP
@@ -176,7 +176,7 @@ function coniclineartest(solver::MathProgBase.AbstractMathProgSolver;duals=false
         y = MathProgBase.getdual(m)
         @test y[1] > 0
         @test y[2] < 0
-        @test_approx_eq_eps A'y zeros(1) tol
+        @test isapprox((A'y)[1], 0.0, atol=tol)
         @test -dot(b,y) > 0
     end
 
@@ -223,13 +223,13 @@ function conicSOCtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
     [(:SOC,1:3)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @test_approx_eq_eps MathProgBase.getobjval(m) -sqrt(2.0) tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[2] 1.0/sqrt(2.0) tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 1.0/sqrt(2.0) tol
+    @test isapprox(MathProgBase.getobjval(m), -sqrt(2.0), atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[1], 1.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[2], 1.0/sqrt(2.0), atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[3], 1.0/sqrt(2.0), atol=tol)
     if duals
         d = MathProgBase.getdual(m)
-        @test_approx_eq_eps d[1] sqrt(2.0) tol
+        @test isapprox(d[1], sqrt(2.0), atol=tol)
     end
 
 
@@ -252,16 +252,16 @@ function conicSOCtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
     [(:Free,1:3)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @test_approx_eq_eps MathProgBase.getobjval(m) -sqrt(2.0) tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[2] 1.0/sqrt(2.0) tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 1.0/sqrt(2.0) tol
+    @test isapprox(MathProgBase.getobjval(m), -sqrt(2.0), atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[1], 1.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[2], 1.0/sqrt(2.0), atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[3], 1.0/sqrt(2.0), atol=tol)
     if duals
         d = MathProgBase.getdual(m)
-        @test_approx_eq_eps d[1] sqrt(2.0) tol
-        @test_approx_eq_eps d[2] sqrt(2.0) tol
-        @test_approx_eq_eps d[3] -1.0 tol
-        @test_approx_eq_eps d[4] -1.0 tol
+        @test isapprox(d[1], sqrt(2.0), atol=tol)
+        @test isapprox(d[2], sqrt(2.0), atol=tol)
+        @test isapprox(d[3], -1.0, atol=tol)
+        @test isapprox(d[4], -1.0, atol=tol)
     end
 
     # Problem SOC2
@@ -289,17 +289,17 @@ function conicSOCtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
     MathProgBase.loadproblem!(m, c, A, b, constr_cones, var_cones)
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @test_approx_eq_eps MathProgBase.getobjval(m) -1/sqrt(2) tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[1] -1/sqrt(2)  tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[2]  1/sqrt(2)  tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[3]  1.0  tol
+    @test isapprox(MathProgBase.getobjval(m), -1/sqrt(2), atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[1], -1/sqrt(2), atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[2], 1/sqrt(2), atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[3], 1.0, atol=tol)
 
     if duals
         y = MathProgBase.getdual(m)
-        @test_approx_eq_eps -dot(b,y) -1/sqrt(2) tol
-        @test_approx_eq_eps c + A'y zeros(3) tol
+        @test isapprox(-dot(b,y), -1/sqrt(2), atol=tol)
+        @test isapprox(norm(c + A'y), 0.0, atol=tol)
         s = MathProgBase.getvardual(m)
-        @test_approx_eq_eps s zeros(3) tol
+        @test isapprox(norm(s), 0.0, atol=tol)
     end
 
     # Problem SOC2A
@@ -324,17 +324,17 @@ function conicSOCtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
     MathProgBase.loadproblem!(m, c, A, b, constr_cones, var_cones)
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @test_approx_eq_eps MathProgBase.getobjval(m) -1/sqrt(2) tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[1] -1/sqrt(2)  tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[2]  1/sqrt(2)  tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[3]  1.0  tol
+    @test isapprox(MathProgBase.getobjval(m), -1/sqrt(2), atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[1], -1/sqrt(2), atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[2], 1/sqrt(2), atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[3], 1.0, atol=tol)
 
     if duals
         y = MathProgBase.getdual(m)
-        @test_approx_eq_eps -dot(b,y) -1/sqrt(2) tol
-        @test_approx_eq_eps c + A'y zeros(3) tol
+        @test isapprox(-dot(b,y), -1/sqrt(2), atol=tol)
+        @test isapprox(norm(c + A'y), 0.0, atol=tol)
         s = MathProgBase.getvardual(m)
-        @test_approx_eq_eps s zeros(3) tol
+        @test isapprox(norm(s), 0.0, atol=tol)
     end
 
     # Problem SOC3 - Infeasible
@@ -389,12 +389,12 @@ function conicSOCtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
         y = MathProgBase.getdual(m)
         s = MathProgBase.getvardual(m)
 
-        @test_approx_eq_eps dot(c,x) -dot(y,b) tol
+        @test isapprox(dot(c,x), -dot(y,b), atol=tol)
         @test x[1]^2 ≥ x[4]^2 + x[5]^2 - tol
         @test s[1]^2 ≥ s[4]^2 + s[5]^2 - tol
-        @test_approx_eq_eps s[2] 0.0 tol
-        @test_approx_eq_eps s[3] 0.0 tol
-        @test_approx_eq_eps (c+A'y) s tol
+        @test isapprox(s[2], 0.0, atol=tol)
+        @test isapprox(s[3], 0.0, atol=tol)
+        @test isapprox(norm((c+A'y) - s), 0.0, atol=tol)
     end
 end
 
@@ -413,18 +413,18 @@ function conicSOCRotatedtest(solver::MathProgBase.AbstractMathProgSolver;duals=f
     MathProgBase.loadproblem!(m,c,A,b,[(:Zero,1:2)],[(:SOCRotated,1:4)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @test_approx_eq_eps MathProgBase.getobjval(m) -sqrt(2.0) tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[1] 0.5 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[2] 1.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 1.0/sqrt(2.0) tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[4] 1.0/sqrt(2.0) tol
+    @test isapprox(MathProgBase.getobjval(m), -sqrt(2.0), atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[1], 0.5, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[2], 1.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[3], 1.0/sqrt(2.0), atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[4], 1.0/sqrt(2.0), atol=tol)
     if duals
         d = MathProgBase.getdual(m)
         dualobj = -dot(b,d)
-        @test_approx_eq_eps dualobj -sqrt(2.0) tol
+        @test isapprox(dualobj, -sqrt(2.0), atol=tol)
         @test all(d .>= 0)
         vardual = MathProgBase.getvardual(m)
-        @test_approx_eq_eps vardual (c+ A'd) tol
+        @test isapprox(norm(vardual - (c+ A'd)), 0.0, atol=tol)
         @test 2*vardual[1]*vardual[2] ≥ vardual[3]^2 + vardual[4]^2 - tol
     end
 
@@ -445,18 +445,18 @@ function conicSOCRotatedtest(solver::MathProgBase.AbstractMathProgSolver;duals=f
     [(:Free,1:2)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @test_approx_eq_eps MathProgBase.getobjval(m) -sqrt(2.0) tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0/sqrt(2.0) tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[2] 1.0/sqrt(2.0) tol
+    @test isapprox(MathProgBase.getobjval(m), -sqrt(2.0), atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[1], 1.0/sqrt(2.0), atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[2], 1.0/sqrt(2.0), atol=tol)
     if duals
         d = MathProgBase.getdual(m)
         @test 2*d[1]*d[2] ≥ d[3]^2 + d[4]^2 - tol
         dualobj = -dot(b,d)
-        @test_approx_eq_eps dualobj -sqrt(2.0) tol
+        @test isapprox(dualobj, -sqrt(2.0), atol=tol)
 
         vardual = MathProgBase.getvardual(m)
-        @test_approx_eq_eps vardual (c+ A'd) tol
-        @test_approx_eq_eps vardual zeros(2) tol
+        @test isapprox(norm(vardual - (c+ A'd)), 0.0, atol=tol)
+        @test isapprox(norm(vardual), 0.0, atol=tol)
     end
 
     # Problem SOCRotated2 - Infeasible
@@ -488,7 +488,7 @@ function conicSOCRotatedtest(solver::MathProgBase.AbstractMathProgSolver;duals=f
         @test y[1] > 0
         @test y[2] < 0
         vardual = MathProgBase.getvardual(m)
-        @test_approx_eq_eps A'y vardual tol
+        @test isapprox(norm(A'y-vardual), 0.0, atol=tol)
         @test 2*vardual[1]*vardual[2] ≥ vardual[3]^2
         @test -dot(b,y) > 0
     end
@@ -512,10 +512,10 @@ function conicSOCINTtest(solver::MathProgBase.AbstractMathProgSolver;tol=1e-6)
     MathProgBase.setvartype!(m, [:Cont,:Bin,:Bin])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @test_approx_eq_eps MathProgBase.getobjval(m) -2 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[2] 1.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 0.0 tol
+    @test isapprox(MathProgBase.getobjval(m), -2, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[1], 1.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[2], 1.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[3], 0.0, atol=tol)
 end
 
 
@@ -537,20 +537,20 @@ function conicEXPtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
     [(:ExpPrimal, 1:3)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @test_approx_eq_eps MathProgBase.getobjval(m) (2*exp(1/2)+3) tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[2] 2.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 2*exp(1/2) tol
+    @test isapprox(MathProgBase.getobjval(m), (2*exp(1/2)+3), atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[1], 1.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[2], 2.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[3], 2*exp(1/2), atol=tol)
 
     if duals
         d = MathProgBase.getdual(m)
-        @test_approx_eq_eps -dot(b,d) MathProgBase.getobjval(m) tol
+        @test isapprox(-dot(b,d), MathProgBase.getobjval(m), atol=tol)
         u,v,w = c+A'd
         # should belong to the ExpDual cone
         @test u < 0
         @test -u*exp(v/w) ≤ exp(1)*w + tol
         s = MathProgBase.getvardual(m)
-        @test_approx_eq_eps s c+A'd tol
+        @test isapprox(norm(s - (c+A'd)), 0.0, atol=tol)
     end
 
     # Problem EXP1A - ExpPrimal
@@ -569,21 +569,21 @@ function conicEXPtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
     [(:Free, 1:3)])
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
-    @test_approx_eq_eps MathProgBase.getobjval(m) (2*exp(1/2)+3) tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[1] 1.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[2] 2.0 tol
-    @test_approx_eq_eps MathProgBase.getsolution(m)[3] 2*exp(1/2) tol
+    @test isapprox(MathProgBase.getobjval(m), (2*exp(1/2)+3), atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[1], 1.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[2], 2.0, atol=tol)
+    @test isapprox(MathProgBase.getsolution(m)[3], 2*exp(1/2), atol=tol)
 
     if duals
         d = MathProgBase.getdual(m)
-        @test_approx_eq_eps -dot(b,d) MathProgBase.getobjval(m) tol
-        @test_approx_eq_eps c+A'd zeros(3) tol
+        @test isapprox(-dot(b,d), MathProgBase.getobjval(m), atol=tol)
+        @test isapprox(norm(c+A'd), 0.0, atol=tol)
         u,v,w = d[3:5]
         # should belong to the ExpDual cone
         @test u < 0
         @test -u*exp(v/w) ≤ exp(1)*w + tol
         s = MathProgBase.getvardual(m)
-        @test_approx_eq_eps s zeros(3) tol
+        @test isapprox(norm(s), 0.0, atol=tol)
     end
 
     # Problem EXP2
@@ -610,21 +610,21 @@ function conicEXPtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
         conval = b-A*primalsol
         @test conval[3] + tol ≥ conval[2]*exp(conval[1]/conval[2])
         @test conval[6] + tol ≥ conval[5]*exp(conval[4]/conval[5])
-        @test_approx_eq_eps conval[7] 0.0 tol
+        @test isapprox(conval[7], 0.0, atol=tol)
         for i in 8:14
             @test conval[i] ≥ -tol
         end
 
-        @test_approx_eq_eps conval[15] 0.0 tol
+        @test isapprox(conval[15], 0.0, atol=tol)
 
         y = MathProgBase.getdual(m)
         dualobj = -dot(b,y)
-        @test_approx_eq_eps primalobj dualobj tol
+        @test isapprox(primalobj, dualobj, atol=tol)
         dualconval = c + A'*y
         var = MathProgBase.getvardual(m)
-        @test_approx_eq_eps dualconval var tol
+        @test isapprox(dualconval, var, atol=tol)
         for i in 1:9
-            @test_approx_eq_eps dualconval[i] 0.0 tol
+            @test isapprox(dualconval[i], 0.0, atol=tol)
         end
         if y[1] == 0.0
             @test y[2] ≥ -tol
@@ -674,12 +674,12 @@ function conicEXPtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
 
         y = MathProgBase.getdual(m)
         dualobj = -dot(b,y)
-        @test_approx_eq_eps primalobj dualobj tol
+        @test isapprox(primalobj, dualobj, atol=tol)
         dualconval = c + A'*y
         var = MathProgBase.getvardual(m)
-        @test_approx_eq_eps dualconval var tol
+        @test isapprox(norm(dualconval - var), 0.0, atol=tol)
         for i in 1:2
-            @test_approx_eq_eps dualconval[1] 0.0 tol
+            @test isapprox(dualconval[1], 0.0, atol=tol)
         end
         @test y[1] ≥ -tol
         @test -y[2]*log(-y[2]/y[4]) + y[2] - y[3] ≤ tol
@@ -731,7 +731,7 @@ function conicSDPtest(solver::MathProgBase.AbstractMathProgSolver;duals=true, to
     MathProgBase.optimize!(m)
     @test MathProgBase.status(m) == :Optimal
     pobj = MathProgBase.getobjval(m)
-    @test_approx_eq_eps pobj 7.05710509e-01 tol
+    @test isapprox(pobj, 7.05710509e-01, atol=tol)
 
     xx = MathProgBase.getsolution(m)
     x123 = xx[1:3]
@@ -743,12 +743,12 @@ function conicSDPtest(solver::MathProgBase.AbstractMathProgSolver;duals=true, to
         comp_pobj = dot(X,[2.0,s2,0.0, 2.0,s2, 2.0]) + x123[1]
         # Check dual objective
         comp_dobj = -dot(y,b)
-        @test_approx_eq_eps comp_pobj comp_dobj tol
+        @test isapprox(comp_pobj, comp_dobj, atol=tol)
 
         var = c + A' * y
         @test (var[2]^2 + var[3]^2 - var[1]^2) < tol # (var[1],var[2],var[3]) in SOC
         s = MathProgBase.getvardual(m)
-        @test_approx_eq_eps var s tol
+        @test isapprox(norm(var - s), 0.0, atol=tol)
 
         M = [s[4]    s[5]/s2 s[6]/s2
              s[5]/s2 s[7]    s[8]/s2
@@ -784,7 +784,7 @@ function conicSDPtest(solver::MathProgBase.AbstractMathProgSolver;duals=true, to
     @test eigmin([con[8] con[9]/s2 ; con[9]/s2 con[10]]) > -tol
     @test con[1] >= -tol
     @test all(con[2:7] .<= tol)
-    @test_approx_eq_eps con[11] 0. tol
+    @test isapprox(con[11], 0.0, atol=tol)
     
     if duals
         y = MathProgBase.getdual(m)
@@ -793,10 +793,10 @@ function conicSDPtest(solver::MathProgBase.AbstractMathProgSolver;duals=true, to
         @test all(y[2:7] .<= tol)
         var = c + A' * y
         @test all(var[1:6] .>= -tol)
-        @test_approx_eq_eps var[7] 0.0 tol
+        @test isapprox(var[7], 0.0, atol=tol)
         dobj = -dot(y,b)
-        @test_approx_eq_eps pobj dobj tol
+        @test isapprox(pobj, dobj, atol=tol)
         s = MathProgBase.getvardual(m)
-        @test_approx_eq_eps s var tol
+        @test isapprox(norm(s - var), 0.0, atol=tol)
     end
 end
