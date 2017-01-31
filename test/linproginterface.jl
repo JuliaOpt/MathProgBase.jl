@@ -22,11 +22,11 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
 
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq_eps getobjval(m) -1 eps
-    @test_approx_eq_eps getsolution(m) [1.0, 0.0] eps
-    @test_approx_eq_eps getconstrsolution(m) [1.0] eps
-    @test_approx_eq_eps getconstrduals(m) [-1.0] eps
-    @test_approx_eq_eps getreducedcosts(m) [0.0, 1.0] eps
+    @test isapprox(getobjval(m), -1, atol=eps)
+    @test isapprox(norm(getsolution(m) - [1.0, 0.0]), 0.0, atol=eps)
+    @test isapprox(getconstrsolution(m)[1], 1.0, atol=eps)
+    @test isapprox(getconstrduals(m)[1], -1.0, atol=eps)
+    @test isapprox(norm(getreducedcosts(m) - [0.0, 1.0]), 0.0, atol=eps)
 
     setsense!(m, :Max)
     # max x
@@ -34,11 +34,11 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
     optimize!(m)
 
     @test status(m) == :Optimal
-    @test_approx_eq_eps getobjval(m) 1 eps
-    @test_approx_eq_eps getsolution(m) [1.0, 0.0] eps
-    @test_approx_eq_eps getconstrsolution(m) [1.0] eps
-    @test_approx_eq_eps getconstrduals(m) [1.0] eps
-    @test_approx_eq_eps getreducedcosts(m) [0.0, -1.0] eps
+    @test isapprox(getobjval(m), 1, atol=eps)
+    @test isapprox(norm(getsolution(m) - [1.0, 0.0]), 0.0, atol=eps)
+    @test isapprox(getconstrsolution(m)[1], 1.0, atol=eps)
+    @test isapprox(getconstrduals(m)[1], 1.0, atol=eps)
+    @test isapprox(norm(getreducedcosts(m) - [0.0, -1.0]), 0.0, atol=eps)
 
     # add new variable to get:
     # max x + 2z
@@ -52,17 +52,17 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
     optimize!(m)
 
     @test status(m) == :Optimal
-    @test_approx_eq_eps getobjval(m) 2 eps
-    @test_approx_eq_eps getsolution(m) [0.0, 0.0, 1.0] eps
-    @test_approx_eq_eps getconstrsolution(m) [1.0] eps
-    @test_approx_eq_eps getconstrduals(m) [2.0] eps
-    @test_approx_eq_eps getreducedcosts(m) [-1.0, -2.0, 0.0] eps
+    @test isapprox(getobjval(m), 2, atol=eps)
+    @test isapprox(norm(getsolution(m) - [0.0, 0.0, 1.0]), 0.0, atol=eps)
+    @test isapprox(getconstrsolution(m)[1], 1.0, atol=eps)
+    @test isapprox(getconstrduals(m)[1], 2.0, atol=eps)
+    @test isapprox(norm(getreducedcosts(m) - [-1.0, -2.0, 0.0]), 0.0, atol=eps)
 
     setvarLB!(m, [-1.0,0.0,0.0])
     optimize!(m)
 
     @test status(m) == :Optimal
-    @test_approx_eq_eps getobjval(m) 3 eps
+    @test isapprox(getobjval(m), 3, atol=eps)
 
     # fix z to zero
     setvarLB!(m, [0.0,0.0,0.0])
@@ -70,17 +70,17 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
     optimize!(m)
 
     @test status(m) == :Optimal
-    @test_approx_eq_eps getobjval(m) 1 eps
+    @test isapprox(getobjval(m), 1, atol=eps)
 
     setconstrUB!(m, [2.0])
     setconstrLB!(m, [2.0])
     optimize!(m)
-    @test_approx_eq_eps getobjval(m) 2 eps
+    @test isapprox(getobjval(m), 2, atol=eps)
 
     setobj!(m, [1.0, 2.0, 0.0])
     optimize!(m)
-    @test_approx_eq_eps getobjval(m) 4 eps
-    @test_approx_eq_eps getsolution(m) [0.0, 2.0, 0.0] eps
+    @test isapprox(getobjval(m), 4, atol=eps)
+    @test isapprox(norm(getsolution(m) - [0.0, 2.0, 0.0]), 0.0, atol=eps)
 
 
     # we now have:
@@ -93,10 +93,10 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
     optimize!(m)
 
     @test status(m) == :Optimal
-    @test_approx_eq_eps getobjval(m) 3 eps
-    @test_approx_eq_eps getsolution(m) [1.0, 1.0, 0.0] eps
-    @test_approx_eq_eps getconstrduals(m) [1.5, -0.5] eps
-    @test_approx_eq_eps getreducedcosts(m) [0.0, 0.0, -1.5] eps
+    @test isapprox(getobjval(m), 3, atol=eps)
+    @test isapprox(norm(getsolution(m) - [1.0, 1.0, 0.0]), 0.0, atol=eps)
+    @test isapprox(norm(getconstrduals(m) - [1.5, -0.5]), 0.0, atol=eps)
+    @test isapprox(norm(getreducedcosts(m) - [0.0, 0.0, -1.5]), 0.0, atol=eps)
 
 
     # test addvar! interface
@@ -121,11 +121,11 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
 
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq_eps getobjval(m) -1 eps
-    @test_approx_eq_eps getsolution(m) [1.0, 0.0] eps
-    @test_approx_eq_eps getconstrsolution(m) [1.0] eps
-    @test_approx_eq_eps getconstrduals(m) [-1.0] eps
-    @test_approx_eq_eps getreducedcosts(m) [0.0, 1.0] eps
+    @test isapprox(getobjval(m), -1, atol=eps)
+    @test isapprox(norm(getsolution(m) - [1.0, 0.0]), 0.0, atol=eps)
+    @test isapprox(getconstrsolution(m)[1], 1.0, atol=eps)
+    @test isapprox(getconstrduals(m)[1], -1.0, atol=eps)
+    @test isapprox(norm(getreducedcosts(m) - [0.0, 1.0]), 0.0, atol=eps)
 
 
     ####################################
@@ -147,8 +147,8 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
     optimize!(m)
 
     @test status(m) == :Optimal
-    @test_approx_eq_eps getobjval(m) 0.0 eps
-    @test_approx_eq_eps getsolution(m) [ 0.0, 0.0 ] eps
+    @test isapprox(getobjval(m), 0.0, atol=eps)
+    @test isapprox(norm(getsolution(m)), 0.0, atol=eps)
 
     # Min  x - y
     # s.t. 100.0 <= x
@@ -157,8 +157,8 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
     setconstrLB!(m,[100.0,-Inf])
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq_eps getobjval(m) 100.0 eps
-    @test_approx_eq_eps getsolution(m) [ 100.0, 0.0 ] eps
+    @test isapprox(getobjval(m), 100.0, atol=eps)
+    @test isapprox(norm(getsolution(m) - [ 100.0, 0.0 ]), 0.0, atol=eps)
 
     # Min  x - y
     # s.t. 100.0 <= x
@@ -167,8 +167,8 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
     setconstrUB!(m,[Inf,-100.0])
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq_eps getobjval(m) 200.0 eps
-    @test_approx_eq_eps getsolution(m) [ 100.0, -100.0 ] eps
+    @test isapprox(getobjval(m), 200.0, atol=eps)
+    @test isapprox(norm(getsolution(m) - [ 100.0, -100.0 ]), 0.0, atol=eps)
 
     # Test issue #40 from Gurobi.jl
     # min  x
@@ -216,8 +216,8 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
 
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq_eps getobjval(m) 2.6666666666 eps
-    @test_approx_eq_eps getsolution(m) [1.3333333333, 1.3333333333] eps
+    @test isapprox(getobjval(m), 2.6666666666, atol=eps)
+    @test isapprox(norm(getsolution(m) - [1.3333333333, 1.3333333333]), 0.0, atol=eps)
 
     # copy and solve again
 
@@ -225,8 +225,8 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
         m2 = copy(m)
         optimize!(m2)
         @test status(m2) == :Optimal
-        @test_approx_eq_eps getobjval(m2) 2.6666666666 eps
-        @test_approx_eq_eps getsolution(m2) [1.3333333333, 1.3333333333] eps
+        @test isapprox(getobjval(m2), 2.6666666666, atol=eps)
+        @test isapprox(norm(getsolution(m2) - [1.3333333333, 1.3333333333]), 0.0, atol=eps)
     end
 
 
@@ -242,8 +242,8 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
         changecoeffs!(m, [1], [2],  [2.])
         optimize!(m)
         @test status(m) == :Optimal
-        @test_approx_eq_eps getobjval(m) 2.0 eps
-        @test_approx_eq_eps getsolution(m) [0.0, 2.0] eps
+        @test isapprox(getobjval(m), 2.0, atol=eps)
+        @test isapprox(norm(getsolution(m) - [0.0, 2.0]), 0.0, atol=eps)
     end
 
 
@@ -258,8 +258,8 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
         delconstrs!(m, [1])
         optimize!(m)
         @test status(m) == :Optimal
-        @test_approx_eq_eps getobjval(m) 4.0 eps
-        @test_approx_eq_eps getsolution(m) [4.0, 0.0] eps
+        @test isapprox(getobjval(m), 4.0, atol=eps)
+        @test isapprox(norm(getsolution(m) - [4.0, 0.0]), 0.0, atol=eps)
     end
 
     # delvars and solve
@@ -273,8 +273,8 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
         delvars!(m, [1])
         optimize!(m)
         @test status(m) == :Optimal
-        @test_approx_eq_eps getobjval(m) 2.0 eps
-        @test_approx_eq_eps getsolution(m) [2.0] eps
+        @test isapprox(getobjval(m), 2.0, atol=eps)
+        @test isapprox(getsolution(m)[1], 2.0, atol=eps)
     end
 
 
@@ -300,8 +300,8 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver; eps = Base.rtold
 
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) 0.0
-    @test_approx_eq getsolution(m) [ 0.0, 0.0 ]
+    @test isapprox(getobjval(m), 0.0)
+    @test isapprox(norm(getsolution(m)), 0.0)
 
     # Min  x - y
     # s.t. 0.0 <= x <= 100.0
@@ -310,8 +310,8 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver; eps = Base.rtold
     setconstrUB!(m,[100.0,100.0])
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) -100.0
-    @test_approx_eq getsolution(m) [ 0.0, 100.0 ]
+    @test isapprox(getobjval(m), -100.0)
+    @test isapprox(norm(getsolution(m) - [ 0.0, 100.0 ]), 0.0)
 
     # Min  x - y
     # s.t. -100.0 <= x <= 100.0
@@ -320,8 +320,8 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver; eps = Base.rtold
     setconstrLB!(m,[-100.0,-100.0])
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) -200.0
-    @test_approx_eq getsolution(m) [ -100.0, 100.0 ]
+    @test isapprox(getobjval(m), -200.0)
+    @test isapprox(norm(getsolution(m) - [ -100.0, 100.0 ]), 0.0)
 
     # Min  x - y
     # s.t. -100.0 <= x <= 100.0
@@ -331,8 +331,8 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver; eps = Base.rtold
     setconstrUB!(m,[10.0,10.0])
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) 0.0
-    @test_approx_eq getsolution(m) [ 10.0, 10.0 ]
+    @test isapprox(getobjval(m), 0.0)
+    @test isapprox(norm(getsolution(m) - [ 10.0, 10.0 ]), 0.0)
 
     # Min  x - y
     # s.t. 0.0  <= x <= Inf
@@ -342,8 +342,8 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver; eps = Base.rtold
     setconstrUB!(m,[Inf,0.0])
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) 0.0
-    @test_approx_eq getsolution(m) [ 0.0, 0.0 ]
+    @test isapprox(getobjval(m), 0.0)
+    @test isapprox(norm(getsolution(m)), 0.0)
 
     # Min  x - y
     # s.t. -Inf <= x <= Inf
@@ -388,8 +388,8 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver; eps = Base.rtold
 
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) 0.0
-    @test_approx_eq getsolution(m) [ 0.0, 0.0 ]
+    @test isapprox(getobjval(m), 0.0)
+    @test isapprox(norm(getsolution(m)), 0.0)
 
 
 
@@ -403,8 +403,8 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver; eps = Base.rtold
     setvarUB!(m,[100.0,100.0])
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) -100.0
-    @test_approx_eq getsolution(m) [ 0.0, 100.0 ]
+    @test isapprox(getobjval(m), -100.0)
+    @test isapprox(norm(getsolution(m) - [ 0.0, 100.0 ]), 0.0)
 
     # Min  x - y
     # s.t. -Inf <= x <= Inf
@@ -414,8 +414,8 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver; eps = Base.rtold
     setvarLB!(m,[-100.0,-100.0])
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) -200.0
-    @test_approx_eq getsolution(m) [ -100.0, 100.0 ]
+    @test isapprox(getobjval(m), -200.0)
+    @test isapprox(norm(getsolution(m) - [ -100.0, 100.0 ]), 0.0)
 
     # Min  x - y
     # s.t. -Inf <= x <= Inf
@@ -426,8 +426,8 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver; eps = Base.rtold
     setvarUB!(m,[10.0,10.0])
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) 0.0
-    @test_approx_eq getsolution(m) [ 10.0, 10.0 ]
+    @test isapprox(getobjval(m), 0.0)
+    @test isapprox(norm(getsolution(m) - [ 10.0, 10.0 ]), 0.0)
 
     # Min  x - y
     # s.t. -Inf <= x <= Inf
@@ -439,8 +439,8 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver; eps = Base.rtold
     setvarUB!(m,[Inf,0.0])
     optimize!(m)
     @test status(m) == :Optimal
-    @test_approx_eq getobjval(m) 0.0
-    @test_approx_eq getsolution(m) [ 0.0, 0.0 ]
+    @test isapprox(getobjval(m), 0.0)
+    @test isapprox(norm(getsolution(m)), 0.0)
 
     # Min  x - y
     # s.t. -Inf <= x <= Inf
