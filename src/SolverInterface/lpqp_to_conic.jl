@@ -244,9 +244,11 @@ end
 
 setwarmstart!(model::LPQPtoConicBridge,v) = setwarmstart!(model.lpqpmodel,extend_solution(model,v))
 
-for f in [:optimize!, :status, :getsolution, :getobjval, :getvartype]
+for f in [:optimize!, :status, :getobjval, :getvartype]
     @eval $f(model::LPQPtoConicBridge) = $f(model.lpqpmodel)
 end
+
+getsolution(model::LPQPtoConicBridge) = getsolution(model.lpqpmodel)[1:length(model.c)]
 
 function getdual(model::LPQPtoConicBridge)
     if model.qcp
