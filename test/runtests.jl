@@ -8,6 +8,14 @@ mixintprogtest(GLPKSolverMIP())
 
 include("quadprog.jl")
 quadprogtest(IpoptSolver())
+qpdualtest(IpoptSolver())
+socptest(ECOSSolver())
+
+include("nlp.jl")
+nlptest(IpoptSolver())
+nlptest_nohessian(IpoptSolver())
+convexnlptest(IpoptSolver())
+rosenbrocktest(IpoptSolver())
 
 include("conicinterface.jl")
 coniclineartest(ECOSSolver(), duals=true)
@@ -16,5 +24,6 @@ coniclineartest(GLPKSolverLP(), duals=true)
 
 include("linproginterface.jl")
 linprogsolvertest(GLPKSolverLP())
+linprogsolvertestextra(GLPKSolverLP())
 # Test LP fallback for conics
 linprogsolvertest(ECOSSolver())
