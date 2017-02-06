@@ -113,8 +113,8 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
 
 
     # Linear constraint bounds
-    lb = Array(Float64,length(linconstr_idx))
-    ub = Array(Float64,length(linconstr_idx))
+    lb = Array{Float64}(length(linconstr_idx))
+    ub = Array{Float64}(length(linconstr_idx))
     k = 1
     for (cone,idxs) in constr_cones
         if cone != :SOC && cone != :SOCRotated

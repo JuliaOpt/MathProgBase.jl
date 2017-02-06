@@ -16,7 +16,7 @@ type ConicToLPQPBridge <: AbstractLinearQuadraticModel
     SOCconstrs::Vector{Vector{Int}} # x'x <= y^2, y is first index in vector
 end
 
-ConicToLPQPBridge(s::AbstractConicModel) = ConicToLPQPBridge(s, sparse(Int[],Int[],Float64[]), Float64[], Float64[], Float64[], Float64[], Float64[], :Min, Int[], Array(Vector{Int},0))
+ConicToLPQPBridge(s::AbstractConicModel) = ConicToLPQPBridge(s, sparse(Int[],Int[],Float64[]), Float64[], Float64[], Float64[], Float64[], Float64[], :Min, Int[], Array{Vector{Int}}(0))
 
 export ConicToLPQPBridge
 
@@ -70,7 +70,7 @@ function optimize!(wrap::ConicToLPQPBridge)
     (nvar = length(collb)) == length(colub) || error("Unequal lengths for column bounds")
     (nrow = length(rowlb)) == length(rowub) || error("Unequal lengths for row bounds")
 
-    constr_cones = Array(Any,0)
+    constr_cones = Array{Any}(0)
     var_cones = [(:Free,1:nvar)]
 
     # for each variable bound, create a new constraint
