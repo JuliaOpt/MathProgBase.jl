@@ -36,8 +36,8 @@ function mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub
         sense = rowlbtmp
         rhs = rowubtmp
         @assert realtype <: Real
-        rowlb = Array(realtype, nrow)
-        rowub = Array(realtype, nrow)
+        rowlb = Array{realtype}(nrow)
+        rowub = Array{realtype}(nrow)
         for i in 1:nrow
             if sense[i] == '<'
                 rowlb[i] = typemin(realtype)

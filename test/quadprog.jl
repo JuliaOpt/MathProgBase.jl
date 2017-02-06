@@ -44,7 +44,7 @@ function qpdualtest(solver)
     # max x
     # s.t. x^2 <= 2
     m = LinearQuadraticModel(solver)
-    loadproblem!(m, Array(Float64,0,1), [-Inf], [Inf], [1.0], Float64[], Float64[], :Max)
+    loadproblem!(m, Array{Float64}(0,1), [-Inf], [Inf], [1.0], Float64[], Float64[], :Max)
     addquadconstr!(m, [], [], [1], [1], [1.0], '<', 2.0)
     optimize!(m)
     stat = status(m)
@@ -60,7 +60,7 @@ function qpdualtest(solver)
     # min -x
     # s.t. x^2 <= 2
     m = LinearQuadraticModel(solver)
-    loadproblem!(m, Array(Float64,0,1), [-Inf], [Inf], [-1.0], Float64[], Float64[], :Min)
+    loadproblem!(m, Array{Float64}(0,1), [-Inf], [Inf], [-1.0], Float64[], Float64[], :Min)
     addquadconstr!(m, [], [], [1], [1], [1.0], '<', 2.0)
     optimize!(m)
     stat = status(m)
