@@ -21,6 +21,7 @@ export AbstractLinearQuadraticModel
     delconstrs!
     addsos1!
     addsos2!
+    addindconstr!
     writeproblem
     getvarLB
     getvarUB
