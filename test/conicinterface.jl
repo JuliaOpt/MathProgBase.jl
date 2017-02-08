@@ -163,7 +163,7 @@ function coniclineartest(solver::MathProgBase.AbstractMathProgSolver;duals=false
     println("Problem LIN3")
 
     b = [-1, 1]
-    A = [-1, -1]''
+    A = reshape([-1, -1], 2, 1)
     c = [0]
     constr_cones = [(:NonNeg,1:1),(:NonPos,2:2)]
     var_cones = [(:Free,1:1)]
@@ -191,7 +191,7 @@ function coniclineartest(solver::MathProgBase.AbstractMathProgSolver;duals=false
     println("Problem LIN4")
 
     b = [-1]
-    A = [-1]''
+    A = reshape([-1], 1, 1)
     c = [0]
     constr_cones = [(:NonNeg,1:1)]
     var_cones = [(:NonPos,1:1)]
