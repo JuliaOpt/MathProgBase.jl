@@ -109,13 +109,13 @@ to indicate equality constraints.
     coefficients, and the ``varidx`` vector contains the indices of the corresponding
     variables.
     
-.. function:: addindconstr!(m::AbstractLinearQuadraticModel, ind, comp, varidx, coef, lb, ub)
+.. function:: addindconstr!(m::AbstractLinearQuadraticModel, binvar, binval, varidx, coef, lb, ub)
 
     Adds a new indicator constraint to the model, of the form
 .. math::
     y = 1 \Rightarrow ax \leq b
     
-    ``ind`` is the indicator variable (binary), and ``comp`` is the complement relationship. If bin = 1, comp = true = 0. 
+    ``binvar`` is the indicator variable (binary), and ``binval`` is the value of the binary variable. 
     The rest of the arguments are the same as addconstr!
 
 
