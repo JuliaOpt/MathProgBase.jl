@@ -109,14 +109,13 @@ to indicate equality constraints.
     coefficients, and the ``varidx`` vector contains the indices of the corresponding
     variables.
     
-.. function:: addindconstr!(m::AbstractLinearQuadraticModel, binvar, binval, varidx, coef, lb, ub)
+.. function:: addindconstr!(m::AbstractLinearQuadraticModel, binvar, binval, varidx, coef, sense, rhs)
 
     Adds a new indicator constraint to the model, of the form
 .. math::
     y = 1 \Rightarrow ax \leq b
     
-    ``binvar`` is the indicator variable (binary), and ``binval`` is the value of the binary variable. 
-    The rest of the arguments are the same as addconstr!
+    ``binvar`` is the indicator variable (binary), and ``binval`` is the value of the binary variable. Coefficients for the linear constraint are specified in a sparse format: the ``coef`` vector contains the nonzero coefficients, and the ``varidx`` vector contains the indices of the corresponding variables. ``sense`` is the sense of the linear constraint ``('<','=','>')``, and ``rhs`` is the right hand side.
 
 
 .. function:: delconstrs!(m::AbstractLinearQuadraticModel, idxs)
