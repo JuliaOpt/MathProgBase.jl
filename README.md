@@ -4,7 +4,7 @@
 [![MathProgBase](http://pkg.julialang.org/badges/MathProgBase_0.5.svg)](http://pkg.julialang.org/?pkg=MathProgBase&ver=0.5)
 [![MathProgBase](http://pkg.julialang.org/badges/MathProgBase_0.6.svg)](http://pkg.julialang.org/?pkg=MathProgBase&ver=0.6)
 
-This package provides high-level one-shot functions for linear and mixed-intege
+This package provides high-level one-shot functions for linear and mixed-integer
 programming (``linprog`` and ``mixintprog``), as well as a solver-independent
 low-level interface for implementing advanced techniques that require efficiently
 solving a sequence of linear programming problems.
