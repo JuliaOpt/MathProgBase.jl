@@ -167,7 +167,7 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
 
     loadproblem!(m.lpqpmodel, Alin, l, u, c, lb, ub, :Min)
     m.cbvec = zeros(length(c))
-    m.cbvec2 = fill(NaN,length(c))
+    m.cbvec2 = fill(NaN,length(c)-num_aux)
 
     # Add conic constraints
 
@@ -232,7 +232,6 @@ function extend_solution(model::LPQPtoConicBridge,x)
     end
 
     if length(rsocconstr_idx) > 0
-        Aaux = model.A[rsocconstr_idx,:]
         diagvec = ones(length(rsocconstr_idx))
         diagvec[rsoc_start_idx] = sqrt(2)
         rsoc_aux = diagvec .* (model.b[rsocconstr_idx] - model.Arsoc*x)
@@ -342,7 +341,7 @@ function cbsetsolutionvalue!(cb::LPQPWrapperCallbackData, varidx, value)
 end
 
 function cbaddsolution!(cb::LPQPWrapperCallbackData)
-    newsol = extend_solution(cb.model,cb.solvec)
+    newsol = extend_solution(cb.model,cb.heurvec)
     for i in 1:length(newsol)
         if isfinite(newsol[i])
             cbsetsolutionvalue!(cb.lpqpcb,i,newsol[i])
