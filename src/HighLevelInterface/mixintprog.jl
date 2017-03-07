@@ -6,7 +6,7 @@ type MixintprogSolution
     attrs
 end
 
-typealias SymbolInputVector Union{Vector{Symbol},Symbol}
+const SymbolInputVector = Union{Vector{Symbol},Symbol}
 
 function no_mip_solver()
     error("""

@@ -1,6 +1,6 @@
 # Methods for the LinearQuadratic interface
 
-abstract AbstractLinearQuadraticModel <: AbstractMathProgModel
+@compat abstract type AbstractLinearQuadraticModel <: AbstractMathProgModel end
 export AbstractLinearQuadraticModel
 
 #    writeproblem
