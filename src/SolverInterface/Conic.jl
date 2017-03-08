@@ -1,6 +1,6 @@
 # Methods for the Conic interface
 
-abstract AbstractConicModel <: AbstractMathProgModel
+@compat abstract type AbstractConicModel <: AbstractMathProgModel end
 export AbstractConicModel
 
 @define_interface begin

@@ -1,4 +1,5 @@
 module HighLevelInterface
+using Compat
 
 using ..SolverInterface
 using ..MathProgBase

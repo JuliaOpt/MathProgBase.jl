@@ -1,4 +1,4 @@
-abstract MathProgCallbackData
+@compat abstract type MathProgCallbackData end
 export MathProgCallbackData
 
 # callback has signature:

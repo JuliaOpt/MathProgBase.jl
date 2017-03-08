@@ -1,9 +1,9 @@
 # Methods for the Nonlinear interface
 
-abstract AbstractNonlinearModel <: AbstractMathProgModel
+@compat abstract type AbstractNonlinearModel <: AbstractMathProgModel end
 export AbstractNonlinearModel
 
-abstract AbstractNLPEvaluator
+@compat abstract type AbstractNLPEvaluator end
 export AbstractNLPEvaluator
 
 # methods for AbstractNLPEvaluator
