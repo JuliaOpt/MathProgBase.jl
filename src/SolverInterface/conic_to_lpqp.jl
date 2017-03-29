@@ -229,7 +229,7 @@ function optimize!(wrap::ConicToLPQPBridge)
 
     #@show obj, full(A), b, constr_cones, var_cones
     loadproblem!(wrap.m, obj, A, b, constr_cones, var_cones)
-    if !isempty(wrap.vartypes)
+    if !all(t -> t == :Cont, wrap.vartypes)
         setvartype!(wrap.m, wrap.vartypes)
     end
     optimize!(wrap.m)
@@ -241,11 +241,13 @@ function getconstrsolution(wrap::ConicToLPQPBridge)
     wrap.A * getsolution(wrap.m)
 end
 status(wrap::ConicToLPQPBridge) = status(wrap.m)
-function getobjval(wrap::ConicToLPQPBridge)
-    if wrap.sense == :Max
-        return -getobjval(wrap.m)
-    else
-        return getobjval(wrap.m)
+for f in [:getobjval, :getobjbound]
+    @eval function ($f)(wrap::ConicToLPQPBridge)
+        if wrap.sense == :Max
+            return -$f(wrap.m)
+        else
+            return $f(wrap.m)
+        end
     end
 end
 
