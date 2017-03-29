@@ -15,9 +15,10 @@ type ConicToLPQPBridge <: AbstractLinearQuadraticModel
     varboundmap::Vector{Int}
     SOCconstrs::Vector{Vector{Int}} # x'x <= y^2, y is first index in vector
     RSOCconstrs::Vector{Vector{Int}} # x'x <= y*z, y is first index in vector, z is second
+    vartypes::Vector{Symbol}
 end
 
-ConicToLPQPBridge(s::AbstractConicModel) = ConicToLPQPBridge(s, sparse(Int[],Int[],Float64[]), Float64[], Float64[], Float64[], Float64[], Float64[], :Min, Int[], Array{Vector{Int}}(0),Array{Vector{Int}}(0))
+ConicToLPQPBridge(s::AbstractConicModel) = ConicToLPQPBridge(s, sparse(Int[],Int[],Float64[]), Float64[], Float64[], Float64[], Float64[], Float64[], :Min, Int[], Array{Vector{Int}}(0),Array{Vector{Int}}(0), Symbol[])
 
 export ConicToLPQPBridge
 
@@ -228,6 +229,9 @@ function optimize!(wrap::ConicToLPQPBridge)
 
     #@show obj, full(A), b, constr_cones, var_cones
     loadproblem!(wrap.m, obj, A, b, constr_cones, var_cones)
+    if !isempty(wrap.vartypes)
+        setvartype!(wrap.m, wrap.vartypes)
+    end
     optimize!(wrap.m)
 
 end
@@ -307,4 +311,7 @@ function addconstr!{T<:Integer}(wrap::ConicToLPQPBridge, varidx::AbstractArray{T
     wrap.A = [wrap.A; sparsevec(varidx, coef, size(wrap.A, 2))']
     push!(wrap.rowlb, lb)
     push!(wrap.rowub, ub)
+end
+function setvartype!(wrap::ConicToLPQPBridge, v)
+    wrap.vartypes = copy(v)
 end
