@@ -229,7 +229,7 @@ function optimize!(wrap::ConicToLPQPBridge)
 
     #@show obj, full(A), b, constr_cones, var_cones
     loadproblem!(wrap.m, obj, A, b, constr_cones, var_cones)
-    if !isempty(wrap.vartypes)
+    if !all(t -> t == :Cont, wrap.vartypes)
         setvartype!(wrap.m, wrap.vartypes)
     end
     optimize!(wrap.m)
