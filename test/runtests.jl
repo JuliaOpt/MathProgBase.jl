@@ -1,29 +1,34 @@
 using GLPKMathProgInterface, Ipopt, ECOS
 
+lp_solver = GLPKSolverLP()
+ip_solver = GLPKSolverMIP()
+conic_solver = ECOSSolver(verbose=false)
+nlp_solver = IpoptSolver(print_level=0)
+
 include("linprog.jl")
-linprogtest(GLPKSolverLP())
+linprogtest(lp_solver)
 
 include("mixintprog.jl")
-mixintprogtest(GLPKSolverMIP())
+mixintprogtest(ip_solver)
 
 include("quadprog.jl")
-quadprogtest(IpoptSolver())
-qpdualtest(IpoptSolver())
-socptest(ECOSSolver())
+quadprogtest(nlp_solver)
+qpdualtest(nlp_solver)
+socptest(conic_solver)
 
 include("nlp.jl")
-nlptest(IpoptSolver())
-nlptest_nohessian(IpoptSolver())
-convexnlptest(IpoptSolver())
-rosenbrocktest(IpoptSolver())
+nlptest(nlp_solver)
+nlptest_nohessian(nlp_solver)
+convexnlptest(nlp_solver)
+rosenbrocktest(nlp_solver)
 
 include("conicinterface.jl")
-coniclineartest(ECOSSolver(), duals=true)
+coniclineartest(conic_solver, duals=true)
 # Test conic fallback for LPs
-coniclineartest(GLPKSolverLP(), duals=true)
+coniclineartest(lp_solver, duals=true)
 
 include("linproginterface.jl")
-linprogsolvertest(GLPKSolverLP())
-linprogsolvertestextra(GLPKSolverLP())
+linprogsolvertest(lp_solver)
+linprogsolvertestextra(lp_solver)
 # Test LP fallback for conics
-linprogsolvertest(ECOSSolver())
+linprogsolvertest(conic_solver)

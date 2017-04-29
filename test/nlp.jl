@@ -89,31 +89,32 @@ function MathProgBase.eval_hesslag(d::HS071, H, x, σ, μ)
 end
 
 function nlptest(solver)
+    @testset "Testing NLP with $solver" begin
+        m = MathProgBase.NonlinearModel(solver)
+        l = [1,1,1,1]
+        u = [5,5,5,5]
+        lb = [25, 40]
+        ub = [Inf, 40]
+        MathProgBase.loadproblem!(m, 4, 2, l, u, lb, ub, :Min, HS071())
+        MathProgBase.setwarmstart!(m,[1,5,5,1])
 
-    m = MathProgBase.NonlinearModel(solver)
-    l = [1,1,1,1]
-    u = [5,5,5,5]
-    lb = [25, 40]
-    ub = [Inf, 40]
-    MathProgBase.loadproblem!(m, 4, 2, l, u, lb, ub, :Min, HS071())
-    MathProgBase.setwarmstart!(m,[1,5,5,1])
+        MathProgBase.optimize!(m)
+        stat = MathProgBase.status(m)
 
-    MathProgBase.optimize!(m)
-    stat = MathProgBase.status(m)
+        @test stat == :Optimal
+        x = MathProgBase.getsolution(m)
+        @test isapprox(x[1], 1.0000000000000000, atol=1e-5)
+        @test isapprox(x[2], 4.7429996418092970, atol=1e-5)
+        @test isapprox(x[3], 3.8211499817883077, atol=1e-5)
+        @test isapprox(x[4], 1.3794082897556983, atol=1e-5)
+        @test isapprox(MathProgBase.getobjval(m), 17.014017145179164, atol=1e-5)
 
-    @test stat == :Optimal
-    x = MathProgBase.getsolution(m)
-    @test isapprox(x[1], 1.0000000000000000, atol=1e-5)
-    @test isapprox(x[2], 4.7429996418092970, atol=1e-5)
-    @test isapprox(x[3], 3.8211499817883077, atol=1e-5)
-    @test isapprox(x[4], 1.3794082897556983, atol=1e-5)
-    @test isapprox(MathProgBase.getobjval(m), 17.014017145179164, atol=1e-5)
-
-    # Test that a second call to optimize! works
-    MathProgBase.setwarmstart!(m,[1,5,5,1])
-    MathProgBase.optimize!(m)
-    stat = MathProgBase.status(m)
-    @test stat == :Optimal
+        # Test that a second call to optimize! works
+        MathProgBase.setwarmstart!(m,[1,5,5,1])
+        MathProgBase.optimize!(m)
+        stat = MathProgBase.status(m)
+        @test stat == :Optimal
+    end
 end
 
 # Same as above but no hessian callback
@@ -151,31 +152,32 @@ MathProgBase.jac_structure(d::HS071_2) = MathProgBase.jac_structure(HS071())
 MathProgBase.eval_jac_g(d::HS071_2, J, x) = MathProgBase.eval_jac_g(HS071(), J, x)
 
 function nlptest_nohessian(solver)
+    @testset "Testing NLP without Hessian with $solver" begin
+        m = MathProgBase.NonlinearModel(solver)
+        l = [1,1,1,1]
+        u = [5,5,5,5]
+        lb = [25, 40]
+        ub = [Inf, 40]
+        MathProgBase.loadproblem!(m, 4, 2, l, u, lb, ub, :Min, HS071_2())
+        MathProgBase.setwarmstart!(m,[1,5,5,1])
 
-    m = MathProgBase.NonlinearModel(solver)
-    l = [1,1,1,1]
-    u = [5,5,5,5]
-    lb = [25, 40]
-    ub = [Inf, 40]
-    MathProgBase.loadproblem!(m, 4, 2, l, u, lb, ub, :Min, HS071_2())
-    MathProgBase.setwarmstart!(m,[1,5,5,1])
+        MathProgBase.optimize!(m)
+        stat = MathProgBase.status(m)
 
-    MathProgBase.optimize!(m)
-    stat = MathProgBase.status(m)
+        @test stat == :Optimal
+        x = MathProgBase.getsolution(m)
+        @test isapprox(x[1], 1.0000000000000000, atol=1e-5)
+        @test isapprox(x[2], 4.7429996418092970, atol=1e-5)
+        @test isapprox(x[3], 3.8211499817883077, atol=1e-5)
+        @test isapprox(x[4], 1.3794082897556983, atol=1e-5)
+        @test isapprox(MathProgBase.getobjval(m), 17.014017145179164, atol=1e-5)
 
-    @test stat == :Optimal
-    x = MathProgBase.getsolution(m)
-    @test isapprox(x[1], 1.0000000000000000, atol=1e-5)
-    @test isapprox(x[2], 4.7429996418092970, atol=1e-5)
-    @test isapprox(x[3], 3.8211499817883077, atol=1e-5)
-    @test isapprox(x[4], 1.3794082897556983, atol=1e-5)
-    @test isapprox(MathProgBase.getobjval(m), 17.014017145179164, atol=1e-5)
-
-    # Test that a second call to optimize! works
-    MathProgBase.setwarmstart!(m,[1,5,5,1])
-    MathProgBase.optimize!(m)
-    stat = MathProgBase.status(m)
-    @test stat == :Optimal
+        # Test that a second call to optimize! works
+        MathProgBase.setwarmstart!(m,[1,5,5,1])
+        MathProgBase.optimize!(m)
+        stat = MathProgBase.status(m)
+        @test stat == :Optimal
+    end
 end
 
 # a test for convex nonlinear solvers
@@ -234,26 +236,27 @@ function MathProgBase.eval_hesslag(d::QCQP, H, x, σ, μ)
 end
 
 function convexnlptest(solver)
+    @testset "Testing convex NLP with $solver" begin
+        m = MathProgBase.NonlinearModel(solver)
+        l = [-2,-2]
+        u = [2,2]
+        lb = [-Inf]
+        ub = [1.0]
+        MathProgBase.loadproblem!(m, 2, 1, l, u, lb, ub, :Min, QCQP())
 
-    m = MathProgBase.NonlinearModel(solver)
-    l = [-2,-2]
-    u = [2,2]
-    lb = [-Inf]
-    ub = [1.0]
-    MathProgBase.loadproblem!(m, 2, 1, l, u, lb, ub, :Min, QCQP())
+        MathProgBase.optimize!(m)
+        stat = MathProgBase.status(m)
 
-    MathProgBase.optimize!(m)
-    stat = MathProgBase.status(m)
+        @test stat == :Optimal
+        x = MathProgBase.getsolution(m)
+        @test isapprox(x[1]+x[2], -1/3, atol=1e-3)
+        @test isapprox(MathProgBase.getobjval(m), -1-4/sqrt(3), atol=1e-5)
 
-    @test stat == :Optimal
-    x = MathProgBase.getsolution(m)
-    @test isapprox(x[1]+x[2], -1/3, atol=1e-3)
-    @test isapprox(MathProgBase.getobjval(m), -1-4/sqrt(3), atol=1e-5)
-
-    # Test that a second call to optimize! works
-    MathProgBase.optimize!(m)
-    stat = MathProgBase.status(m)
-    @test stat == :Optimal
+        # Test that a second call to optimize! works
+        MathProgBase.optimize!(m)
+        stat = MathProgBase.status(m)
+        @test stat == :Optimal
+    end
 end
 
 
@@ -299,26 +302,27 @@ function MathProgBase.eval_hesslag(d::Rosenbrock, H, x, σ, μ)
 end
 
 function rosenbrocktest(solver)
+    @testset "Testing NLP on the Rosenbrock function with $solver" begin
+        m = MathProgBase.NonlinearModel(solver)
+        l = [-Inf,-Inf]
+        u = [Inf,Inf]
+        lb = Float64[]
+        ub = Float64[]
+        MathProgBase.loadproblem!(m, 2, 0, l, u, lb, ub, :Min, Rosenbrock())
 
-    m = MathProgBase.NonlinearModel(solver)
-    l = [-Inf,-Inf]
-    u = [Inf,Inf]
-    lb = Float64[]
-    ub = Float64[]
-    MathProgBase.loadproblem!(m, 2, 0, l, u, lb, ub, :Min, Rosenbrock())
+        MathProgBase.setwarmstart!(m,[10.0,10.0])
+        MathProgBase.optimize!(m)
+        stat = MathProgBase.status(m)
 
-    MathProgBase.setwarmstart!(m,[10.0,10.0])
-    MathProgBase.optimize!(m)
-    stat = MathProgBase.status(m)
+        @test stat == :Optimal
+        x = MathProgBase.getsolution(m)
+        @test isapprox(x[1], 1.0, atol=1e-5)
+        @test isapprox(x[2], 1.0, atol=1e-5)
+        @test isapprox(MathProgBase.getobjval(m), 0.0, atol=1e-5)
 
-    @test stat == :Optimal
-    x = MathProgBase.getsolution(m)
-    @test isapprox(x[1], 1.0, atol=1e-5)
-    @test isapprox(x[2], 1.0, atol=1e-5)
-    @test isapprox(MathProgBase.getobjval(m), 0.0, atol=1e-5)
-
-    # Test that a second call to optimize! works
-    MathProgBase.optimize!(m)
-    stat = MathProgBase.status(m)
-    @test stat == :Optimal
+        # Test that a second call to optimize! works
+        MathProgBase.optimize!(m)
+        stat = MathProgBase.status(m)
+        @test stat == :Optimal
+    end
 end
