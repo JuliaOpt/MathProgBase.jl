@@ -708,6 +708,7 @@ end
 
 
 function conicSDPtest(solver::MathProgBase.AbstractMathProgSolver;duals=true, tol=1e-6)
+    s2 = sqrt(2)
     @testset "Testing SDP problems through conic interface with $solver" begin
         # Problem SDP1 - sdo1 from MOSEK docs
         # From Mosek.jl/test/mathprogtestextra.jl, under license:
@@ -738,7 +739,6 @@ function conicSDPtest(solver::MathProgBase.AbstractMathProgSolver;duals=true, to
         #
         @testset "SDP1" begin
             m = MathProgBase.ConicModel(solver)
-            s2 = sqrt(2)
             #     x1   x2   x3    X11  X21  X31  X22  X32  X33
             c = [ 1.0, 0.0, 0.0,  2.0, s2,  0.0, 2.0, s2,  2.0 ]
             A = [ 1.0  0.0  0.0   1.0  0.0  0.0  1.0  0.0  1.0 ;  # A1
