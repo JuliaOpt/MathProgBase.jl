@@ -1,5 +1,4 @@
-
-type MixintprogSolution
+struct MixintprogSolution
     status
     objval
     sol
@@ -77,5 +76,3 @@ mixintprog(c,A,rowlb,rowub,vartypes) = no_mip_solver()
 mixintprog(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::InputVector, vartypes::SymbolInputVector, lb::InputVector, ub::InputVector) = no_mip_solver()
 
 export mixintprog
-
-

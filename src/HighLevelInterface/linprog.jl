@@ -1,4 +1,4 @@
-type LinprogSolution
+struct LinprogSolution
     status
     objval
     sol
