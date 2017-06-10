@@ -1,6 +1,5 @@
 module SolverInterface
 
-using Compat
 using Base.Meta
 
 const methods_by_tag = Dict{Symbol,Vector{Symbol}}()
@@ -44,11 +43,11 @@ macro define_interface(args)
     return code
 end
 
-@compat abstract type AbstractMathProgModel end
+abstract type AbstractMathProgModel end
 export AbstractMathProgModel
 
 # immutable type which we dispatch solvers on
-@compat abstract type AbstractMathProgSolver end
+abstract type AbstractMathProgSolver end
 export AbstractMathProgSolver
 
 # create dummy method to define function so that we can attach methods in other modules
