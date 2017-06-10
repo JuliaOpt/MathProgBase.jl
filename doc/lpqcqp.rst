@@ -108,6 +108,17 @@ to indicate equality constraints.
     are specified in a sparse format: the ``coef`` vector contains the nonzero
     coefficients, and the ``varidx`` vector contains the indices of the corresponding
     variables.
+    
+.. function:: addindconstr!(m::AbstractLinearQuadraticModel, binvar, binval, varidx, coef, sense, rhs)
+
+    Adds a new indicator constraint to the model, of the form
+.. math::
+    y = 1 \Rightarrow ax \leq b
+    
+    ``binvar`` is the index of the indicator variable (binary), and ``binval`` is the value of the binary variable, either ``0`` or ``1``.  Coefficients for the linear constraint are specified in a sparse format: the ``coef`` vector contains the nonzero coefficients, and the ``varidx`` vector contains the indices of the corresponding variables. ``sense`` is the sense of the linear constraint ``('<','=','>')``, and ``rhs`` is the right hand side.
+    
+    This builds the constraint ``binvar = binval => ax <= b``, where ``ax <= b`` is specified with ``(varidx,coef,sense,rhs``)
+
 
 .. function:: delconstrs!(m::AbstractLinearQuadraticModel, idxs)
 
