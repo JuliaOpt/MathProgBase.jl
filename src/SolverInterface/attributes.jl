@@ -6,19 +6,25 @@ to set or get attributes (properties) of the model.
 """
 abstract type AbstractAttribute end
 
+# TODO:
+# in-place getters
+
 """
-    getattribute(m::AbstractMathProgModel, attr::Type{T} where T <: AbstractAttribute)
+    getattribute(m::AbstractMathProgModel, attr::AbstractAttribute)
 
 Return an attribute of the model `m` specified by attribute type `attr`.
 
 # Examples
 
-    getattribute(m, ObjectiveValue)
+    getattribute(m, ObjectiveValue())
+    getattribute(m, VariableResult())
+    getattribute(m, VariableResult(5))
+    getattribute(m, OtherAttribute("something specific to cplex"))
 """
 function getattribute end
 
 """
-    cangetattribute(m::AbstractMathProgModel, attr::Type{T} where T <: AbstractAttribute)::Bool
+    cangetattribute(m::AbstractMathProgModel, attr::AbstractAttribute)::Bool
 
 Return a `Bool` indicating whether the model `m` currently has a value for
 the attributed specified by attribute type `attr`.
@@ -26,7 +32,7 @@ the attributed specified by attribute type `attr`.
 function cangetattribute end
 
 """
-    cansetattribute(m::AbstractMathProgModel, attr::Type{T} where T <: AbstractAttribute)::Bool
+    cansetattribute(m::AbstractMathProgModel, attr::AbstractAttribute)::Bool
 
 Return a `Bool` indicating whether the model `m` will accept a
 `setattribute!` call for the attributed specified by attribute type `attr`.
@@ -34,7 +40,7 @@ Return a `Bool` indicating whether the model `m` will accept a
 function cansetattribute end
 
 """
-    setattribute!(m::AbstractMathProgModel, attr::Type{T} where T <: AbstractAttribute, ...)
+    setattribute!(m::AbstractMathProgModel, attr::AbstractAttribute, ...)
 
 Set an attribute of the model `m` specified by attribute type `attr`.
 """
@@ -55,12 +61,14 @@ The best known bound on the optimal objective value.
 """
 struct ObjectiveBound <: AbstractAttribute end
 
+
+struct RelativeGapAttr <: AbstractAttribute  end
 """
     RelativeGap
 
 The final relative optimality gap as optimization terminated. That is, ``\\frac{|b-f|}{|f|}``, where ``b`` is the best bound and ``f`` is the best feasible objective value.
 """
-struct RelativeGap <: AbstractAttribute  end
+const RelativeGap = RelativeGapAttr()
 
 """
     SolveTime
@@ -131,11 +139,15 @@ to warm-start the solve.
 struct VariableDualStart <: AbstractAttribute end
 
 """
-    VariableResult{N}
+    VariableResult
 
 The assignment to the primal variables in result `N`. If `N` is omitted, it is interpreted as 1.
 """
-struct VariableResult{N} <: AbstractAttribute end
+struct VariableResult <: AbstractAttribute
+    N::Int
+end
+
+# VarType?
 
 
 function getsolution end
