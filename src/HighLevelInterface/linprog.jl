@@ -32,7 +32,7 @@ end
 """
     buildlp(c::InputVector, A::AbstractMatrix, sense::InputVector, b::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver)
 
-    Builds the linear programming problem as defined in [`linprog`](@ref) and accepts the following arguments:
+Builds the linear programming problem as defined in [`linprog`](@ref) and accepts the following arguments:
 
 *    ``c`` is the objective vector, always in the sense of minimization
 
