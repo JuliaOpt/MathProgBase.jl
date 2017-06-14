@@ -54,11 +54,11 @@ dimension(s::Interval) = 1
 
 Add the constraint
 ```math
-Ax + b + q \\in S
+Ax + b + q(x) \\in S
 ```
 where ``A`` is a sparse vector specified in triplet form by
 `a_constridx`, `a_varidx`, and `a_coef`; ``b`` is a vector;
-``q`` is a vector with entry `k` equal to ``\\frac{1}{2}x^TQ_kx``
+``q(x)`` is a vector with component ``(q(x))_k`` defined to be ``\\frac{1}{2}x^TQ_kx``
 where the symmetric matrix ``Q_k`` is defined by the triplets in `Q_vari`, `Q_varj`,
 `Q_coef` for which `Q_constridx` equals `k`; and the set ``S`` is defined by `S`.
 
