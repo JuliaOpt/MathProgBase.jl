@@ -6,9 +6,6 @@ to set or get attributes (properties) of the model.
 """
 abstract type AbstractAttribute end
 
-# TODO:
-# in-place getters
-
 """
     getattribute(m::AbstractMathProgModel, attr::AbstractAttribute)
 
