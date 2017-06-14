@@ -26,7 +26,7 @@ function getattribute end
 """
     getattribute!(output, m::AbstractMathProgModel, attr::AbstractAttribute)
 
-An in-place version of `getattribute!`. Return an attribute of the model `m` specified by attribute type `attr` into output vector `attr`.
+An in-place version of `getattribute`. Return an attribute of the model `m` specified by attribute type `attr` into output vector `attr`.
 """
 function getattribute! end
 
