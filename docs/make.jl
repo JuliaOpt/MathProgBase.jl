@@ -18,6 +18,6 @@ deploydocs(
     target = "build",
     osname = "linux",
     julia  = "0.6",
-    deps   = Deps.pip("pygments", "mkdocs", "python-markdown-math"),
+    deps   = nothing,
     make   = nothing
 )
