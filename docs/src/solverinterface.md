@@ -16,23 +16,6 @@ optimize!
 freemodel!
 ```
 
-## Sets
-
-How to add constraints.
-```@docs
-addconstraint!
-```
-
-List of sets.
-```@docs
-NonNegative
-NonPositive
-Zero
-Interval
-Integers
-Binaries
-```
-
 ## Attributes
 
 These are used to get and set properties of the model.
@@ -64,12 +47,7 @@ ResultCount
 
 ```@docs
 VariableStart
-VariableLowerBoundDualStart
-VariableUpperBoundDualStart
-VariableLowerBound
-VariableLowerBoundVector
-VariableUpperBound
-VariableUpperBoundVector
+VariableDualStart
 VariableResult
 ```
 
