@@ -50,17 +50,30 @@ end
 dimension(s::Interval) = 1
 
 """
+    addconstraint!(m::AbstractMathProgModel, b, a_constridx, a_varidx, a_coef, Q_constridx, Q_vari, Q_varj, Q_coef, S::AbstractSet)
+
+Add the constraint
+```math
+Ax + b + q \\in S
+```
+where ``A`` is a sparse vector specified in triplet form by
+`a_constridx`, `a_varidx`, and `a_coef`; ``b`` is a vector;
+``q`` is a vector with entry `k` equal to ``\\frac{1}{2}x^TQ_kx``
+where the symmetric matrix ``Q_k`` is defined by the triplets in `Q_vari`, `Q_varj`,
+`Q_coef` for which `Q_constridx` equals `k`; and the set ``S`` is defined by `S`.
+
+Duplicate indices in either ``A`` or  a ``Q`` matrix are accepted and will be summed together. Off-diagonal entries of ``Q`` will be mirrored, so either the upper triangular or lower triangular entries of ``Q`` should be provided. If entries for both ``(i,j)`` and ``(j,i)`` are provided, these are considered duplicate terms.
+
     addconstraint!(m::AbstractMathProgModel, b, a_varidx, a_coef, Q_vari, Q_varj, Q_coef, S::AbstractSet)
 
+A specialized version of `addconstraint!` for one-dimensional sets.
 Add the constraint
 ```math
 a^Tx + b + \\frac{1}{2}x^TQx \\in S
 ```
 where ``a`` is a sparse vector specified in tuple form by
 `a_varidx`, and `a_coef`; ``b`` is a scalar;
-the symmetric matrix ``Q_i`` is defined by the triplets in `Q_vari`, `Q_varj`,
+the symmetric matrix ``Q`` is defined by the triplets in `Q_vari`, `Q_varj`,
 `Q_coef`; and the set ``S`` is defined by `S`.
-
-Duplicate indices in either `a_varidx` or `Q_vari` and `Q_varj` are accepted and will be summed together. Off-diagonal entries of ``Q`` will be mirrored, so either the upper triangular or lower triangular entries of ``Q`` should be provided. If entries for both ``(i,j)`` and ``(j,i)`` are provided, these are considered duplicate terms.
 """
 function addconstraint! end
