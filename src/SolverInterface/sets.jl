@@ -46,7 +46,7 @@ struct Interval{T} <: AbstractSet
     upper::T
 end
 
-dimension(s::Interval) = 1
+dimension(s::Interval) = length(s.lower)
 
 """
     Integers(n)
