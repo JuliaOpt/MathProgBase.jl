@@ -5,7 +5,11 @@ makedocs(
     sitename = "MathProgBase",
     pages = [
         "Introduction" => "index.md",
-        "Solver Interface" => "solverinterface.md"
+        "Linear Programming" => "linearprog.md",
+        "Mixed-Integer Programming" => "mixedintprog.md",
+        "Quadratic Programming" => "quadprog.md",
+        "Solver Interface" => "solverinterface.md",
+        "Choosing Solver" => "choosingsolver.md"
     ]
 )
 
@@ -14,6 +18,6 @@ deploydocs(
     target = "build",
     osname = "linux",
     julia  = "0.6",
-    deps   = nothing,
+    deps   = Deps.pip("pygments", "mkdocs", "python-markdown-math"),
     make   = nothing
 )

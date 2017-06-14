@@ -29,6 +29,8 @@ NonNegative
 NonPositive
 Zero
 Interval
+Integers
+Binaries
 ```
 
 ## Attributes
@@ -62,7 +64,12 @@ ResultCount
 
 ```@docs
 VariableStart
-VariableDualStart
+VariableLowerBoundDualStart
+VariableUpperBoundDualStart
+VariableLowerBound
+VariableLowerBoundVector
+VariableUpperBound
+VariableUpperBoundVector
 VariableResult
 ```
 
