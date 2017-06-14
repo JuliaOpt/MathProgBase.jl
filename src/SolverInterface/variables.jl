@@ -16,12 +16,12 @@ Return a `Bool` indicating whether this variable can be removed from the model `
 candelete(m::AbstractMathProgModel,ref::VariableReference) = throw(MethodError())
 
 """
-    isalive(m::AbstractMathProgModel, ref::VariableReference)::Bool
+    isvalid(m::AbstractMathProgModel, ref::VariableReference)::Bool
 
 Return a `Bool` indicating whether this reference is valid
 for an active variable in the model `m`.
 """
-isactive(m::AbstractMathProgModel, ref::VariableReference) = throw(MethodError())
+isvalid(m::AbstractMathProgModel, ref::VariableReference) = throw(MethodError())
 
 """
     delete!(m::AbstractMathProgModel, ref::VariableReference)

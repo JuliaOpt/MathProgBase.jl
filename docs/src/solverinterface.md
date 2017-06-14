@@ -21,7 +21,7 @@ freemodel!
 ```@docs
 VariableReference
 candelete(::AbstractMathProgModel,::VariableReference)
-isactive(::AbstractMathProgModel,::VariableReference)
+isvalid(::AbstractMathProgModel,::VariableReference)
 delete!(::AbstractMathProgModel,::VariableReference)
 addvariables!
 addvariable!
@@ -33,7 +33,7 @@ How to add constraints.
 ```@docs
 ConstraintReference
 candelete(::AbstractMathProgModel,::ConstraintReference)
-isactive(::AbstractMathProgModel,::ConstraintReference)
+isvalid(::AbstractMathProgModel,::ConstraintReference)
 delete!(::AbstractMathProgModel,::ConstraintReference)
 addconstraint!
 ```

@@ -18,12 +18,12 @@ Return a `Bool` indicating whether this constraint can be removed from the model
 candelete(m::AbstractMathProgModel, ref::ConstraintReference) = throw(MethodError())
 
 """
-    isalive(m::AbstractMathProgModel, ref::ConstraintReference)::Bool
+    isvalid(m::AbstractMathProgModel, ref::ConstraintReference)::Bool
 
 Return a `Bool` indicating whether this reference is valid
 for an active constraint in the model `m`.
 """
-isactive(m::AbstractMathProgModel, ref::ConstraintReference) = throw(MethodError())
+isvalid(m::AbstractMathProgModel, ref::ConstraintReference) = throw(MethodError())
 
 """
     delete!(m::AbstractMathProgModel, ref::ConstraintReference)
