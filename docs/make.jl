@@ -4,7 +4,8 @@ makedocs(
     format = :html,
     sitename = "MathProgBase",
     pages = [
-        "index.md",
+        "Introduction" => "index.md",
+        "Solver Interface" => "solverinterface.md"
     ]
 )
 
