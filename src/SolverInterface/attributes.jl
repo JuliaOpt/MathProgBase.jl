@@ -46,6 +46,26 @@ Set an attribute of the model `m` specified by attribute type `attr`.
 """
 function setattribute! end
 
+"""
+    getattribute!(y, m::AbstractMathProgModel, attr:AbstractAttribute)
+
+Store the attribute of the model `m` specified by attribute type `attr` in `y`.
+
+# Examples
+    y = zeros(N)
+    getattribute!(y, m, VariableResult)
+"""
+function getattribute! end
+
+"""
+    cangetattribute!(m::AbstractMathProgModel, attr::AbstractAttribute)::Bool
+
+Return a `Bool` indicating whether the model `m` currently has a value for the
+attribute specified by attribute type `attr` than can be queried by
+`getattribute!`.
+"""
+function cangetattribute! end
+
 # Scalar attributes
 """
     ObjectiveValue
@@ -240,5 +260,3 @@ To be documented: `NumericalError`, `InvalidModel`, `InvalidOption`, `Interrupte
 
 """
 @enum TerminationStatusCode Success AlmostSuccess InfeasibleNoResult UnboundedNoResult InfeasibleOrUnbounded IterationLimit TimeLimit NodeLimit SolutionLimit MemoryLimit ObjectiveLimit NormLimit OtherLimit SlowProgress NumericalError InvalidModel InvalidOption Interrupted OtherError
-
-
