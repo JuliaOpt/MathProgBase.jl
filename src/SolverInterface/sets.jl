@@ -9,33 +9,32 @@ abstract type AbstractSet end
 
 
 """
-    NonNegative(dim)
+    NonNegative(n)
 
-The nonnegative orthant ``\\{ x \\in \\mathbb{R}^n : x \\ge 0 \\}`` where the dimension ``n`` is specified by the field `dim`.
+The nonnegative orthant ``\\{ x \\in \\mathbb{R}^n : x \\ge 0 \\}`` where the dimension ``n`` is specified by the field `n`.
 """
 struct NonNegative <: AbstractSet
     dim::Int
 end
 
 """
-    NonPositive(dim)
+    NonPositive(n)
 
-The nonpositive orthant ``\\{ x \\in \\mathbb{R}^n : x \\le 0 \\}`` where the dimension ``n`` is specified by the field `dim`.
+The nonpositive orthant ``\\{ x \\in \\mathbb{R}^n : x \\le 0 \\}`` where the dimension ``n`` is specified by the field `n`.
 """
 struct NonPositive <: AbstractSet
     dim::Int
 end
 
 """
-    Zero(dim)
+    Zero(n)
 
-The set ``\\{0\\}^n`` where the dimension ``n`` is specified by the field `dim`.
+The set ``\\{0\\}^n`` where the dimension ``n`` is specified by the field `n`.
 """
 struct Zero <: AbstractSet
     dim::Int
 end
 
-dimension(s::Union{NonNegative,NonPositive,Zero}) = s.dim
 
 """
     Interval(lower,upper)
@@ -48,6 +47,27 @@ struct Interval{T} <: AbstractSet
 end
 
 dimension(s::Interval) = 1
+
+"""
+    Integers(n)
+
+The set of integers ``\\mathbb{Z}^n``.
+"""
+struct Integers <: AbstractSet
+    dim::Int
+end
+
+"""
+    Binaries(n)
+
+The set of binary vectors ``\\{0,1\\}^n``.
+"""
+struct Binaries <: AbstractSet
+    dim::Int
+end
+
+
+dimension(s::Union{NonNegative,NonPositive,Zero,Integers,Binaries}) = s.dim
 
 """
     addconstraint!(m::AbstractMathProgModel, b, a_constridx, a_varidx, a_coef, Q_constridx, Q_vari, Q_varj, Q_coef, S::AbstractSet)
@@ -75,5 +95,14 @@ where ``a`` is a sparse vector specified in tuple form by
 `a_varidx`, and `a_coef`; ``b`` is a scalar;
 the symmetric matrix ``Q`` is defined by the triplets in `Q_vari`, `Q_varj`,
 `Q_coef`; and the set ``S`` is defined by `S`.
+
+    addconstraint!(m::AbstractMathProgModel, varidx, S::AbstractSet)
+
+A specialized version of `addconstraint!` for constraints on subsets of variables.
+Add the constraint
+```math
+x_{varidx} \\in S
+```
+where `varidx` specifies the indices of the subvector of `x`.
 """
 function addconstraint! end

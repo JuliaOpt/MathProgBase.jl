@@ -131,12 +131,54 @@ to warm-start the solve.
 struct VariableStart <: AbstractAttribute end
 
 """
-    VariableDualStart
+    VariableLowerBoundDualStart
 
-An initial assignment of the variable duals that the solver may use
+An initial assignment of the variable lower-bound duals that the solver may use
 to warm-start the solve.
 """
-struct VariableDualStart <: AbstractAttribute end
+struct VariableLowerBoundDualStart <: AbstractAttribute end
+
+"""
+    VariableUpperBoundDualStart
+
+An initial assignment of the variable upper-bound duals that the solver may use
+to warm-start the solve.
+"""
+struct VariableUpperBoundDualStart <: AbstractAttribute end
+
+
+"""
+    VariableLowerBound(i)
+
+Lower-bound constraint on variable index `i`. `-Inf` is valid as no bound.
+"""
+struct VariableLowerBound <: AbstractAttribute
+    i::Int
+end
+
+"""
+    VariableLowerBoundVector
+
+Lower-bound constraint vector for the variables. `-Inf` is valid as no bound.
+"""
+struct VariableLowerBoundVector <: AbstractAttribute end
+
+"""
+    VariableUpperBound(i)
+
+Upper-bound constraint vector for the variables. `Inf` is valid as no bound.
+"""
+struct VariableUpperBound <: AbstractAttribute
+    i::Int
+end
+
+"""
+    VariableUpperBoundVector
+
+Upper-bound constraints on variable index `i`. `Inf` is valid as no bound.
+"""
+struct VariableUpperBoundVector <: AbstractAttribute end
+
 
 """
     VariableResult
