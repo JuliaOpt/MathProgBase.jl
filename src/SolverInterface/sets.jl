@@ -9,33 +9,32 @@ abstract type AbstractSet end
 
 
 """
-    NonNegative(dim)
+    NonNegative(n)
 
-The nonnegative orthant ``\\{ x \\in \\mathbb{R}^n : x \\ge 0 \\}`` where the dimension ``n`` is specified by the field `dim`.
+The nonnegative orthant ``\\{ x \\in \\mathbb{R}^n : x \\ge 0 \\}`` where the dimension ``n`` is specified by the field `n`.
 """
 struct NonNegative <: AbstractSet
     dim::Int
 end
 
 """
-    NonPositive(dim)
+    NonPositive(n)
 
-The nonpositive orthant ``\\{ x \\in \\mathbb{R}^n : x \\le 0 \\}`` where the dimension ``n`` is specified by the field `dim`.
+The nonpositive orthant ``\\{ x \\in \\mathbb{R}^n : x \\le 0 \\}`` where the dimension ``n`` is specified by the field `n`.
 """
 struct NonPositive <: AbstractSet
     dim::Int
 end
 
 """
-    Zero(dim)
+    Zero(n)
 
-The set ``\\{0\\}^n`` where the dimension ``n`` is specified by the field `dim`.
+The set ``\\{0\\}^n`` where the dimension ``n`` is specified by the field `n`.
 """
 struct Zero <: AbstractSet
     dim::Int
 end
 
-dimension(s::Union{NonNegative,NonPositive,Zero}) = s.dim
 
 """
     Interval(lower,upper)
@@ -50,30 +49,23 @@ end
 dimension(s::Interval) = 1
 
 """
-    addconstraint!(m::AbstractMathProgModel, b, a_constridx, a_varidx, a_coef, Q_constridx, Q_vari, Q_varj, Q_coef, S::AbstractSet)
+    Integers(n)
 
-Add the constraint
-```math
-Ax + b + q \\in S
-```
-where ``A`` is a sparse vector specified in triplet form by
-`a_constridx`, `a_varidx`, and `a_coef`; ``b`` is a vector;
-``q`` is a vector with entry `k` equal to ``\\frac{1}{2}x^TQ_kx``
-where the symmetric matrix ``Q_k`` is defined by the triplets in `Q_vari`, `Q_varj`,
-`Q_coef` for which `Q_constridx` equals `k`; and the set ``S`` is defined by `S`.
-
-Duplicate indices in either ``A`` or  a ``Q`` matrix are accepted and will be summed together. Off-diagonal entries of ``Q`` will be mirrored, so either the upper triangular or lower triangular entries of ``Q`` should be provided. If entries for both ``(i,j)`` and ``(j,i)`` are provided, these are considered duplicate terms.
-
-    addconstraint!(m::AbstractMathProgModel, b, a_varidx, a_coef, Q_vari, Q_varj, Q_coef, S::AbstractSet)
-
-A specialized version of `addconstraint!` for one-dimensional sets.
-Add the constraint
-```math
-a^Tx + b + \\frac{1}{2}x^TQx \\in S
-```
-where ``a`` is a sparse vector specified in tuple form by
-`a_varidx`, and `a_coef`; ``b`` is a scalar;
-the symmetric matrix ``Q`` is defined by the triplets in `Q_vari`, `Q_varj`,
-`Q_coef`; and the set ``S`` is defined by `S`.
+The set of integers ``\\mathbb{Z}^n``.
 """
-function addconstraint! end
+struct Integers <: AbstractSet
+    dim::Int
+end
+
+"""
+    Binaries(n)
+
+The set of binary vectors ``\\{0,1\\}^n``.
+"""
+struct Binaries <: AbstractSet
+    dim::Int
+end
+
+
+dimension(s::Union{NonNegative,NonPositive,Zero,Integers,Binaries}) = s.dim
+

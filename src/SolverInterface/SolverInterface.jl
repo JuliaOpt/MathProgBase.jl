@@ -56,6 +56,8 @@ function loadproblem! end
 # solver parameters, may be implemented by AbstractMathProgModel or AbstractMathProgSolver
 function setparameters! end
 
+include("variables.jl")
+include("constraints.jl")
 include("sets.jl")
 include("attributes.jl")
 
