@@ -16,12 +16,31 @@ optimize!
 freemodel!
 ```
 
-## Sets
+## Variables
+
+```@docs
+VariableReference
+candelete(::AbstractMathProgModel,::VariableReference)
+isactive(::AbstractMathProgModel,::VariableReference)
+delete!(::AbstractMathProgModel,::VariableReference)
+addvariables!
+addvariable!
+```
+
+## Constraints
 
 How to add constraints.
 ```@docs
+ConstraintReference
+candelete(::AbstractMathProgModel,::ConstraintReference)
+isactive(::AbstractMathProgModel,::ConstraintReference)
+delete!(::AbstractMathProgModel,::ConstraintReference)
 addconstraint!
 ```
+
+## Sets
+
+
 
 List of sets.
 ```@docs
@@ -62,15 +81,17 @@ ResultCount
 
 ### Variable Attributes
 
+These attributes are associated with variables. Calls to `getattribute` and `setattribute!` should include a single `VariableReference` or a vector of `VariableReference` objects.
+
 ```@docs
 VariableStart
 VariableLowerBoundDualStart
 VariableUpperBoundDualStart
 VariableLowerBound
-VariableLowerBoundVector
 VariableUpperBound
-VariableUpperBoundVector
-VariableResult
+VariablePrimal
+VariableLowerBoundDual
+VariableUpperBoundDual
 ```
 
 

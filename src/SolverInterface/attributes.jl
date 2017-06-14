@@ -17,11 +17,18 @@ Return an attribute of the model `m` specified by attribute type `attr`.
 # Examples
 
     getattribute(m, ObjectiveValue())
-    getattribute(m, VariableResult())
-    getattribute(m, VariableResult(5))
+    getattribute(m, VariableResult(), ref)
+    getattribute(m, VariableResult(5), [ref1,ref2])
     getattribute(m, OtherAttribute("something specific to cplex"))
 """
 function getattribute end
+
+"""
+    getattribute!(output, m::AbstractMathProgModel, attr::AbstractAttribute)
+
+An in-place version of `getattribute!`. Return an attribute of the model `m` specified by attribute type `attr` into output vector `attr`.
+"""
+function getattribute! end
 
 """
     cangetattribute(m::AbstractMathProgModel, attr::AbstractAttribute)::Bool
@@ -148,46 +155,48 @@ struct VariableUpperBoundDualStart <: AbstractAttribute end
 
 
 """
-    VariableLowerBound(i)
+    VariableLowerBound
 
-Lower-bound constraint on variable index `i`. `-Inf` is valid as no bound.
+Lower-bound constraints on variables. `-Inf` is valid as no bound.
 """
-struct VariableLowerBound <: AbstractAttribute
-    i::Int
-end
-
-"""
-    VariableLowerBoundVector
-
-Lower-bound constraint vector for the variables. `-Inf` is valid as no bound.
-"""
-struct VariableLowerBoundVector <: AbstractAttribute end
-
-"""
-    VariableUpperBound(i)
-
-Upper-bound constraint vector for the variables. `Inf` is valid as no bound.
-"""
-struct VariableUpperBound <: AbstractAttribute
-    i::Int
-end
-
-"""
-    VariableUpperBoundVector
-
-Upper-bound constraints on variable index `i`. `Inf` is valid as no bound.
-"""
-struct VariableUpperBoundVector <: AbstractAttribute end
+struct VariableLowerBound <: AbstractAttribute end
 
 
 """
-    VariableResult
+    VariableUpperBound
+
+Upper-bound constraints for the variables. `Inf` is valid as no bound.
+"""
+struct VariableUpperBound <: AbstractAttribute end
+
+"""
+    VariablePrimal(N)
 
 The assignment to the primal variables in result `N`. If `N` is omitted, it is interpreted as 1.
 """
-struct VariableResult <: AbstractAttribute
+struct VariablePrimal <: AbstractAttribute
     N::Int
 end
+
+"""
+    VariableLowerBoundDual(N)
+
+The assignment to the duals on the variable lower bounds in result `N`. If `N` is omitted, it is interpreted as 1.
+"""
+struct VariableLowerBoundDual <: AbstractAttribute
+    N::Int
+end
+
+"""
+    VariableUpperBoundDual(N)
+
+The assignment to the duals on the variable upper bounds in result `N`. If `N` is omitted, it is interpreted as 1.
+"""
+struct VariableUpperBoundDual <: AbstractAttribute
+    N::Int
+end
+
+
 
 # VarType?
 
