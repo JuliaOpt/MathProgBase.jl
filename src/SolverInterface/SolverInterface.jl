@@ -1,6 +1,6 @@
 using Base.Meta
 
-export AbstractMathProgModel, AbstractMathProgSolver 
+export AbstractMathProgModel, AbstractMathProgSolver
 
 # not sure if this should still be here
 rewrap_methods = [:getobjbound,

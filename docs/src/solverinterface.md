@@ -51,7 +51,6 @@ Interval
 Integers
 Binaries
 ```
-
 ## Attributes
 
 These are used to get and set properties of the model.

@@ -248,5 +248,3 @@ To be documented: `NumericalError`, `InvalidModel`, `InvalidOption`, `Interrupte
 
 """
 @enum TerminationStatusCode Success AlmostSuccess InfeasibleNoResult UnboundedNoResult InfeasibleOrUnbounded IterationLimit TimeLimit NodeLimit SolutionLimit MemoryLimit ObjectiveLimit NormLimit OtherLimit SlowProgress NumericalError InvalidModel InvalidOption Interrupted OtherError
-
-

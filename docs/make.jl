@@ -5,7 +5,11 @@ makedocs(
     sitename = "MathProgBase",
     pages = [
         "Introduction" => "index.md",
-        "Solver Interface" => "solverinterface.md"
+        "Linear Programming" => "linearprog.md",
+        "Mixed-Integer Programming" => "mixedintprog.md",
+        "Quadratic Programming" => "quadprog.md",
+        "Solver Interface" => "solverinterface.md",
+        "Choosing Solver" => "choosingsolver.md"
     ]
 )
 
