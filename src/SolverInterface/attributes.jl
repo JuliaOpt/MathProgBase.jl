@@ -84,9 +84,11 @@ struct SolveTime <: AbstractAttribute end
 """
     Sense
 
-The optimization sense of the model. Valid values are `:Min` and `:Max`.
+The optimization sense of the model, an `OptimizationSense` with value `MinSense` or `MaxSense`.
 """
 struct Sense <: AbstractAttribute end
+
+@enum OptimizationSense MinSense MaxSense
 
 """
     SimplexIterations
