@@ -16,6 +16,21 @@ optimize!
 freemodel!
 ```
 
+## Sets
+
+How to add constraints.
+```@docs
+addconstraint!
+```
+
+List of sets.
+```@docs
+NonNegative
+NonPositive
+Zero
+Interval
+```
+
 ## Attributes
 
 These are used to get and set properties of the model.

@@ -56,6 +56,7 @@ function loadproblem! end
 # solver parameters, may be implemented by AbstractMathProgModel or AbstractMathProgSolver
 function setparameters! end
 
+include("sets.jl")
 include("attributes.jl")
 
 #include("LinearQuadratic.jl")
