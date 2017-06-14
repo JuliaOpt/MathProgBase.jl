@@ -61,7 +61,7 @@ function getattribute! end
     cangetattribute!(m::AbstractMathProgModel, attr::AbstractAttribute)::Bool
 
 Return a `Bool` indicating whether the model `m` currently has a value for the
-attribute specified by attribute type `attr` than can be queried by
+attribute specified by attribute type `attr` that can be queried by
 `getattribute!`.
 """
 function cangetattribute! end
