@@ -9,14 +9,6 @@ rewrap_methods = [:getobjbound,
                   :getsolvetime,
                  ]
 
-"""
-    AbstractMathProgModel
-
-Abstract supertype which represents a solver's
-in-memory representation of an optimization problem.
-"""
-abstract type AbstractMathProgModel end
-
 # immutable type which we dispatch solvers on
 """
     AbstractMathProgSolver
@@ -25,6 +17,42 @@ Abstract supertype for "solver" objects. A solver is a lightweight object used f
 """
 abstract type AbstractMathProgSolver end
 
+"""
+    AbstractNonLinearModel
+
+Abstract supertype which represents a solver's in-memory representation of a
+non-linear optimization problem.
+"""
+abstract type AbstractNonLinearModel end
+
+"""
+    NonLinearModel(solver::AbstractMathProgSolver)
+
+Create an instance of `AbstractNonLinearModel` using the given solver.
+"""
+function NonLinearModel end
+
+"""
+    AbstractModel
+
+Abstract supertype which represents a solver's in-memory representation of an
+optimization problem.
+"""
+abstract type AbstractModel end
+
+"""
+    Model(solver::AbstractMathProgSolver)
+
+Create an instance of `AbstractModel` using the given solver.
+"""
+function Model end
+
+"""
+    AbstractMathProgModel
+
+Union type of both `AbstractNonLinearModel` and `AbstractModel`.
+"""
+const AbstractMathProgModel = Union{AbstractNonLinearModel, AbstractModel}
 
 # basic methods methods for AbstractMathProgModel
 
@@ -51,7 +79,7 @@ function freemodel! end
 function loadproblem! end
 
 """
-    writeproblem(m::AbstractLinearQuadraticModel, filename::String)
+    writeproblem(m::AbstractModel, filename::String)
 
 Writes the current problem data to the given file. Supported file types are solver-dependent.
 """

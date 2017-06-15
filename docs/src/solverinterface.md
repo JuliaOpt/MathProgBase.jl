@@ -5,13 +5,16 @@ CurrentModule = MathProgBase
 ```
 
 ```@docs
-AbstractMathProgModel
+AbstractModel
+AbstractNonLinearModel
 AbstractMathProgSolver
 ```
 
 ## Basic Methods
 
 ```@docs
+Model
+NonLinearModel
 optimize!
 freemodel!
 ```
@@ -138,4 +141,3 @@ TODO: attributes and status codes for LP basis status
 ## Duals
 
 We take the convention that duals on variable lower bounds should be nonnegative, duals on variable upper bounds should be nonpositive, and duals on closed convex cones should belong to the dual cone.
-
