@@ -139,6 +139,48 @@ The number of results available.
 """
 struct ResultCount <: AbstractAttribute end
 
+"""
+    VariableCount()
+
+The number of variables in the model.
+"""
+struct VariableCount <: AbstractAttribute end
+
+
+"""
+    ConstraintCount{T}()
+
+The number of constraints of type T in the model.
+"""
+struct ConstraintCount{T} <: AbstractAttribute end
+
+"""
+    SupportsVariablesInSet{T}()
+
+A `Bool` indicating whether the solver or model supports
+a constraint of type ``x_{varidx} \\in S`` where ``S``
+is a set of type `T` and ``varidx`` indicates any subset
+of the variables.
+"""
+struct SupportsVariablesInSet{T} <: AbstractAttribute end
+
+"""
+    SupportsAffineInSet{T}()
+
+A `Bool` indicating whether the solver or model supports
+a constraint of of the form "affine expression" in ``S`` where ``S``
+is a set of type `T`.
+"""
+struct SupportsAffineInSet{T} <: AbstractAttribute end
+
+"""
+    SupportsQuadraticInSet{T}()
+
+A `Bool` indicating whether the solver or model supports
+a constraint of of the form "quadratic expression" in ``S`` where ``S``
+is a set of type `T`.
+"""
+struct SupportsQuadraticInSet{T} <: AbstractAttribute end
 
 
 

@@ -76,6 +76,11 @@ BarrierIterations
 NodeCount
 RawSolver
 ResultCount
+VariableCount
+ConstraintCount
+SupportsVariablesInSet
+SupportsAffineInSet
+SupportsQuadraticInSet
 ```
 
 ### Variable Attributes
