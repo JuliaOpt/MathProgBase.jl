@@ -2,16 +2,30 @@ using Base.Test
 using MathProgBase
 using MathProgBase.SolverInterface
 
+const MPB = MathProgBase
 
-"""
 function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefault(Float64))
     @testset "Testing LP interface with $solver" begin
         @testset "Basic interface" begin
-            m = LinearQuadraticModel(solver)
+            m = MathProgBase.Model(solver)
 
             # Min -x
             # s.t. x + y <= 1
             # x, y >= 0
+
+            # Min -x
+            # s.t. x + y <= 1
+            # x, y >= 0
+            v = MPB.addvariables!(m, 2)
+            @test MPB.cansetattribute(m, VariableLowerBound())
+            MPB.setattribute!(m, VariableLowerBound(), v, [0, 0])
+            @test MPB.getattribute(m, VariableCount()) == 2
+            @test getattribute(m, SupportsAffineInSet{MPB.NonPositive})
+            c = MPB.addconstraints!(m, -1, v, [1, 1], [], [], [], MPB.NonPositive)
+        end
+    end
+end
+"""
             loadproblem!(m, [1. 1.], [0.,0.], [Inf, Inf], [-1.,0.], [-Inf],[1.], :Min)
             @test numvar(m) == 2
             @test numconstr(m) == 1
