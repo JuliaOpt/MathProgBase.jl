@@ -19,5 +19,6 @@ deploydocs(
     osname = "linux",
     julia  = "0.6",
     deps   = nothing,
-    make   = nothing
+    make   = nothing,
+    latest = "break_everything"
 )
