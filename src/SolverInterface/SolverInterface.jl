@@ -66,10 +66,10 @@ include("constraints.jl")
 include("sets.jl")
 include("attributes.jl")
 include("objectives.jl")
+include("Nonlinear.jl")
 
 #include("LinearQuadratic.jl")
 #include("callbacks.jl")
-#include("Nonlinear.jl")
 #include("Conic.jl")
 
 # Solver conversion routines
