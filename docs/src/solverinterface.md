@@ -110,8 +110,12 @@ The `PrimalStatus` and `DualStatus` attributes are meant to explain how to inter
 ```@docs
 PrimalStatus
 DualStatus
-ResultStatus
+ResultStatusCode
 ```
+
+## Basis Status
+
+TODO: attributes and status codes for LP basis status
 
 
 ## Duals
