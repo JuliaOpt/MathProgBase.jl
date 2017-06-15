@@ -258,12 +258,18 @@ VariableUpperBoundDual() = VariableUpperBoundDual(1)
     VariableBasisStatus()
 
 Returns the `VariableBasisStatusCode` of a given variable, with respect to an available optimal solution basis.
+"""
+struct VariableBasisStatus <: AbstractAttribute end
+
+"""
+    VariableBasisStatusCode
+
+An Enum of possible values for the `VariableBasisStatus` attribute. This explains the status of a given variable with respect to an optimal solution basis. Possible values are:
     * `Basic`: variable is in the basis.
     * `NonbasicAtLower`: variable is not in the basis and is at its lower bound.
     * `NonbasicAtUpper`: variable is not in the basis and is at its upper bound.
     * `SuperBasic`: variable is not in the basis but is also not at one of its bounds.
 """
-struct VariableBasisStatus <: AbstractAttribute end
 @enum VariableBasisStatusCode Basic NonbasicAtLower NonbasicAtUpper SuperBasic
 
 # Constraint attributes
@@ -310,10 +316,16 @@ ConstraintDual() = ConstraintDual(1)
     ConstraintBasisStatus()
 
 Returns the `ConstraintBasisStatusCode` of a given constraint, with respect to an available optimal solution basis.
+"""
+struct ConstraintBasisStatus <: AbstractAttribute end
+
+"""
+    ConstraintBasisStatusCode
+
+An Enum of possible values for the `ConstraintBasisStatus` attribute. This explains the status of a given constraint with respect to an optimal solution basis. Possible values are:
     * `Basic`: constraint is in the basis, i.e. the corresponding slack variable is in the basis.
     * `Nonbasic`: constraint is not in the basis.
 """
-struct ConstraintBasisStatus <: AbstractAttribute end
 @enum ConstraintBasisStatusCode Basic Nonbasic
 
 
