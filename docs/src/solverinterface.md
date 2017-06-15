@@ -83,7 +83,7 @@ ResultCount
 These attributes are associated with variables. Calls to `getattribute` and `setattribute!` should include as an argument a single `VariableReference` or a vector of `VariableReference` objects.
 
 ```@docs
-VariableStart
+VariablePrimalStart
 VariableLowerBoundDualStart
 VariableUpperBoundDualStart
 VariableLowerBound
@@ -92,6 +92,18 @@ VariablePrimal
 VariableLowerBoundDual
 VariableUpperBoundDual
 ```
+
+### Constraint Attributes
+
+These attributes are associated with constraints. Calls to `getattribute` and `setattribute!` should include as an argument a single `ConstraintReference` or a vector of `ConstriaintReference{T}` objects.
+
+```@docs
+ConstraintPrimalStart
+ConstraintDualStart
+ConstraintPrimal
+ConstraintDual
+```
+
 
 
 ## Termination Status

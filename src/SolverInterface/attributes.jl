@@ -133,12 +133,12 @@ struct ResultCount <: AbstractAttribute end
 # Variable attributes
 
 """
-    VariableStart()
+    VariablePrimalStart()
 
 An initial assignment of the variables that the solver may use
 to warm-start the solve.
 """
-struct VariableStart <: AbstractAttribute end
+struct VariablePrimalStart <: AbstractAttribute end
 
 """
     VariableLowerBoundDualStart()
@@ -204,13 +204,45 @@ end
 VariableUpperBoundDual() = VariableUpperBoundDual(1)
 
 
-# VarType?
+# Constraint attributes
 
+"""
+    ConstraintPrimalStart()
 
-function getsolution end
+An initial assignment of the constraint primal values that the solver may use
+to warm-start the solve.
+"""
+struct ConstraintPrimalStart <: AbstractAttribute end
 
+"""
+    ConstraintDualStart()
 
-function loadproblem! end
+An initial assignment of the constriant duals that the solver may use
+to warm-start the solve.
+"""
+struct ConstraintDualStart <: AbstractAttribute end
+
+"""
+    ConstraintPrimal(N)
+    ConstraintPrimal()
+
+The assignment to the constraint primal values in result `N`. If `N` is omitted, it is 1 by default.
+"""
+struct ConstraintPrimal <: AbstractAttribute
+    N::Int
+end
+ConstraintPrimal() = ConstraintPrimal(1)
+
+"""
+    ConstraintDual(N)
+    ConstraintDual()
+
+The assignment to the constraint dual values in result `N`. If `N` is omitted, it is 1 by default.
+"""
+struct ConstraintDual <: AbstractAttribute
+    N::Int
+end
+ConstraintDual() = ConstraintDual(1)
 
 
 # Termination status
