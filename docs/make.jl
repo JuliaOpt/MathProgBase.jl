@@ -9,6 +9,7 @@ makedocs(
         "Solver Interface" => [
              "Basics" => "basics.md",
              "Variables" => "variables.md",
+             "Objectives" => "objectives.md",
              "Constraints" => "constraints.md",
              "Sets" => "sets.md",
              "Attributes" => "attributes.md",
