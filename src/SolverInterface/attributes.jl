@@ -170,12 +170,14 @@ struct VariableUpperBound <: AbstractAttribute end
 
 """
     VariablePrimal(N)
+    VariablePrimal()
 
-The assignment to the primal variables in result `N`. If `N` is omitted, it is interpreted as 1.
+The assignment to the primal variables in result `N`. If `N` is omitted, it is 1 by default.
 """
 struct VariablePrimal <: AbstractAttribute
     N::Int
 end
+VariablePrimal() = VariablePrimal(1)
 
 """
     VariableLowerBoundDual(N)
