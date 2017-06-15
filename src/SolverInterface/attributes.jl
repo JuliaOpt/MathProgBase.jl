@@ -257,20 +257,21 @@ VariableUpperBoundDual() = VariableUpperBoundDual(1)
 """
     VariableBasisStatus()
 
-Returns the `VariableBasisStatusCode` of a given variable, with respect to an available optimal solution basis.
+Returns the `BasisStatusCode` of a given variable, with respect to an available optimal solution basis.
 """
 struct VariableBasisStatus <: AbstractAttribute end
 
 """
-    VariableBasisStatusCode
+    BasisStatusCode
 
-An Enum of possible values for the `VariableBasisStatus` attribute. This explains the status of a given variable with respect to an optimal solution basis. Possible values are:
-    * `Basic`: variable is in the basis.
-    * `NonbasicAtLower`: variable is not in the basis and is at its lower bound.
-    * `NonbasicAtUpper`: variable is not in the basis and is at its upper bound.
-    * `SuperBasic`: variable is not in the basis but is also not at one of its bounds.
+An Enum of possible values for the `VariableBasisStatus` and `ConstraintBasisStatus` attribute. This explains the status of a given element with respect to an optimal solution basis. Possible values are:
+    * `Basic`: element is in the basis.
+    * `Nonbasic`: element is not in the basis.
+    * `NonbasicAtLower`: element is not in the basis and is at its lower bound.
+    * `NonbasicAtUpper`: element is not in the basis and is at its upper bound.
+    * `SuperBasic`: element is not in the basis but is also not at one of its bounds.
 """
-@enum VariableBasisStatusCode Basic NonbasicAtLower NonbasicAtUpper SuperBasic
+@enum BasisStatusCode Basic Nonbasic NonbasicAtLower NonbasicAtUpper SuperBasic
 
 # Constraint attributes
 
@@ -315,18 +316,9 @@ ConstraintDual() = ConstraintDual(1)
 """
     ConstraintBasisStatus()
 
-Returns the `ConstraintBasisStatusCode` of a given constraint, with respect to an available optimal solution basis.
+Returns the `BasisStatusCode` of a given constraint, with respect to an available optimal solution basis.
 """
 struct ConstraintBasisStatus <: AbstractAttribute end
-
-"""
-    ConstraintBasisStatusCode
-
-An Enum of possible values for the `ConstraintBasisStatus` attribute. This explains the status of a given constraint with respect to an optimal solution basis. Possible values are:
-    * `Basic`: constraint is in the basis, i.e. the corresponding slack variable is in the basis.
-    * `Nonbasic`: constraint is not in the basis.
-"""
-@enum ConstraintBasisStatusCode Basic Nonbasic
 
 
 
