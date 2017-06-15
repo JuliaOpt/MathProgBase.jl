@@ -6,6 +6,30 @@ export AbstractNonlinearModel
 abstract type AbstractNLPEvaluator end
 export AbstractNLPEvaluator
 
+
+###  NLP Attributes ###
+
+"""
+    ConstraintNLPDual(N)
+    ConstraintNLPDual()
+
+The assignment to the NLP constraint dual values in result `N`. If `N` is omitted, it is 1 by default.
+"""
+struct ConstraintNLPDual <: AbstractAttribute
+    N::Int
+end
+ConstraintNLPDual() = ConstraintNLPDual(1)
+
+
+"""
+    ConstraintNLPDualStart()
+
+An initial assignment of the NLP constriant duals that the solver may use
+to warm-start the solve.
+"""
+struct ConstraintNLPDualStart <: AbstractAttribute end
+
+
 ### methods for AbstractNLPEvaluator ###
 
 """
@@ -15,11 +39,11 @@ function NonlinearModel end
 
 
 """
-    loadproblem!(m::AbstractNonlinearModel, numVar, numConstr, l, u, lb, ub, sense, d::AbstractNLPEvaluator)
+    loadnlp!(m::AbstractNonlinearModel, numVar, numConstr, l, u, lb, ub, sense, d::AbstractNLPEvaluator)
 
 Loads the nonlinear programming problem into the model. The parameter `numVar` is the number of variables in the problem, `numConstr` is the number of constraints, `l` contains the variable lower bounds, `u` contains the variable upper bounds, `lb` contains the constraint lower bounds, and `ub` contains the constraint upper bounds. Sense contains the symbol `:Max` or `:Min`, indicating the direction of optimization. The final parameter `d` is an instance of an `AbstractNLPEvaluator`, described below, which may be queried for evaluating ``f`` and ``g`` and their corresponding derivatives.
 """
-function loadproblem! end
+function loadnlp! end
 
 
 """
@@ -140,24 +164,6 @@ function eval_hesslag end
 
 
 """
-
-"""
-function isobjlinear end
-
-
-"""
-
-"""
-function isobjquadratic end
-
-
-"""
-
-"""
-function isconstrlinear end
-
-
-"""
     obj_expr(d::AbstractNLPEvaluator)
 
 Returns an expression graph for the objective function as a standard Julia `Expr`
@@ -214,21 +220,4 @@ isobjquadratic(::AbstractNLPEvaluator) = false
 isconstrlinear(::AbstractNLPEvaluator, i::Integer) = false
 
 
-### update ###
-"""
-    getreducedcosts(m::AbstractNonlinearModel)
-
-Returns the dual solution vector corresponding to the variable bounds,
-known as the reduced costs. Not available when integer variables are present.
-"""
-function getreducedcosts end
-
-
-"""
-    getconstrduals(m::AbstractNonlinearModel)
-
-Returns the dual solution vector corresponding to the constraints.
-Not available when integer variables are present.
-"""
-function getconstrduals end
 

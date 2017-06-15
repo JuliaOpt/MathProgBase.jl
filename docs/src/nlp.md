@@ -2,10 +2,13 @@
     CurrentModule = MathProgBase
 ```
 
-# Nonlinear models
+# NonLinear Programming Interface (NLP)
+
+
+## NLP Methods
 
 ```@docs
-loadproblem!
+loadnlp!
 initialize
 features_available
 eval_f
@@ -17,12 +20,16 @@ eval_jac_prod
 eval_jac_prod_t
 eval_hesslag_prod
 eval_hesslag
-isobjlinear
-isobjquadratic
-isconstrlinear
+isobjlinear(::AbstractNLPEvaluator)
+isobjquadratic(::AbstractNLPEvaluator)
+isconstrlinear(::AbstractNLPEvaluator, i::Integer)
 obj_expr
 constr_expr
-getreducedcosts
-getconstrduals
 ```
 
+## NLP Attributes
+
+```@docs
+ConstraintNLPDual
+ConstraintNLPDualStart
+```
