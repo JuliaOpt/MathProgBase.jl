@@ -5,10 +5,15 @@ makedocs(
     sitename = "MathProgBase",
     pages = [
         "Introduction" => "index.md",
-        "Linear Programming" => "linearprog.md",
-        "Mixed-Integer Programming" => "mixedintprog.md",
-        "Quadratic Programming" => "quadprog.md",
-        "Solver Interface" => "solverinterface.md",
+        "High-level Interfaces" => "highlevel.md",
+        "Solver Interface" => [
+             "Basics" => "basics.md",
+             "Variables" => "variables.md",
+             "Constraints" => "constraints.md",
+             "Sets" => "sets.md",
+             "Attributes" => "attributes.md",
+             "Status Codes" => "statuscodes.md",
+             "Duals" => "duals.md"],
         "Choosing Solver" => "choosingsolver.md"
     ]
 )
