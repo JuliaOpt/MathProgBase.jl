@@ -75,3 +75,57 @@ x_{varidx} \\in S
 where `varidx` specifies the indices of the subvector of `x`.
 """
 function addconstraint! end
+
+"""
+    modifyconstraint!(m::AbstractMathProgModel, c::ConstraintReference, i::Int, args...)
+
+Modify elements of the `i`'th row of the constraint `c` depending on the
+arguments `args`. The `i`'th row will have the form
+```math
+    a_i^T + b_i + \\frac{1}{2}x^TQ_ix \\in S
+```
+There are three cases.
+
+# Modify Constant term
+
+    modifyconstraint!(m::AbstractMathProgModel, c::ConstraintReference, i::Int, b)
+
+Set the constant term of the `i`'th row in the constraint `c` to `b`.
+
+### Examples
+
+        modifyconstraint!(m, c, 1, 1.0)
+
+# Modify Linear term
+
+modifyconstraint!(m::AbstractMathProgModel, c::ConstraintReference, i::Int, a_varidx, a_coef)
+
+Set elements given by `a_varidx` in the linear term of the `i`'th element in the
+constraint `c` to `a_coef`. Either `a_varidx` and `a_coef` are both singletons,
+or they should be collections with equal length.
+
+The behaviour of duplicate entries in `a_varidx` is undefined.
+
+### Examples
+
+        modifyconstraint!(m, c, v, 1.0)
+        modifyconstraint!(m, c, [v1, v2], [1.0, 2.0])
+
+# Modify Quadratic term
+
+    modifyconstraint!(m::AbstractMathProgModel, c::ConstraintReference, i::Int, Q_vari, Q_varj, Q_coef)
+
+Set the elements in the quadratic term of the `i`'th element of the constraint `c`
+specified by the triplets `Q_vari`, `Q_varj`, and `Q_coef`. Off-diagonal entries
+will be mirrored. `Q_vari`, `Q_varj` should be collections of `VariableReference`
+objects.
+
+The behaviour of duplicate entries is undefined. If entries for both ``(i,j)``
+and ``(j,i)`` are provided, these are considered duplicate terms.
+
+### Examples
+
+        modifyconstraint!(m, c, v1, v2, 1.0)
+        modifyconstraint!(m, c, [v1, v2], [v1, v1], [1.0, 2.0])
+"""
+function modifyconstraint! end
