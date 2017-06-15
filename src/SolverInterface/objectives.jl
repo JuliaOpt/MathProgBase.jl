@@ -24,7 +24,7 @@ function setobjective! end
 Modify elements of the `i`'th objective depending on the
 arguments `args`. The `i`'th objective will have the form:
 ```math
-    a_i^T + b_i + \\frac{1}{2}x^TQ_ix
+    a_i^Tx + b_i + \\frac{1}{2}x^TQ_ix
 ```
 There are three cases.
 
