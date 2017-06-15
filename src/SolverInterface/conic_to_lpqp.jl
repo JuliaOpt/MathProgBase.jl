@@ -3,7 +3,7 @@
 # To enable LPQP support from a Conic solver, define, e.g.,
 # LinearQuadraticModel(s::ECOSSolver) = ConicToLPQPBridge(ConicModel(s))
 
-type ConicToLPQPBridge <: AbstractLinearQuadraticModel
+mutable struct ConicToLPQPBridge <: AbstractLinearQuadraticModel
     m::AbstractConicModel
     A::SparseMatrixCSC{Float64,Int}
     collb::Vector{Float64}
