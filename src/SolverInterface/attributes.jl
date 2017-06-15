@@ -63,30 +63,28 @@ end
 ObjectiveValue() = ObjectiveValue(1)
 
 """
-    ObjectiveBound
+    ObjectiveBound()
 
 The best known bound on the optimal objective value.
 """
 struct ObjectiveBound <: AbstractAttribute end
 
-
-struct RelativeGapAttr <: AbstractAttribute  end
 """
-    RelativeGap
+    RelativeGap()
 
 The final relative optimality gap as optimization terminated. That is, ``\\frac{|b-f|}{|f|}``, where ``b`` is the best bound and ``f`` is the best feasible objective value.
 """
-const RelativeGap = RelativeGapAttr()
+struct RelativeGap <: AbstractAttribute  end
 
 """
-    SolveTime
+    SolveTime()
 
 The total elapsed solution time (in seconds) as reported by the solver.
 """
 struct SolveTime <: AbstractAttribute end
 
 """
-    Sense
+    Sense()
 
 The optimization sense of the model, an `OptimizationSense` with value `MinSense` or `MaxSense`.
 """
@@ -95,35 +93,35 @@ struct Sense <: AbstractAttribute end
 @enum OptimizationSense MinSense MaxSense
 
 """
-    SimplexIterations
+    SimplexIterations()
 
 The cumulative number of simplex iterations during the optimization process. In particular, for a MIP the total simplex iterations for all nodes.
 """
 struct SimplexIterations <: AbstractAttribute end
 
 """
-    BarrierIterations
+    BarrierIterations()
 
 The cumulative number of barrier iterations during the optimization process.
 """
 struct BarrierIterations <: AbstractAttribute end
 
 """
-    NodeCount
+    NodeCount()
 
 The total number of branch-and-bound nodes explored.
 """
 struct NodeCount <: AbstractAttribute end
 
 """
-    RawSolver
+    RawSolver()
 
 An object that may be used to access a solver-specific API for this model.
 """
 struct RawSolver <: AbstractAttribute end
 
 """
-    ResultCount
+    ResultCount()
 
 The number of results available.
 """
@@ -135,7 +133,7 @@ struct ResultCount <: AbstractAttribute end
 # Variable attributes
 
 """
-    VariableStart
+    VariableStart()
 
 An initial assignment of the variables that the solver may use
 to warm-start the solve.
@@ -143,7 +141,7 @@ to warm-start the solve.
 struct VariableStart <: AbstractAttribute end
 
 """
-    VariableLowerBoundDualStart
+    VariableLowerBoundDualStart()
 
 An initial assignment of the variable lower-bound duals that the solver may use
 to warm-start the solve.
@@ -151,7 +149,7 @@ to warm-start the solve.
 struct VariableLowerBoundDualStart <: AbstractAttribute end
 
 """
-    VariableUpperBoundDualStart
+    VariableUpperBoundDualStart()
 
 An initial assignment of the variable upper-bound duals that the solver may use
 to warm-start the solve.
@@ -160,7 +158,7 @@ struct VariableUpperBoundDualStart <: AbstractAttribute end
 
 
 """
-    VariableLowerBound
+    VariableLowerBound()
 
 Lower-bound constraints on variables. `-Inf` is valid as no bound.
 """
@@ -168,7 +166,7 @@ struct VariableLowerBound <: AbstractAttribute end
 
 
 """
-    VariableUpperBound
+    VariableUpperBound()
 
 Upper-bound constraints for the variables. `Inf` is valid as no bound.
 """
@@ -216,7 +214,7 @@ function loadproblem! end
 
 # Termination status
 """
-    TerminationStatus
+    TerminationStatus()
 
 A `TerminationStatusCode` explaining why the solver stopped.
 """
@@ -260,7 +258,7 @@ To be documented: `NumericalError`, `InvalidModel`, `InvalidOption`, `Interrupte
 # Result status
 
 """
-    ResultStatus
+    ResultStatusCode
 
 An Enum of possible values for the `PrimalStatus` and `DualStatus` attributes. The values indicate how to interpret the result vector.
 
@@ -274,13 +272,13 @@ An Enum of possible values for the `PrimalStatus` and `DualStatus` attributes. T
   * `Unknown`
   * `Other`
 """
-@enum ResultStatus FeasiblePoint NearlyFeasiblePoint InfeasiblePoint InfeasibilityCertificate NearlyInfeasibilityCertificate ReductionCertificate NearlyReductionCertificate Unknown Other
+@enum ResultStatusCode FeasiblePoint NearlyFeasiblePoint InfeasiblePoint InfeasibilityCertificate NearlyInfeasibilityCertificate ReductionCertificate NearlyReductionCertificate Unknown Other
 
 """
     PrimalStatus(N)
     PrimalStatus()
 
-The `ResultStatus` of the primal result `N`. If `N` is omitted, it defaults to 1.
+The `ResultStatusCode` of the primal result `N`. If `N` is omitted, it defaults to 1.
 """
 struct PrimalStatus <: AbstractAttribute
     N::Int
@@ -291,7 +289,7 @@ PrimalStatus() = PrimalStatus(1)
     DualStatus(N)
     DualStatus()
 
-The `ResultStatus` of the dual result `N`. If `N` is omitted, it defaults to 1.
+The `ResultStatusCode` of the dual result `N`. If `N` is omitted, it defaults to 1.
 """
 struct DualStatus <: AbstractAttribute
     N::Int

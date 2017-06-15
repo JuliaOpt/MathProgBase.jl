@@ -105,7 +105,7 @@ TerminationStatusCode
 
 ## Result Status
 
-The `PrimalStatus` and `DualStatus` attributes are meant to explain how to interpret the result returned by the solver. The value of the attributes are of type `ResultStatus`.
+The `PrimalStatus` and `DualStatus` attributes are meant to explain how to interpret the result returned by the solver. The value of the attributes are of type `ResultStatusCode`.
 
 ```@docs
 PrimalStatus
