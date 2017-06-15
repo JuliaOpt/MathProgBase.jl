@@ -28,9 +28,14 @@ isvalid(m::AbstractMathProgModel, ref::ConstraintReference) = throw(MethodError(
 """
     delete!(m::AbstractMathProgModel, ref::ConstraintReference)
 
-Delete the referenced variable from the model.
+Delete the referenced constraint from the model.
+
+    delete!(m::AbstractMathProgModel, refs::Vector{ConstraintReference})
+
+Delete the referenced constraints in the vector `refs` from the model.
 """
 Base.delete!(m::AbstractMathProgModel, ref::ConstraintReference) = throw(MethodError())
+Base.delete!(m::AbstractMathProgModel, refs::Vector{ConstraintReference}) = throw(MethodError())
 
 
 """
