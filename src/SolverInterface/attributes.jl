@@ -73,8 +73,8 @@ Both `resultindex` and `objectiveindex` default to 1.
 struct ObjectiveValue <: AbstractAttribute
     resultindex::Int
     objectiveindex::Int
+    (::Type{ObjectiveValue})(resultindex=1, objectiveindex=1) = new(resultindex, objectiveindex)
 end
-ObjectiveValue(resultindex=1, objectiveindex=1) = ObjectiveValue(resultindex, objectiveindex)
 
 """
     ObjectiveBound()
