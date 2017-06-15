@@ -191,6 +191,7 @@ The assignment to the duals on the variable lower bounds in result `N`. If `N` i
 struct VariableLowerBoundDual <: AbstractAttribute
     N::Int
 end
+VariableLowerBoundDual() = VariableLowerBoundDual(1)
 
 """
     VariableUpperBoundDual(N)
@@ -200,7 +201,7 @@ The assignment to the duals on the variable upper bounds in result `N`. If `N` i
 struct VariableUpperBoundDual <: AbstractAttribute
     N::Int
 end
-
+VariableUpperBoundDual() = VariableUpperBoundDual(1)
 
 
 # VarType?
