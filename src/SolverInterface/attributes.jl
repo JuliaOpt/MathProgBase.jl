@@ -7,7 +7,7 @@ to set or get attributes (properties) of the model.
 abstract type AbstractAttribute end
 
 """
-    getattribute(m::AbstractMathProgModel, attr::AbstractAttribute)
+    getattribute(m::AbstractMathProgModel, attr::AbstractAttribute, extra_args...)
 
 Return an attribute of the model `m` specified by attribute type `attr`.
 
@@ -20,12 +20,19 @@ Return an attribute of the model `m` specified by attribute type `attr`.
 """
 function getattribute end
 
+function getattribute(m, attr::AbstractAttribute, args...)
+    throw(ArgumentError("Model of type $(typeof(m)) does not support accessing the attribute $attr"))
+end
+
 """
-    getattribute!(output, m::AbstractMathProgModel, attr::AbstractAttribute)
+    getattribute!(output, m::AbstractMathProgModel, attr::AbstractAttribute, extra_args...)
 
 An in-place version of `getattribute`. Return an attribute of the model `m` specified by attribute type `attr` into output vector `attr`.
 """
 function getattribute! end
+function getattribute!(output, m, attr::AbstractAttribute, args...)
+    throw(ArgumentError("Model of type $(typeof(m)) does not support accessing the attribute $attr"))
+end
 
 """
     cangetattribute(m::AbstractMathProgModel, attr::AbstractAttribute)::Bool
@@ -34,6 +41,7 @@ Return a `Bool` indicating whether the model `m` currently has a value for
 the attributed specified by attribute type `attr`.
 """
 function cangetattribute end
+cangetattribute(m::AbstractMathProgModel, attr::AbstractAttribute) = false
 
 """
     cansetattribute(m::AbstractMathProgModel, attr::AbstractAttribute)::Bool
@@ -42,6 +50,7 @@ Return a `Bool` indicating whether the model `m` will accept a
 `setattribute!` call for the attributed specified by attribute type `attr`.
 """
 function cansetattribute end
+cansetattribute(m::AbstractMathProgModel, attr::AbstractAttribute) = false
 
 """
     setattribute!(m::AbstractMathProgModel, attr::AbstractAttribute, ...)
@@ -49,6 +58,9 @@ function cansetattribute end
 Set an attribute of the model `m` specified by attribute type `attr`.
 """
 function setattribute! end
+function setattribute!(m, attr::AbstractAttribute, args...)
+    throw(ArgumentError("Model of type $(typeof(m)) does not support setting the attribute $attr"))
+end
 
 # Scalar attributes
 """
