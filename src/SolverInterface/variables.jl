@@ -1,12 +1,14 @@
 
+
+struct GenericVariableReference{T}
+    value::UInt64
+end
 """
     VariableReference
 
 A lightweight object used to reference variables in a model.
 """
-struct VariableReference
-    value::UInt64
-end
+const VariableReference = GenericVariableReference{1}
 
 """
     candelete(m::AbstractMathProgModel, ref::VariableReference)::Bool
