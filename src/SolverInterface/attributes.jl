@@ -64,29 +64,48 @@ end
 
 # Scalar attributes
 """
-    ObjectiveValue(N)
+    ObjectiveValue(objectiveindex::Int, resultindex::Int)
+    ObjectiveValue(;objectiveindex::Int=1, resultindex::Int=1)
     ObjectiveValue()
 
-The objective value of the primal result `N`. If `N` is omitted, it defaults to 1.
+The objective value of the `resultindex`'th primal result of the `objectiveindex`'th objective.
+
+Both `objectiveindex` and `resultindex` default to 1.
 """
 struct ObjectiveValue <: AbstractAttribute
-    N::Int
+    objectiveindex::Int
+    resultindex::Int
 end
-ObjectiveValue() = ObjectiveValue(1)
+ObjectiveValue() = ObjectiveValue(1, 1)
+ObjectiveValue(;objectiveindex=1, resultindex=1) = ObjectiveValue(objectiveindex, resultindex)
 
 """
+    ObjectiveBound(N::Int)
     ObjectiveBound()
 
-The best known bound on the optimal objective value.
+The best known bound on the optimal objective value for the `N`'th objective.
+
+If `N` is not specified it defaults to 1.
 """
-struct ObjectiveBound <: AbstractAttribute end
+struct ObjectiveBound <: AbstractAttribute
+    N::Int
+end
+ObjectiveBound() = ObjectiveBound(1)
 
 """
+    RelativeGap(N::Int)
     RelativeGap()
 
-The final relative optimality gap as optimization terminated. That is, ``\\frac{|b-f|}{|f|}``, where ``b`` is the best bound and ``f`` is the best feasible objective value.
+The final relative optimality gap of the `N`'th objective as optimization terminated.
+That is, ``\\frac{|b-f|}{|f|}``, where ``b`` is the best bound and ``f`` is the
+best feasible objective value.
+
+If `N` is not specified it defaults to 1.
 """
-struct RelativeGap <: AbstractAttribute  end
+struct RelativeGap <: AbstractAttribute
+    N::Int
+end
+RelativeGap() = RelativeGap(1)
 
 """
     SolveTime()
@@ -96,11 +115,18 @@ The total elapsed solution time (in seconds) as reported by the solver.
 struct SolveTime <: AbstractAttribute end
 
 """
+    Sense(N::Int)
     Sense()
 
-The optimization sense of the model, an `OptimizationSense` with value `MinSense` or `MaxSense`.
+The optimization sense of `N`'th objective in the model. It is an
+`OptimizationSense` with value `MinSense` or `MaxSense`.
+
+If `N` is not specified it defaults to 1.
 """
-struct Sense <: AbstractAttribute end
+struct Sense <: AbstractAttribute
+    N::Int
+end
+Sense() = Sense(1)
 
 @enum OptimizationSense MinSense MaxSense
 
