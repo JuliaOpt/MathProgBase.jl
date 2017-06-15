@@ -6,7 +6,14 @@ makedocs(
     pages = [
         "Introduction" => "index.md",
         "High-level Interfaces" => "highlevel.md",
-        "Solver Interface" => "solverinterface.md",
+        "Solver Interface" => [
+             "Basics" => "basics.md",
+             "Variables" => "variables.md",
+             "Constraints" => "constraints.md",
+             "Sets" => "sets.md",
+             "Attributes" => "attributes.md",
+             "Status Codes" => "statuscodes.md",
+             "Duals" => "duals.md"],
         "Choosing Solver" => "choosingsolver.md"
     ]
 )
