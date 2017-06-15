@@ -39,7 +39,7 @@ function NonlinearModel end
 
 
 """
-    loadnlp!(m::AbstractNonlinearModel, numVar, numConstr, l, u, lb, ub, sense, d::AbstractNLPEvaluator)
+    loadnlp!(m::AbstractNonlinearModel, numVar, numConstr, l, u, lb, ub, sense::OptimizationSense, d::AbstractNLPEvaluator)
 
 Loads the nonlinear programming problem into the model. The parameter `numVar` is the number of variables in the problem, `numConstr` is the number of constraints, `l` contains the variable lower bounds, `u` contains the variable upper bounds, `lb` contains the constraint lower bounds, and `ub` contains the constraint upper bounds. Sense contains the symbol `:Max` or `:Min`, indicating the direction of optimization. The final parameter `d` is an instance of an `AbstractNLPEvaluator`, described below, which may be queried for evaluating ``f`` and ``g`` and their corresponding derivatives.
 """
