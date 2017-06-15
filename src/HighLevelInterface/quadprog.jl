@@ -1,4 +1,4 @@
-struct QuadprogSolution
+type QuadprogSolution
     status
     objval
     sol

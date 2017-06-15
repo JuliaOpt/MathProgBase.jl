@@ -1,4 +1,4 @@
-struct MixintprogSolution
+type MixintprogSolution
     status
     objval
     sol
