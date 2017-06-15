@@ -50,7 +50,12 @@ function freemodel! end
 # TODO
 function loadproblem! end
 
+"""
+    writeproblem(m::AbstractLinearQuadraticModel, filename::String)
 
+Writes the current problem data to the given file. Supported file types are solver-dependent.
+"""
+function writeproblem end
 
 # these could change to attributes that can be set on a model *or solver*
 # solver parameters, may be implemented by AbstractMathProgModel or AbstractMathProgSolver

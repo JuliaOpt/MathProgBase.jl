@@ -257,6 +257,13 @@ end
 ConstraintDual() = ConstraintDual(1)
 
 
+"""
+    SolutionBasis()
+
+Returns the basis set for the optimal solution in the form `(cbasis,rbasis)`, where both return values are vectors of symbols. The vector `cbasis` indexes the columns of the constraint matrix, while `rbasis` indexes the rows (values indicate whether the constraint is active at a lower/upper bound). The entries take value `:Basic` if the element is basic, `:NonbasicAtLower` if it is nonbasic at a lower bound, and `:NonbasicAtUpper` if it is nonbasic at upper bound. Other values may appear, taking solver-specific values. Note that this function may not work if the optimization algorithm is not able to provide basis information.
+"""
+struct SolutionBasis <: AbstractAttribute end
+
 # Termination status
 """
     TerminationStatus()
