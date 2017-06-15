@@ -90,6 +90,7 @@ function writeproblem end
 function setparameters! end
 
 include("variables.jl")
+include("references.jl")
 include("constraints.jl")
 include("sets.jl")
 include("attributes.jl")

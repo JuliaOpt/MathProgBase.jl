@@ -4,7 +4,9 @@ CurrentModule = MathProgBase
 
 How to add constraints.
 ```@docs
-ConstraintReference
+VariablewiseConstraintReference
+AffineConstraintReference
+QuadraticConstraintReference
 candelete(::AbstractMathProgModel,::ConstraintReference)
 isvalid(::AbstractMathProgModel,::ConstraintReference)
 delete!(::AbstractMathProgModel,::ConstraintReference)
