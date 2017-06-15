@@ -64,15 +64,17 @@ end
 
 # Scalar attributes
 """
-    ObjectiveValue(N)
-    ObjectiveValue()
+    ObjectiveValue(resultidx::Int=1, objectiveindex::Int=1)
 
-The objective value of the primal result `N`. If `N` is omitted, it defaults to 1.
+The objective value of the `resultindex`'th primal result of the `objectiveindex`'th objective.
+
+Both `resultindex` and `objectiveindex` default to 1.
 """
 struct ObjectiveValue <: AbstractAttribute
-    N::Int
+    resultindex::Int
+    objectiveindex::Int
 end
-ObjectiveValue() = ObjectiveValue(1)
+ObjectiveValue(resultindex=1, objectiveindex=1) = ObjectiveValue(resultindex, objectiveindex)
 
 """
     ObjectiveBound()
