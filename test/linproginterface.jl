@@ -2,6 +2,8 @@ using Base.Test
 using MathProgBase
 using MathProgBase.SolverInterface
 
+
+"""
 function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefault(Float64))
     @testset "Testing LP interface with $solver" begin
         @testset "Basic interface" begin
@@ -471,3 +473,4 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver; eps = Base.rtold
         end
     end
 end
+"""

@@ -8,6 +8,7 @@
 using Base.Test
 using MathProgBase
 
+"""
 function coniclineartest(solver::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e-6)
     @testset "Testing linear problems through conic interface with $solver" begin
         # Problem LIN1 - all vars in nonneg cone
@@ -820,3 +821,4 @@ function conicSDPtest(solver::MathProgBase.AbstractMathProgSolver;duals=true, to
         end
     end
 end
+"""
