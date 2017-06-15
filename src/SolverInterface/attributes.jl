@@ -105,6 +105,13 @@ struct Sense <: AbstractAttribute end
 @enum OptimizationSense MinSense MaxSense
 
 """
+    LinearConstraintCount()
+
+The number of linear constraints in the model.
+"""
+struct LinearConstraintCount <: AbstractAttribute end
+
+"""
     SimplexIterations()
 
 The cumulative number of simplex iterations during the optimization process. In particular, for a MIP the total simplex iterations for all nodes.
@@ -145,7 +152,6 @@ struct ResultCount <: AbstractAttribute end
 The number of variables in the model.
 """
 struct VariableCount <: AbstractAttribute end
-
 
 """
     ConstraintCount{T}()
@@ -297,7 +303,6 @@ struct ConstraintDual <: AbstractAttribute
     N::Int
 end
 ConstraintDual() = ConstraintDual(1)
-
 
 """
     SolutionBasis()
