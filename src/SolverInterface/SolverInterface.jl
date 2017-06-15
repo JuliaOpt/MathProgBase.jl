@@ -66,7 +66,7 @@ include("constraints.jl")
 include("sets.jl")
 include("attributes.jl")
 include("objectives.jl")
-include("Nonlinear.jl")
+include("nlp.jl")
 
 #include("LinearQuadratic.jl")
 #include("callbacks.jl")
