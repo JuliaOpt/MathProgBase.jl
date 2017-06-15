@@ -18,19 +18,19 @@ Abstract supertype for "solver" objects. A solver is a lightweight object used f
 abstract type AbstractMathProgSolver end
 
 """
-    AbstractNonLinearModel
+    AbstractNLPModel
 
 Abstract supertype which represents a solver's in-memory representation of a
 non-linear optimization problem.
 """
-abstract type AbstractNonLinearModel end
+abstract type AbstractNLPModel end
 
 """
-    NonLinearModel(solver::AbstractMathProgSolver)
+    NLPModel(solver::AbstractMathProgSolver)
 
-Create an instance of `AbstractNonLinearModel` using the given solver.
+Create an instance of `AbstractNLPModel` using the given solver.
 """
-function NonLinearModel end
+function NLPModel end
 
 """
     AbstractModel
@@ -50,9 +50,9 @@ function Model end
 """
     AbstractMathProgModel
 
-Union type of both `AbstractNonLinearModel` and `AbstractModel`.
+Union type of both `AbstractNLPModel` and `AbstractModel`.
 """
-const AbstractMathProgModel = Union{AbstractNonLinearModel, AbstractModel}
+const AbstractMathProgModel = Union{AbstractNLPModel, AbstractModel}
 
 # basic methods methods for AbstractMathProgModel
 
