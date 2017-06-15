@@ -105,13 +105,6 @@ struct Sense <: AbstractAttribute end
 @enum OptimizationSense MinSense MaxSense
 
 """
-    LinearConstraintCount()
-
-The number of linear constraints in the model.
-"""
-struct LinearConstraintCount <: AbstractAttribute end
-
-"""
     SimplexIterations()
 
 The cumulative number of simplex iterations during the optimization process. In particular, for a MIP the total simplex iterations for all nodes.
@@ -216,14 +209,12 @@ to warm-start the solve.
 """
 struct VariableUpperBoundDualStart <: AbstractAttribute end
 
-
 """
     VariableLowerBound()
 
 Lower-bound constraints on variables. `-Inf` is valid as no bound.
 """
 struct VariableLowerBound <: AbstractAttribute end
-
 
 """
     VariableUpperBound()
@@ -263,6 +254,17 @@ struct VariableUpperBoundDual <: AbstractAttribute
 end
 VariableUpperBoundDual() = VariableUpperBoundDual(1)
 
+"""
+    VariableBasisStatus()
+
+Returns the `VariableBasisStatusCode` of a given variable, with respect to an available optimal solution basis.
+    * `Basic`: variable is in the basis.
+    * `NonbasicAtLower`: variable is not in the basis and is at its lower bound.
+    * `NonbasicAtUpper`: variable is not in the basis and is at its upper bound.
+    * `SuperBasic`: variable is not in the basis but is also not at one of its bounds.
+"""
+struct VariableBasisStatus <: AbstractAttribute end
+@enum VariableBasisStatusCode Basic NonbasicAtLower NonbasicAtUpper SuperBasic
 
 # Constraint attributes
 
@@ -305,11 +307,17 @@ end
 ConstraintDual() = ConstraintDual(1)
 
 """
-    SolutionBasis()
+    ConstraintBasisStatus()
 
-Returns the basis set for the optimal solution in the form `(cbasis,rbasis)`, where both return values are vectors of symbols. The vector `cbasis` indexes the columns of the constraint matrix, while `rbasis` indexes the rows (values indicate whether the constraint is active at a lower/upper bound). The entries take value `:Basic` if the element is basic, `:NonbasicAtLower` if it is nonbasic at a lower bound, and `:NonbasicAtUpper` if it is nonbasic at upper bound. Other values may appear, taking solver-specific values. Note that this function may not work if the optimization algorithm is not able to provide basis information.
+Returns the `ConstraintBasisStatusCode` of a given constraint, with respect to an available optimal solution basis.
+    * `Basic`: constraint is in the basis, i.e. the corresponding slack variable is in the basis.
+    * `Nonbasic`: constraint is not in the basis.
 """
-struct SolutionBasis <: AbstractAttribute end
+struct ConstraintBasisStatus <: AbstractAttribute end
+@enum ConstraintBasisStatusCode Basic Nonbasic
+
+
+
 
 # Termination status
 """
