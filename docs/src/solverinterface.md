@@ -80,7 +80,7 @@ ResultCount
 
 ### Variable Attributes
 
-These attributes are associated with variables. Calls to `getattribute` and `setattribute!` should include a single `VariableReference` or a vector of `VariableReference` objects.
+These attributes are associated with variables. Calls to `getattribute` and `setattribute!` should include as an argument a single `VariableReference` or a vector of `VariableReference` objects.
 
 ```@docs
 VariableStart
@@ -99,9 +99,22 @@ VariableUpperBoundDual
 The `TerminationStatus` attribute is meant to explain the reason why the solver stopped executing. The value of the attribute is of type `TerminationStatusCode`.
 
 ```@docs
+TerminationStatus
 TerminationStatusCode
 ```
+
+## Result Status
+
+The `PrimalStatus` and `DualStatus` attributes are meant to explain how to interpret the result returned by the solver. The value of the attributes are of type `ResultStatus`.
+
+```@docs
+PrimalStatus
+DualStatus
+ResultStatus
+```
+
 
 ## Duals
 
 We take the convention that duals on variable lower bounds should be nonnegative, duals on variable upper bounds should be nonpositive, and duals on closed convex cones should belong to the dual cone.
+

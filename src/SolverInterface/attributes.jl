@@ -52,11 +52,15 @@ function setattribute! end
 
 # Scalar attributes
 """
-    ObjectiveValue
+    ObjectiveValue(N)
+    ObjectiveValue()
 
-The objective value of the best primal result vector found by the solver.
+The objective value of the primal result `N`. If `N` is omitted, it defaults to 1.
 """
-struct ObjectiveValue <: AbstractAttribute end
+struct ObjectiveValue <: AbstractAttribute
+    N::Int
+end
+ObjectiveValue() = ObjectiveValue(1)
 
 """
     ObjectiveBound
@@ -124,6 +128,8 @@ struct RawSolver <: AbstractAttribute end
 The number of results available.
 """
 struct ResultCount <: AbstractAttribute end
+
+
 
 
 # Variable attributes
@@ -203,17 +209,17 @@ end
 
 
 function getsolution end
-function getobjval end
 
 
-function setvartype! end
-function getvartype end
 function loadproblem! end
-function setwarmstart! end
 
 
 # Termination status
+"""
+    TerminationStatus
 
+A `TerminationStatusCode` explaining why the solver stopped.
+"""
 struct TerminationStatus <: AbstractAttribute end
 
 """
@@ -250,3 +256,44 @@ To be documented: `NumericalError`, `InvalidModel`, `InvalidOption`, `Interrupte
 
 """
 @enum TerminationStatusCode Success AlmostSuccess InfeasibleNoResult UnboundedNoResult InfeasibleOrUnbounded IterationLimit TimeLimit NodeLimit SolutionLimit MemoryLimit ObjectiveLimit NormLimit OtherLimit SlowProgress NumericalError InvalidModel InvalidOption Interrupted OtherError
+
+# Result status
+
+"""
+    ResultStatus
+
+An Enum of possible values for the `PrimalStatus` and `DualStatus` attributes. The values indicate how to interpret the result vector.
+
+  * `FeasiblePoint`
+  * `NearlyFeasiblePoint`
+  * `InfeasiblePoint`
+  * `InfeasibilityCertificate`
+  * `NearlyInfeasibilityCertificate`
+  * `ReductionCertificate`
+  * `NearlyReductionCertificate`
+  * `Unknown`
+  * `Other`
+"""
+@enum ResultStatus FeasiblePoint NearlyFeasiblePoint InfeasiblePoint InfeasibilityCertificate NearlyInfeasibilityCertificate ReductionCertificate NearlyReductionCertificate Unknown Other
+
+"""
+    PrimalStatus(N)
+    PrimalStatus()
+
+The `ResultStatus` of the primal result `N`. If `N` is omitted, it defaults to 1.
+"""
+struct PrimalStatus <: AbstractAttribute
+    N::Int
+end
+PrimalStatus() = PrimalStatus(1)
+
+"""
+    DualStatus(N)
+    DualStatus()
+
+The `ResultStatus` of the dual result `N`. If `N` is omitted, it defaults to 1.
+"""
+struct DualStatus <: AbstractAttribute
+    N::Int
+end
+DualStatus() = DualStatus(1)
