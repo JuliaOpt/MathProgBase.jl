@@ -116,5 +116,19 @@ and ``(j,i)`` are provided, these are considered duplicate terms.
 
         modifyconstraint!(m, c, v1, v2, 1.0)
         modifyconstraint!(m, c, [v1, v2], [v1, v1], [1.0, 2.0])
+
+# Modify Set
+
+    modifyconstraint!(m::AbstractMathProgModel, c::ConstraintReference{S}, set::S)
+
+Change the set of constraint `c` to the new set `set` which should be of the same
+type as the original set.
+
+### Examples
+
+If `c` is a `ConstraintReference{Interval}`
+
+        modifyconstraint!(m, c, Interval(0, 5))
+        modifyconstraint!(m, c, NonPositive) # errors
 """
 function modifyconstraint! end
