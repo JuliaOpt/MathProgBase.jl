@@ -2,6 +2,8 @@
 	CurrentModule = MathProgBase
 ```
 
+**These docs are out of date. We need to update the high-level interfaces for new statuses.**
+
 ## Linear Programming
 
 ```@docs
