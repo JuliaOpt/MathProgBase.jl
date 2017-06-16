@@ -189,7 +189,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "MathProgBase.addvariables!",
     "category": "Function",
-    "text": "addvariables!(m::AbstractMathProgModel, N::Int)\n\nAdd N scalar variables to the model, returning a vector of variable references.\n\n\n\n"
+    "text": "addvariables!(m::AbstractMathProgModel, N::Int)::Vector{VariableReference}\n\nAdd N scalar variables to the model, returning a vector of variable references.\n\n\n\n"
 },
 
 {
@@ -197,7 +197,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "MathProgBase.addvariable!",
     "category": "Function",
-    "text": "addvariable!(m::AbstractMathProgModel, N::Int)\n\nAdd a scalar variable to the model, returning variable reference.\n\n\n\n"
+    "text": "addvariable!(m::AbstractMathProgModel)::VariableReference\n\nAdd a scalar variable to the model, returning a variable reference.\n\n\n\n"
 },
 
 {
