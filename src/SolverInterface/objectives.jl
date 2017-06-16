@@ -9,7 +9,7 @@ where ``a`` is a sparse vector specified in tuple form by `a_varidx`, and
 `a_coef`; ``b`` is a scalar; and the symmetric matrix ``Q`` is defined by the
 triplets in `Q_vari`, `Q_varj`, `Q_coef`.
 
-Duplicate indices in either ``A`` or  a ``Q`` matrix are accepted and will be
+Duplicate indices in either the ``a`` vector or the ``Q`` matrix are accepted and will be
 summed together. Off-diagonal entries of ``Q`` will be mirrored, so either the
 upper triangular or lower triangular entries of ``Q`` should be provided. If
 entries for both ``(i,j)`` and ``(j,i)`` are provided, these are considered
@@ -36,7 +36,9 @@ Set the constant term of the `i`'th row objective to `b`.
 
 ### Examples
 
-        modifyobjective!(m, 1, 1.0)
+```julia
+modifyobjective!(m, 1, 1.0)
+```
 
 # Modify Linear term
 
@@ -50,8 +52,10 @@ The behaviour of duplicate entries in `a_varidx` is undefined.
 
 ### Examples
 
-        modifyobjective!(m, 1, v, 1.0)
-        modifyobjective!(m, 1, [v1, v2], [1.0, 2.0])
+```julia
+modifyobjective!(m, 1, v, 1.0)
+modifyobjective!(m, 1, [v1, v2], [1.0, 2.0])
+```
 
 # Modify Quadratic term
 
@@ -66,8 +70,10 @@ and ``(j,i)`` are provided, these are considered duplicate terms.
 
 ### Examples
 
-        modifyobjective!(m, 1, v1, v2, 1.0)
-        modifyobjective!(m, 1, [v1, v2], [v1, v1], [1.0, 2.0])
+```julia
+modifyobjective!(m, 1, v1, v2, 1.0)
+modifyobjective!(m, 1, [v1, v2], [v1, v1], [1.0, 2.0])
+```
 """
 function modifyobjective! end
 

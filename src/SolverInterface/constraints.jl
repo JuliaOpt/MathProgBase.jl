@@ -1,8 +1,3 @@
-
-
-
-
-
 """
     addconstraint!(m::AbstractMathProgModel, b, a_constridx, a_varidx, a_coef, Q_constridx, Q_vari, Q_varj, Q_coef, S::AbstractSet)::QuadraticConstraintReference{typeof(S)}
 
@@ -16,7 +11,7 @@ where ``A`` is a sparse matrix specified in triplet form by
 where the symmetric matrix ``Q_k`` is defined by the triplets in `Q_vari`, `Q_varj`,
 `Q_coef` for which `Q_constridx` equals `k`; and the set ``S`` is defined by `S`.
 
-Duplicate indices in either ``A`` or  a ``Q`` matrix are accepted and will be summed together. Off-diagonal entries of ``Q`` will be mirrored, so either the upper triangular or lower triangular entries of ``Q`` should be provided. If entries for both ``(i,j)`` and ``(j,i)`` are provided, these are considered duplicate terms. `a_varidx`, `Q_vari`, `Q_varj` should be collections of `VariableReference` objects.
+Duplicate indices in either the ``A`` or the ``Q`` matrix are accepted and will be summed together. Off-diagonal entries of ``Q`` will be mirrored, so either the upper triangular or lower triangular entries of ``Q`` should be provided. If entries for both ``(i,j)`` and ``(j,i)`` are provided, these are considered duplicate terms. `a_varidx`, `Q_vari`, `Q_varj` should be collections of `VariableReference` objects.
 
 
 
@@ -71,7 +66,7 @@ function addconstraint! end
 Modify elements of the `i`'th row of the constraint `c` depending on the
 arguments `args`. The `i`'th row will have the form
 ```math
-    a_i^T + b_i + \\frac{1}{2}x^TQ_ix \\in S
+    a_i^Tx + b_i + \\frac{1}{2}x^TQ_ix \\in S
 ```
 There are three cases.
 
@@ -83,11 +78,13 @@ Set the constant term of the `i`'th row in the constraint `c` to `b`.
 
 ### Examples
 
-        modifyconstraint!(m, c, 1, 1.0)
+```julia
+modifyconstraint!(m, c, 1, 1.0)
+```
 
 # Modify Linear term
 
-modifyconstraint!(m::AbstractMathProgModel, c::ConstraintReference, i::Int, a_varidx, a_coef)
+    modifyconstraint!(m::AbstractMathProgModel, c::ConstraintReference, i::Int, a_varidx, a_coef)
 
 Set elements given by `a_varidx` in the linear term of the `i`'th element in the
 constraint `c` to `a_coef`. Either `a_varidx` and `a_coef` are both singletons,
@@ -97,8 +94,10 @@ The behaviour of duplicate entries in `a_varidx` is undefined.
 
 ### Examples
 
-        modifyconstraint!(m, c, v, 1.0)
-        modifyconstraint!(m, c, [v1, v2], [1.0, 2.0])
+```julia
+modifyconstraint!(m, c, v, 1.0)
+modifyconstraint!(m, c, [v1, v2], [1.0, 2.0])
+```
 
 # Modify Quadratic term
 
@@ -114,8 +113,10 @@ and ``(j,i)`` are provided, these are considered duplicate terms.
 
 ### Examples
 
-        modifyconstraint!(m, c, v1, v2, 1.0)
-        modifyconstraint!(m, c, [v1, v2], [v1, v1], [1.0, 2.0])
+```julia
+modifyconstraint!(m, c, v1, v2, 1.0)
+modifyconstraint!(m, c, [v1, v2], [v1, v1], [1.0, 2.0])
+```
 
 # Modify Set
 
@@ -128,7 +129,9 @@ type as the original set.
 
 If `c` is a `ConstraintReference{Interval}`
 
-        modifyconstraint!(m, c, Interval(0, 5))
-        modifyconstraint!(m, c, NonPositive) # errors
+```julia
+modifyconstraint!(m, c, Interval(0, 5))
+modifyconstraint!(m, c, NonPositive) # errors
+```
 """
 function modifyconstraint! end
