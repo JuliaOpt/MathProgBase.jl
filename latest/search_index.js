@@ -561,11 +561,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "attributes.html#MathProgBase.TerminationStatus",
+    "page": "Attributes",
+    "title": "MathProgBase.TerminationStatus",
+    "category": "Type",
+    "text": "TerminationStatus()\n\nA TerminationStatusCode explaining why the solver stopped.\n\n\n\n"
+},
+
+{
+    "location": "attributes.html#MathProgBase.PrimalStatus",
+    "page": "Attributes",
+    "title": "MathProgBase.PrimalStatus",
+    "category": "Type",
+    "text": "PrimalStatus(N)\nPrimalStatus()\n\nThe ResultStatusCode of the primal result N. If N is omitted, it defaults to 1.\n\n\n\n"
+},
+
+{
+    "location": "attributes.html#MathProgBase.DualStatus",
+    "page": "Attributes",
+    "title": "MathProgBase.DualStatus",
+    "category": "Type",
+    "text": "DualStatus(N)\nDualStatus()\n\nThe ResultStatusCode of the dual result N. If N is omitted, it defaults to 1.\n\n\n\n"
+},
+
+{
     "location": "attributes.html#Scalar-Attributes-1",
     "page": "Attributes",
     "title": "Scalar Attributes",
     "category": "section",
-    "text": "ObjectiveValue\nObjectiveBound\nRelativeGap\nSolveTime\nSense\nSimplexIterations\nBarrierIterations\nNodeCount\nRawSolver\nResultCount\nVariableCount\nConstraintCount\nSupportsVariablewiseConstraint\nSupportsAffineConstraint\nSupportsQuadraticConstraint"
+    "text": "ObjectiveValue\nObjectiveBound\nRelativeGap\nSolveTime\nSense\nSimplexIterations\nBarrierIterations\nNodeCount\nRawSolver\nResultCount\nVariableCount\nConstraintCount\nSupportsVariablewiseConstraint\nSupportsAffineConstraint\nSupportsQuadraticConstraint\nTerminationStatus\nPrimalStatus\nDualStatus"
 },
 
 {
@@ -633,11 +657,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "attributes.html#MathProgBase.VariableBasisStatus",
+    "page": "Attributes",
+    "title": "MathProgBase.VariableBasisStatus",
+    "category": "Type",
+    "text": "VariableBasisStatus()\n\nReturns the BasisStatusCode of a given variable, with respect to an available optimal solution basis.\n\n\n\n"
+},
+
+{
     "location": "attributes.html#Variable-Attributes-1",
     "page": "Attributes",
     "title": "Variable Attributes",
     "category": "section",
-    "text": "These attributes are associated with variables. Calls to getattribute and setattribute! should include as an argument a single VariableReference or a vector of VariableReference objects.VariablePrimalStart\nVariableLowerBoundDualStart\nVariableUpperBoundDualStart\nVariableLowerBound\nVariableUpperBound\nVariablePrimal\nVariableLowerBoundDual\nVariableUpperBoundDual"
+    "text": "These attributes are associated with variables. Calls to getattribute and setattribute! should include as an argument a single VariableReference or a vector of VariableReference objects.VariablePrimalStart\nVariableLowerBoundDualStart\nVariableUpperBoundDualStart\nVariableLowerBound\nVariableUpperBound\nVariablePrimal\nVariableLowerBoundDual\nVariableUpperBoundDual\nVariableBasisStatus"
 },
 
 {
@@ -673,11 +705,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "attributes.html#MathProgBase.ConstraintBasisStatus",
+    "page": "Attributes",
+    "title": "MathProgBase.ConstraintBasisStatus",
+    "category": "Type",
+    "text": "ConstraintBasisStatus()\n\nReturns the BasisStatusCode of a given constraint, with respect to an available optimal solution basis.\n\n\n\n"
+},
+
+{
     "location": "attributes.html#Constraint-Attributes-1",
     "page": "Attributes",
     "title": "Constraint Attributes",
     "category": "section",
-    "text": "These attributes are associated with constraints. Calls to getattribute and setattribute! should include as an argument a single ConstraintReference or a vector of ConstriaintReference{T} objects.ConstraintPrimalStart\nConstraintDualStart\nConstraintPrimal\nConstraintDual"
+    "text": "These attributes are associated with constraints. Calls to getattribute and setattribute! should include as an argument a single ConstraintReference or a vector of ConstriaintReference{T} objects.ConstraintPrimalStart\nConstraintDualStart\nConstraintPrimal\nConstraintDual\nConstraintBasisStatus"
 },
 
 {
@@ -686,14 +726,6 @@ var documenterSearchIndex = {"docs": [
     "title": "Status Codes",
     "category": "page",
     "text": "CurrentModule = MathProgBase"
-},
-
-{
-    "location": "statuscodes.html#MathProgBase.TerminationStatus",
-    "page": "Status Codes",
-    "title": "MathProgBase.TerminationStatus",
-    "category": "Type",
-    "text": "TerminationStatus()\n\nA TerminationStatusCode explaining why the solver stopped.\n\n\n\n"
 },
 
 {
@@ -709,23 +741,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Status Codes",
     "title": "Termination Status",
     "category": "section",
-    "text": "The TerminationStatus attribute is meant to explain the reason why the solver stopped executing. The value of the attribute is of type TerminationStatusCode.TerminationStatus\nTerminationStatusCode"
-},
-
-{
-    "location": "statuscodes.html#MathProgBase.PrimalStatus",
-    "page": "Status Codes",
-    "title": "MathProgBase.PrimalStatus",
-    "category": "Type",
-    "text": "PrimalStatus(N)\nPrimalStatus()\n\nThe ResultStatusCode of the primal result N. If N is omitted, it defaults to 1.\n\n\n\n"
-},
-
-{
-    "location": "statuscodes.html#MathProgBase.DualStatus",
-    "page": "Status Codes",
-    "title": "MathProgBase.DualStatus",
-    "category": "Type",
-    "text": "DualStatus(N)\nDualStatus()\n\nThe ResultStatusCode of the dual result N. If N is omitted, it defaults to 1.\n\n\n\n"
+    "text": "The TerminationStatus attribute is meant to explain the reason why the solver stopped executing. The value of the attribute is of type TerminationStatusCode.TerminationStatusCode"
 },
 
 {
@@ -741,7 +757,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Status Codes",
     "title": "Result Status",
     "category": "section",
-    "text": "The PrimalStatus and DualStatus attributes are meant to explain how to interpret the result returned by the solver. The value of the attributes are of type ResultStatusCode.PrimalStatus\nDualStatus\nResultStatusCode"
+    "text": "The PrimalStatus and DualStatus attributes are meant to explain how to interpret the result returned by the solver. The value of the attributes are of type ResultStatusCode.ResultStatusCode"
+},
+
+{
+    "location": "statuscodes.html#MathProgBase.BasisStatusCode",
+    "page": "Status Codes",
+    "title": "MathProgBase.BasisStatusCode",
+    "category": "Type",
+    "text": "BasisStatusCode\n\nAn Enum of possible values for the VariableBasisStatus and ConstraintBasisStatus attribute. This explains the status of a given element with respect to an optimal solution basis. Possible values are:     * Basic: element is in the basis.     * Nonbasic: element is not in the basis.     * NonbasicAtLower: element is not in the basis and is at its lower bound.     * NonbasicAtUpper: element is not in the basis and is at its upper bound.     * SuperBasic: element is not in the basis but is also not at one of its bounds.\n\n\n\n"
 },
 
 {
@@ -749,7 +773,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Status Codes",
     "title": "Basis Status",
     "category": "section",
-    "text": "TODO: attributes and status codes for LP basis status"
+    "text": "BasisStatusCode"
 },
 
 {
