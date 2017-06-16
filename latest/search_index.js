@@ -197,7 +197,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "MathProgBase.addvariable!",
     "category": "Function",
-    "text": "addvariable!(m::AbstractMathProgModel)::VariableReference\n\nAdd a scalar variable to the model, returning a variable reference.\n\n\n\n"
+    "text": "addvariable!(m::AbstractMathProgModel)::VariableReference\n\nAdd a scalar variable to the model, returning a variable reference.\n\nIn addition, there is a special case for adding variables to existing linear problems.\n\naddvariable!(m::AbstractMathProgModel,\n    cref::Vector{Union{\n            AffineConstraintRef{NonPositive},\n            AffineConstraintRef{NonNegative},\n            AffineConstraintRef{Zero},\n            AffineConstraintRef{Interval}\n        }},\n    coefs)::VariableReference\n\nAdd a variable with coefficients specified by coefs in the existing affine constraints given by the constraint references cref. If you want to add a variable with coefficients in a constraint that is not listed here (such as a quadratic term, or in the SOC), use addvariable!(m) and then modifyconstraint! instead.\n\n\n\n"
 },
 
 {
