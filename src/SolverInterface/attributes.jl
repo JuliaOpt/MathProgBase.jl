@@ -158,32 +158,31 @@ The number of constraints of type T in the model.
 struct ConstraintCount{T} <: AbstractAttribute end
 
 """
-    SupportsVariablesInSet{T}()
+    SupportsVariablewiseConstraint{T}()
 
 A `Bool` indicating whether the solver or model supports
-a constraint of type ``x_{varidx} \\in S`` where ``S``
-is a set of type `T` and ``varidx`` indicates any subset
-of the variables.
+a variablewise constraint in the set ``S`` which
+is a set of type `T`.
 """
-struct SupportsVariablesInSet{T} <: AbstractAttribute end
+struct SupportsVariablewiseConstraint{T} <: AbstractAttribute end
 
 """
-    SupportsAffineInSet{T}()
+    SupportsAffineConstraint{T}()
 
 A `Bool` indicating whether the solver or model supports
 a constraint of of the form "affine expression" in ``S`` where ``S``
 is a set of type `T`.
 """
-struct SupportsAffineInSet{T} <: AbstractAttribute end
+struct SupportsAffineConstraint{T} <: AbstractAttribute end
 
 """
-    SupportsQuadraticInSet{T}()
+    SupportsQuadraticConstraint{T}()
 
 A `Bool` indicating whether the solver or model supports
 a constraint of of the form "quadratic expression" in ``S`` where ``S``
 is a set of type `T`.
 """
-struct SupportsQuadraticInSet{T} <: AbstractAttribute end
+struct SupportsQuadraticConstraint{T} <: AbstractAttribute end
 
 
 

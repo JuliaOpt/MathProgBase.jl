@@ -27,9 +27,9 @@ RawSolver
 ResultCount
 VariableCount
 ConstraintCount
-SupportsVariablesInSet
-SupportsAffineInSet
-SupportsQuadraticInSet
+SupportsVariablewiseConstraint
+SupportsAffineConstraint
+SupportsQuadraticConstraint
 ```
 
 ## Variable Attributes
