@@ -1,5 +1,3 @@
-
-
 """
     VariablewiseConstraintReference{T}
 

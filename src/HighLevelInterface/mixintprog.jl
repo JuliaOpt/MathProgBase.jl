@@ -29,12 +29,14 @@ A scalar is accepted for the ``sense``, ``b``, ``vartypes``, ``lb``, and ``ub`` 
 
 The [`mixintprog`](@ref) function returns an instance of the type::
 
-    type MixintprogSolution
-        status
-        objval
-        sol
-        attrs
-    end
+```julia
+type MixintprogSolution
+    status
+    objval
+    sol
+    attrs
+end
+```
 
 where `status` takes the same values as with [`linprog`](@ref).
 
@@ -61,7 +63,7 @@ We can solve a [binary knapsack problem](http://en.wikipedia.org/wiki/Knapsack_p
 with the following code
 
 ```julia
-    mixintprog(-[5.,3.,2.,7.,4.],[2. 8. 4. 2. 5.],'<',10,:Int,0,1,CbcSolver())
+mixintprog(-[5.,3.,2.,7.,4.],[2. 8. 4. 2. 5.],'<',10,:Int,0,1,CbcSolver())
 ```
 
 """

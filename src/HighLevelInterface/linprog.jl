@@ -197,7 +197,9 @@ A scalar is accepted for the ``l``, ``u``, ``rowlb``, and ``rowub`` arguments, i
 
 A variant usage of this function is to consider the linear programming problem in the following form,
 
-    linprog(c::InputVector, A::AbstractMatrix, sense::InputVector, b::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver)
+```julia
+linprog(c::InputVector, A::AbstractMatrix, sense::InputVector, b::InputVector, lb::InputVector, ub::InputVector, solver::AbstractMathProgSolver)
+```
 
 ```math
 \\begin{align*}
@@ -224,7 +226,9 @@ where:
 
 A shortened version is defined as::
 
-    linprog(c, A, lb, ub, solver) = linprog(c, A, lb, ub, 0, Inf, solver)
+```julia
+linprog(c, A, lb, ub, solver) = linprog(c, A, lb, ub, 0, Inf, solver)
+```
 
 !!! note
     The function [`linprog`](@ref) calls two independent functions for building and solving the linear programming problem, namely [`buildlp`](@ref) and [`solvelp`](@ref).
@@ -232,12 +236,12 @@ A shortened version is defined as::
 The [`linprog`](@ref) function returns an instance of the type::
 
 ```julia
-    type LinprogSolution
-        status
-        objval
-        sol
-        attrs
-    end
+type LinprogSolution
+    status
+    objval
+    sol
+    attrs
+end
 ```
 
 where `status` is a termination status symbol, one of `:Optimal`, `:Infeasible`, `:Unbounded`, `:UserLimit` (iteration limit or timeout), `:Error` (and maybe others).
@@ -256,7 +260,7 @@ If `status` is `:Infeasible`, the `attrs` member will contain an `infeasibilityr
   - `colbasis` -- optimal simplex basis statuses for the variables (columns) if available. Possible values are `:NonbasicAtLower`, `:NonbasicAtUpper`, `:Basic`, and `:Superbasic` (not yet implemented by any solvers)
   - `rowbasis` -- optimal simplex basis statuses for the constraints (rows) if available (not yet implemented by any solvers)
 
-For example, we can solve the two-dimensional problem (see ``test/linprog.jl``):
+For example, we can solve the two-dimensional problem (see `test/linprog.jl`):
 
 ```math
     \\begin{align*}
@@ -267,15 +271,15 @@ For example, we can solve the two-dimensional problem (see ``test/linprog.jl``):
 ```
 
 ```julia
-    using MathProgBase, Clp
+using MathProgBase, Clp
 
-    sol = linprog([-1,0],[2 1],'<',1.5, ClpSolver())
-    if sol.status == :Optimal
-        println("Optimal objective value is \$(sol.objval)")
-        println("Optimal solution vector is: [\$(sol.sol[1]), \$(sol.sol[2])]")
-    else
-        println("Error: solution status \$(sol.status)")
-    end
+sol = linprog([-1,0],[2 1],'<',1.5, ClpSolver())
+if sol.status == :Optimal
+    println("Optimal objective value is \$(sol.objval)")
+    println("Optimal solution vector is: [\$(sol.sol[1]), \$(sol.sol[2])]")
+else
+    println("Error: solution status \$(sol.status)")
+end
 ```
 
 """

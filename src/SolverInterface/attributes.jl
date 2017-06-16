@@ -13,10 +13,12 @@ Return an attribute of the model `m` specified by attribute type `attr`.
 
 # Examples
 
-    getattribute(m, ObjectiveValue())
-    getattribute(m, VariableResult(), ref)
-    getattribute(m, VariableResult(5), [ref1,ref2])
-    getattribute(m, OtherAttribute("something specific to cplex"))
+```julia
+getattribute(m, ObjectiveValue())
+getattribute(m, VariableResult(), ref)
+getattribute(m, VariableResult(5), [ref1,ref2])
+getattribute(m, OtherAttribute("something specific to cplex"))
+```
 """
 function getattribute end
 

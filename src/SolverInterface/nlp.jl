@@ -182,7 +182,7 @@ function obj_expr end
 """
     constr_expr(d::AbstractNLPEvaluator, i)
 
-Returns an expression graph for the ``i\\text{th}`` constraint in the same format as described above. The head of the expression is ``:comparison``, indicating the sense
+Returns an expression graph for the ``i^{\\text{th}}`` constraint in the same format as described above. The head of the expression is ``:comparison``, indicating the sense
 of the constraint. The right-hand side of the comparison must be a constant; that is,
 `:(x[1]^3 <= 1)` is allowed, while `:(1 <= x[1]^3)` is not valid.
 Double-sided constraints are allowed, in which case both the lower bound and
@@ -212,9 +212,6 @@ isobjquadratic(::AbstractNLPEvaluator) = false
 """
     isconstrlinear(::AbstractNLPEvaluator, i::Integer)
 
-`true` if the ``i\text{th}`` constraint is known to be linear, `false` otherwise.
+`true` if the ``i^{\\text{th}}`` constraint is known to be linear, `false` otherwise.
 """
 isconstrlinear(::AbstractNLPEvaluator, i::Integer) = false
-
-
-

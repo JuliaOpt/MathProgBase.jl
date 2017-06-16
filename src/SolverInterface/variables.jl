@@ -1,5 +1,3 @@
-
-
 """
     addvariables!(m::AbstractMathProgModel, N::Int)
 
@@ -11,7 +9,6 @@ function addvariables! end
 """
     addvariable!(m::AbstractMathProgModel, N::Int)
 
-Add a scalar variable to the model, returning a vector of variable
-references.
+Add a scalar variable to the model, returning variable reference.
 """
 function addvariable! end

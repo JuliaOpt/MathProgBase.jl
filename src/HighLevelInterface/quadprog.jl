@@ -56,12 +56,14 @@ A scalar is accepted for the ``b``, ``sense``, ``l``, and ``u`` arguments, in wh
 
 The [`quadprog`](@ref) function returns an instance of the type::
 
-    type QuadprogSolution
-        status
-        objval
-        sol
-        attrs
-    end
+```julia
+type QuadprogSolution
+    status
+    objval
+    sol
+    attrs
+end
+```
 
 where `status` is a termination status symbol, one of `:Optimal`, `:Infeasible`, `:Unbounded`, `:UserLimit` (iteration limit or timeout), `:Error` (and maybe others).
 
@@ -84,16 +86,15 @@ We can solve the three-dimensional QP (see `test/quadprog.jl`):
 ```
 
 ```julia
+using MathProgBase, Ipopt
 
-    using MathProgBase, Ipopt
-
-    sol = quadprog([0., 0., 0.],[2. 1. 0.; 1. 2. 1.; 0. 1. 2.],[1. 2. 3.; 1. 1. 0.],'>',[4., 1.],-Inf,Inf, IpoptSolver())
-    if sol.status == :Optimal
-        println("Optimal objective value is \$(sol.objval)")
-        println("Optimal solution vector is: [\$(sol.sol[1]), \$(sol.sol[2]), \$(sol.sol[3])]")
-    else
-        println("Error: solution status \$(sol.status)")
-    end
+sol = quadprog([0., 0., 0.],[2. 1. 0.; 1. 2. 1.; 0. 1. 2.],[1. 2. 3.; 1. 1. 0.],'>',[4., 1.],-Inf,Inf, IpoptSolver())
+if sol.status == :Optimal
+    println("Optimal objective value is \$(sol.objval)")
+    println("Optimal solution vector is: [\$(sol.sol[1]), \$(sol.sol[2]), \$(sol.sol[3])]")
+else
+    println("Error: solution status \$(sol.status)")
+end
 ```
 
 """
