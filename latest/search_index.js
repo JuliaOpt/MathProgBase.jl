@@ -149,7 +149,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.setobjective!",
     "category": "Function",
-    "text": "setobjective!(m::AbstractMathProgModel, N::Int, b, a_varidx, a_coef, Q_vari, Q_varj, Q_coef)\n\nSet the N'th objective in the model m to be\n\na^Tx + b + frac12x^TQx\n\nwhere a is a sparse vector specified in tuple form by a_varidx, and a_coef; b is a scalar; and the symmetric matrix Q is defined by the triplets in Q_vari, Q_varj, Q_coef.\n\nDuplicate indices in either the a vector or the Q matrix are accepted and will be summed together. Off-diagonal entries of Q will be mirrored, so either the upper triangular or lower triangular entries of Q should be provided. If entries for both (ij) and (ji) are provided, these are considered duplicate terms. a_varidx, Q_vari, Q_varj should be collections of VariableReference objects.\n\n\n\n"
+    "text": "setobjective!(m::AbstractMathProgModel, b, a_varref::Vector{VariableReference}, a_coef, Q_vari::Vector{VariableReference}, Q_varj::Vector{VariableReference}, Q_coef, N::Int=1)\n\nSet the N'th objective in the model m to be\n\na^Tx + b + frac12x^TQx\n\nwhere a is a sparse vector specified in tuple form by a_varref, and a_coef; b is a scalar; and the symmetric matrix Q is defined by the triplets in Q_vari, Q_varj, Q_coef.\n\nDuplicate indices in either the a vector or the Q matrix are accepted and will be summed together. Off-diagonal entries of Q will be mirrored, so either the upper triangular or lower triangular entries of Q should be provided. If entries for both (ij) and (ji) are provided, these are considered duplicate terms. a_varref, Q_vari, Q_varj should be collections of VariableReference objects.\n\nsetobjective!(m::AbstractMathProgModel, b, a_varref::Vector{VariableReference}, a_coef, N::Int=1)\n\nSet the N'th objective in the model m to be\n\na^Tx + b\n\nwhere a is a sparse vector specified in tuple form by a_varref and a_coef and b is a scalar.\n\nDuplicate indices in either the a vector are accepted and will be summed together.\n\n\n\n"
 },
 
 {
@@ -161,11 +161,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "apireference.html#MathProgBase.getobjective",
+    "location": "apireference.html#MathProgBase.getobjectiveconstant",
     "page": "Solver Interface API",
-    "title": "MathProgBase.getobjective",
+    "title": "MathProgBase.getobjectiveconstant",
     "category": "Function",
-    "text": "getobjective(m, i:Int)\n\nReturns the i'th objective as the tuple (b, a_varidx, a_coef, Q_vari, Q_varj, Q_coef).\n\nThe elements in the tuple are the same as those defined in addobjective!.\n\n\n\n"
+    "text": "getobjectiveconstant(m, i::Int=1)\n\nReturn the constant term in the i'th objective.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.getobjectiveaffine",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.getobjectiveaffine",
+    "category": "Function",
+    "text": "getobjectiveaffine(m, i::Int=1)\n\nReturn the affine part of the i'th objective in tuple form (varref,coef) where varref is a VariableReference, and coef is a coefficient. Output is a tuple of two vectors.\n\ngetobjectiveaffine(m, v::VariableReference, i::Int=1)\n\nReturn the coefficient for the variable v in the affine part of the i'th objective.\n\n\n\n"
 },
 
 {
@@ -173,7 +181,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "Objectives",
     "category": "section",
-    "text": "How to add and set objectives.setobjective!\nmodifyobjective!\ngetobjective"
+    "text": "How to add and set objectives.setobjective!\nmodifyobjective!\ngetobjectiveconstant\ngetobjectiveaffine"
 },
 
 {
@@ -241,11 +249,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "apireference.html#MathProgBase.getconstraintconstant",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.getconstraintconstant",
+    "category": "Function",
+    "text": "getconstraintconstant(m::AbstractMathProgModel, c::ConstraintReference, i::Int)\n\nReturn the constant term of the ith row of the constraint corresponding to c.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.getconstraintaffine",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.getconstraintaffine",
+    "category": "Function",
+    "text": "getconstraintaffine(m::AbstractMathProgModel, c::ConstraintReference)\n\nReturn the A matrix of the constraint corresponding to c in triplet form (row,varref,coef) where row is an integer, varref is a VariableReference, and coef is a coefficient. Output is a tuple of three vectors.\n\ngetconstraintaffine(m::AbstractMathProgModel, c::ConstraintReference, i::Int)\n\nReturn the ith row of the A matrix of the constraint corresponding to c in tuple form (varref,coef) where varref is a VariableReference, and coef is a coefficient. Output is a tuple of two vectors.\n\ngetconstraintaffine(m::AbstractMathProgModel, c::ConstraintReference, i::Int, v::VariableReference)\n\nReturn the element of the A matrix of the constraint corresponding to c in row i and variable v.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.getconstraintquadratic",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.getconstraintquadratic",
+    "category": "Function",
+    "text": "getconstraintquadratic(m::AbstractMathProgModel, c::ConstraintReference, i::Int)\n\nReturn the Q matrix of the ith row of the constraint corresponding to c in triplet form (varref_a,varref_b,coef) where varref_a is a VariableReference, varref_b is a VariableReference, and coef is a coefficient. Output is a tuple of three vectors. The Q matrix must be symmetric, and only one of the two symmetric elements is returned.\n\ngetconstraintquadratic(m::AbstractMathProgModel, c::ConstraintReference, i::Int, v1::VariableReference, v2::VariableReference)\n\nReturn the element (v1,v2) of the Q matrix of the ith row of the constraint corresponding to c.\n\n\n\n"
+},
+
+{
     "location": "apireference.html#Constraints-1",
     "page": "Solver Interface API",
     "title": "Constraints",
     "category": "section",
-    "text": "How to add and modify constraints.VariablewiseConstraintReference\nAffineConstraintReference\nQuadraticConstraintReference\ncandelete(::AbstractMathProgModel,::ConstraintReference)\nisvalid(::AbstractMathProgModel,::ConstraintReference)\ndelete!(::AbstractMathProgModel,::ConstraintReference)\naddconstraint!\nmodifyconstraint!"
+    "text": "How to add and modify constraints.VariablewiseConstraintReference\nAffineConstraintReference\nQuadraticConstraintReference\ncandelete(::AbstractMathProgModel,::ConstraintReference)\nisvalid(::AbstractMathProgModel,::ConstraintReference)\ndelete!(::AbstractMathProgModel,::ConstraintReference)\naddconstraint!\nmodifyconstraint!\ngetconstraintconstant\ngetconstraintaffine\ngetconstraintquadratic"
 },
 
 {
@@ -353,6 +385,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "apireference.html#MathProgBase.getattribute!",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.getattribute!",
+    "category": "Function",
+    "text": "getattribute!(output, m::AbstractMathProgModel, attr::AbstractAttribute, extra_args...)\n\nAn in-place version of getattribute. Return an attribute of the model m specified by attribute type attr into output vector attr.\n\n\n\n"
+},
+
+{
     "location": "apireference.html#MathProgBase.cansetattribute",
     "page": "Solver Interface API",
     "title": "MathProgBase.cansetattribute",
@@ -373,7 +413,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "Attributes",
     "category": "section",
-    "text": "These are used to get and set properties of the model.AbstractAttribute\ncangetattribute\ngetattribute\ncansetattribute\nsetattribute!"
+    "text": "These are used to get and set properties of the model.AbstractAttribute\ncangetattribute\ngetattribute\ngetattribute!\ncansetattribute\nsetattribute!"
 },
 
 {
