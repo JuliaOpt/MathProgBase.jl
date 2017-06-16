@@ -21,7 +21,7 @@ var documenterSearchIndex = {"docs": [
     "page": "High-level Interfaces",
     "title": "High-level Interfaces",
     "category": "page",
-    "text": "	CurrentModule = MathProgBase"
+    "text": "	CurrentModule = MathProgBaseThese docs are out of date. We need to update the high-level interfaces for new statuses."
 },
 
 {
@@ -345,6 +345,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "sets.html#MathProgBase.SecondOrderCone",
+    "page": "Sets",
+    "title": "MathProgBase.SecondOrderCone",
+    "category": "Type",
+    "text": "SecondOrderCone(n)\n\nThe second-order cone or the Lorenz cone of dimension n defined as\n\n (tx) in mathbbR^n  t ge x_2 \n\n\n\n"
+},
+
+{
     "location": "sets.html#MathProgBase.Integers",
     "page": "Sets",
     "title": "MathProgBase.Integers",
@@ -361,11 +369,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "sets.html#MathProgBase.SOS1",
+    "page": "Sets",
+    "title": "MathProgBase.SOS1",
+    "category": "Type",
+    "text": "SOS1(weights::Vector{T}) where T\n\nThe set corresponding to the special ordered set (SOS) constraint of type 1. Of the variables in the set, at most one can be nonzero. The weights induce an ordering of the variables; as such, they should be unique values. The k-th element in the set corresponds to the k-th weight in weights.\n\nSee here for a description of SOS constraints and their potential uses.\n\n\n\n"
+},
+
+{
+    "location": "sets.html#MathProgBase.SOS2",
+    "page": "Sets",
+    "title": "MathProgBase.SOS2",
+    "category": "Type",
+    "text": "SOS2(weights::Vector{T}) where T\n\nThe set corresponding to the special ordered set (SOS) constraint of type 2. Of the variables in the set, at most two can be nonzero, and if two are nonzero, they must be adjacent in the ordering of the set. The weights induce an ordering of the variables; as such, they should be unique values. The k-th element in the set corresponds to the k-th weight in weights.\n\nSee here for a description of SOS constraints and their potential uses.\n\n\n\n"
+},
+
+{
     "location": "sets.html#",
     "page": "Sets",
     "title": "Sets",
     "category": "page",
-    "text": "CurrentModule = MathProgBaseList of sets.NonNegative\nNonPositive\nZero\nInterval\nIntegers\nBinaries"
+    "text": "CurrentModule = MathProgBaseList of sets.NonNegative\nNonPositive\nZero\nInterval\nSecondOrderCone\nIntegers\nBinaries\nSOS1\nSOS2"
 },
 
 {
