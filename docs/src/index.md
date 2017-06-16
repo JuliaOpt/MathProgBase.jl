@@ -1,7 +1,3 @@
 # MathProgBase
 
-Solver-independent functions and low-level interfaces for Mathematical Programming
-
-[MathProgBase.jl](https://github.com/JuliaOpt/MathProgBase.jl) provides high-level one-shot functions for linear and mixed-integer programming, as well as a solver-independent low-level interface for implementing advanced techniques that require efficiently solving a sequence of linear programming problems.
-
-To use MathProgBase, an external solver must be installed. See [Choosing Solvers](@ref).
+[MathProgBase.jl](https://github.com/JuliaOpt/MathProgBase.jl) is a standarized API for Mathematical Optimization solvers. [JuMP](https://github.com/JuliaOpt/JuMP.jl) uses MathProgBase as a solver-independent low-level backend, but MathProgBase may be used freely without JuMP. In addition to the low-level API, MathProgBase provides one-shot functions for linear, mixed-integer, and quadratic optimiztion problems.
