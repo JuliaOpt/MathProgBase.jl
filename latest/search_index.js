@@ -13,7 +13,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Introduction",
     "title": "MathProgBase",
     "category": "section",
-    "text": "MathProgBase.jl is a standarized API for Mathematical Optimization solvers. JuMP uses MathProgBase as a solver-independent low-level backend, but MathProgBase may be used freely without JuMP. In addition to the low-level API, MathProgBase provides one-shot functions for linear, mixed-integer, and quadratic optimiztion problems."
+    "text": "MathProgBase.jl is a standardized API for Mathematical Optimization solvers. JuMP uses MathProgBase as a solver-independent low-level backend, but MathProgBase may be used freely without JuMP. In addition to the low-level API, MathProgBase provides one-shot functions for linear, mixed-integer, and quadratic optimization problems."
 },
 
 {
