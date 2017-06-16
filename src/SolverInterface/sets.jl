@@ -47,6 +47,22 @@ end
 dimension(s::Interval) = length(s.lower)
 
 """
+    SecondOrderCone(n)
+
+The second-order cone or the Lorenz cone of dimension `n`
+defined as
+```math
+\\{ (t,x) \\in \\mathbb{R}^n : t \\ge ||x||_2 \\}.
+```
+"""
+struct SecondOrderCone <: AbstractSet
+    dim::Int
+end
+
+#ExponentialCone
+#PositiveSemidefiniteCone
+
+"""
     Integers(n)
 
 The set of integers ``\\mathbb{Z}^n``.
@@ -65,7 +81,7 @@ struct Binaries <: AbstractSet
 end
 
 
-dimension(s::Union{NonNegative,NonPositive,Zero,Integers,Binaries}) = s.dim
+dimension(s::Union{NonNegative,NonPositive,Zero,SecondOrderCone,Integers,Binaries}) = s.dim
 
 """
     SOS1(weights::Vector{T}) where T
