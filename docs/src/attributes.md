@@ -30,6 +30,9 @@ ConstraintCount
 SupportsVariablewiseConstraint
 SupportsAffineConstraint
 SupportsQuadraticConstraint
+TerminationStatus
+PrimalStatus
+DualStatus
 ```
 
 ## Variable Attributes
@@ -45,6 +48,7 @@ VariableUpperBound
 VariablePrimal
 VariableLowerBoundDual
 VariableUpperBoundDual
+VariableBasisStatus
 ```
 
 ## Constraint Attributes
@@ -56,6 +60,7 @@ ConstraintPrimalStart
 ConstraintDualStart
 ConstraintPrimal
 ConstraintDual
+ConstraintBasisStatus
 ```
 
 
