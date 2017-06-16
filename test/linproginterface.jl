@@ -82,31 +82,29 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
 
             test_result(m, v, c, MPB.Success, MPB.FeasiblePoint, MPB.FeasiblePoint, 1, [1.0, 0.0], [0.0, -1.0], [0.0, 0.0], [1.0], [1.0])
 
-        end
-    end
-end
-"""
             # add new variable to get:
             # max x + 2z
             # s.t. x + y + z <= 1
             # x,y,z >= 0
-            addvar!(m, [1], [1.0], 0, Inf, 2.0)
+            z = MPB.addvariable!(m, c, [1])
+            MPB.setattribute!(m, MPB.VariableLowerBound(), z, 0)
+            MPB.modifyobjective!(m, z, 2)
 
-            @test numvar(m) == 3
-            @test numconstr(m) == 1
+            @test MPB.getattribute(m, MPB.VariableCount()) == 3
+            @test MPB.getattribute(m, MPB.ConstraintCount()) == 1
 
             optimize!(m)
 
-            @test status(m) == :Optimal
-            @test isapprox(getobjval(m), 2, atol=eps)
-            @test isapprox(norm(getsolution(m) - [0.0, 0.0, 1.0]), 0.0, atol=eps)
-            @test isapprox(getconstrsolution(m)[1], 1.0, atol=eps)
-            @test isapprox(getconstrduals(m)[1], 2.0, atol=eps)
-            @test isapprox(norm(getreducedcosts(m) - [-1.0, -2.0, 0.0]), 0.0, atol=eps)
+            test_result(m, v, c, MPB.Success, MPB.FeasiblePoint, MPB.FeasiblePoint, 2, [0.0, 0.0, 1.0], [-1.0, -2.0, 0.0], [0.0, 0.0, 0.0], [1.0], [2.0])
 
-            setvarLB!(m, [-1.0,0.0,0.0])
+            MPB.setattribute!(m, MPB.VariableLowerBound(), v[1], -1)
+
             optimize!(m)
 
+        end
+    end
+end
+"""
             @test status(m) == :Optimal
             @test isapprox(getobjval(m), 3, atol=eps)
 
