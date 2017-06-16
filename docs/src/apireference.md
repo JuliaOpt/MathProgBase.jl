@@ -38,7 +38,8 @@ How to add and set objectives.
 ```@docs
 setobjective!
 modifyobjective!
-getobjective
+getobjectiveconstant
+getobjectiveaffine
 ```
 
 ## Constraints
@@ -53,6 +54,9 @@ isvalid(::AbstractMathProgModel,::ConstraintReference)
 delete!(::AbstractMathProgModel,::ConstraintReference)
 addconstraint!
 modifyconstraint!
+getconstraintconstant
+getconstraintaffine
+getconstraintquadratic
 ```
 
 ## Sets
@@ -78,6 +82,7 @@ These are used to get and set properties of the model.
 AbstractAttribute
 cangetattribute
 getattribute
+getattribute!
 cansetattribute
 setattribute!
 ```

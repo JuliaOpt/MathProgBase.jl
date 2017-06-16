@@ -1,11 +1,11 @@
 """
-    setobjective!(m::AbstractMathProgModel, N::Int, b, a_varidx, a_coef, Q_vari, Q_varj, Q_coef)
+    setobjective!(m::AbstractMathProgModel, b, a_varref::Vector{VariableReference}, a_coef, Q_vari::Vector{VariableReference}, Q_varj::Vector{VariableReference}, Q_coef, N::Int=1)
 
 Set the `N`'th objective in the model `m` to be
 ```math
 a^Tx + b + \\frac{1}{2}x^TQx
 ```
-where ``a`` is a sparse vector specified in tuple form by `a_varidx`, and
+where ``a`` is a sparse vector specified in tuple form by `a_varref`, and
 `a_coef`; ``b`` is a scalar; and the symmetric matrix ``Q`` is defined by the
 triplets in `Q_vari`, `Q_varj`, `Q_coef`.
 
@@ -13,8 +13,20 @@ Duplicate indices in either the ``a`` vector or the ``Q`` matrix are accepted an
 summed together. Off-diagonal entries of ``Q`` will be mirrored, so either the
 upper triangular or lower triangular entries of ``Q`` should be provided. If
 entries for both ``(i,j)`` and ``(j,i)`` are provided, these are considered
-duplicate terms. `a_varidx`, `Q_vari`, `Q_varj` should be collections of
+duplicate terms. `a_varref`, `Q_vari`, `Q_varj` should be collections of
 `VariableReference` objects.
+
+    setobjective!(m::AbstractMathProgModel, b, a_varref::Vector{VariableReference}, a_coef, N::Int=1)
+
+Set the `N`'th objective in the model `m` to be
+```math
+a^Tx + b
+```
+where ``a`` is a sparse vector specified in tuple form by `a_varref` and
+`a_coef` and ``b`` is a scalar.
+
+Duplicate indices in either the ``a`` vector are accepted and will be
+summed together.
 """
 function setobjective! end
 
@@ -78,10 +90,21 @@ modifyobjective!(m, 1, [v1, v2], [v1, v1], [1.0, 2.0])
 function modifyobjective! end
 
 """
-    getobjective(m, i:Int)
+    getobjectiveconstant(m, i::Int=1)
 
-Returns the `i`'th objective as the tuple `(b, a_varidx, a_coef, Q_vari, Q_varj, Q_coef)`.
-
-The elements in the tuple are the same as those defined in `addobjective!`.
+Return the constant term in the `i`'th objective.
 """
-function getobjective end
+function getobjectiveconstant end
+
+"""
+    getobjectiveaffine(m, i::Int=1)
+
+Return the affine part of the `i`'th objective in tuple form `(varref,coef)` where `varref` is a `VariableReference`, and `coef` is a coefficient. Output is a tuple of two vectors.
+
+    getobjectiveaffine(m, v::VariableReference, i::Int=1)
+
+Return the coefficient for the variable `v` in the affine part of the `i`'th objective.
+"""
+function getobjectiveaffine end
+
+## TODO: getobjectivequadratic

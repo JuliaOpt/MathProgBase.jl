@@ -135,3 +135,36 @@ modifyconstraint!(m, c, NonPositive) # errors
 ```
 """
 function modifyconstraint! end
+
+"""
+    getconstraintconstant(m::AbstractMathProgModel, c::ConstraintReference, i::Int)
+
+Return the constant term of the `i`th row of the constraint corresponding to `c`.
+"""
+function getconstraintconstant end
+
+"""
+    getconstraintaffine(m::AbstractMathProgModel, c::ConstraintReference)
+
+Return the ``A`` matrix of the constraint corresponding to `c` in triplet form `(row,varref,coef)` where `row` is an integer, `varref` is a `VariableReference`, and `coef` is a coefficient. Output is a tuple of three vectors.
+
+    getconstraintaffine(m::AbstractMathProgModel, c::ConstraintReference, i::Int)
+
+Return the `i`th row of the ``A`` matrix of the constraint corresponding to `c` in tuple form `(varref,coef)` where `varref` is a `VariableReference`, and `coef` is a coefficient. Output is a tuple of two vectors.
+
+    getconstraintaffine(m::AbstractMathProgModel, c::ConstraintReference, i::Int, v::VariableReference)
+
+Return the element of the ``A`` matrix of the constraint corresponding to `c` in row `i` and variable `v`.
+"""
+function getconstraintaffine end
+
+"""
+    getconstraintquadratic(m::AbstractMathProgModel, c::ConstraintReference, i::Int)
+
+Return the ``Q`` matrix of the `i`th row of the constraint corresponding to `c` in triplet form `(varref_a,varref_b,coef)` where `varref_a` is a `VariableReference`, `varref_b` is a `VariableReference`, and `coef` is a coefficient. Output is a tuple of three vectors. The ``Q`` matrix must be symmetric, and only one of the two symmetric elements is returned.
+
+    getconstraintquadratic(m::AbstractMathProgModel, c::ConstraintReference, i::Int, v1::VariableReference, v2::VariableReference)
+
+Return the element `(v1,v2)` of the ``Q`` matrix of the `i`th row of the constraint corresponding to `c`.
+"""
+function getconstraintquadratic end
