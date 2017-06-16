@@ -513,27 +513,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "attributes.html#MathProgBase.SupportsVariablesInSet",
+    "location": "attributes.html#MathProgBase.SupportsVariablewiseConstraint",
     "page": "Attributes",
-    "title": "MathProgBase.SupportsVariablesInSet",
+    "title": "MathProgBase.SupportsVariablewiseConstraint",
     "category": "Type",
-    "text": "SupportsVariablesInSet{T}()\n\nA Bool indicating whether the solver or model supports a constraint of type x_varidx in S where S is a set of type T and varidx indicates any subset of the variables.\n\n\n\n"
+    "text": "SupportsVariablewiseConstraint{T}()\n\nA Bool indicating whether the solver or model supports a variablewise constraint in the set S which is a set of type T.\n\n\n\n"
 },
 
 {
-    "location": "attributes.html#MathProgBase.SupportsAffineInSet",
+    "location": "attributes.html#MathProgBase.SupportsAffineConstraint",
     "page": "Attributes",
-    "title": "MathProgBase.SupportsAffineInSet",
+    "title": "MathProgBase.SupportsAffineConstraint",
     "category": "Type",
-    "text": "SupportsAffineInSet{T}()\n\nA Bool indicating whether the solver or model supports a constraint of of the form \"affine expression\" in S where S is a set of type T.\n\n\n\n"
+    "text": "SupportsAffineConstraint{T}()\n\nA Bool indicating whether the solver or model supports a constraint of of the form \"affine expression\" in S where S is a set of type T.\n\n\n\n"
 },
 
 {
-    "location": "attributes.html#MathProgBase.SupportsQuadraticInSet",
+    "location": "attributes.html#MathProgBase.SupportsQuadraticConstraint",
     "page": "Attributes",
-    "title": "MathProgBase.SupportsQuadraticInSet",
+    "title": "MathProgBase.SupportsQuadraticConstraint",
     "category": "Type",
-    "text": "SupportsQuadraticInSet{T}()\n\nA Bool indicating whether the solver or model supports a constraint of of the form \"quadratic expression\" in S where S is a set of type T.\n\n\n\n"
+    "text": "SupportsQuadraticConstraint{T}()\n\nA Bool indicating whether the solver or model supports a constraint of of the form \"quadratic expression\" in S where S is a set of type T.\n\n\n\n"
 },
 
 {
@@ -541,7 +541,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Attributes",
     "title": "Scalar Attributes",
     "category": "section",
-    "text": "ObjectiveValue\nObjectiveBound\nRelativeGap\nSolveTime\nSense\nSimplexIterations\nBarrierIterations\nNodeCount\nRawSolver\nResultCount\nVariableCount\nConstraintCount\nSupportsVariablesInSet\nSupportsAffineInSet\nSupportsQuadraticInSet"
+    "text": "ObjectiveValue\nObjectiveBound\nRelativeGap\nSolveTime\nSense\nSimplexIterations\nBarrierIterations\nNodeCount\nRawSolver\nResultCount\nVariableCount\nConstraintCount\nSupportsVariablewiseConstraint\nSupportsAffineConstraint\nSupportsQuadraticConstraint"
 },
 
 {
