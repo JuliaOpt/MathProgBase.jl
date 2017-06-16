@@ -14,7 +14,8 @@ makedocs(
              "Sets" => "sets.md",
              "Attributes" => "attributes.md",
              "Status Codes" => "statuscodes.md",
-             "Duals" => "duals.md"],
+             "Duals" => "duals.md",
+             "NLP" => "nlp.md"],
         "Choosing Solver" => "choosingsolver.md"
     ]
 )
