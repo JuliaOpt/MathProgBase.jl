@@ -361,11 +361,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "apireference.html#MathProgBase.AbstractAttribute",
+    "location": "apireference.html#MathProgBase.AbstractSolverOrModelAttribute",
     "page": "Solver Interface API",
-    "title": "MathProgBase.AbstractAttribute",
+    "title": "MathProgBase.AbstractSolverOrModelAttribute",
     "category": "Type",
-    "text": "AbstractAttribute\n\nAbstract supertype for attribute objects that can be used to set or get attributes (properties) of the model.\n\n\n\n"
+    "text": "AbstractSolverOrModelAttribute\n\nAbstract supertype for attribute objects that can be used to set or get attributes (properties) of the model or solver.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.AbstractVariableAttribute",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.AbstractVariableAttribute",
+    "category": "Type",
+    "text": "AbstractVariableAttribute\n\nAbstract supertype for attribute objects that can be used to set or get attributes (properties) of variables in the model.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.AbstractConstraintAttribute",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.AbstractConstraintAttribute",
+    "category": "Type",
+    "text": "AbstractConstraintAttribute\n\nAbstract supertype for attribute objects that can be used to set or get attributes (properties) of constraints in the model.\n\n\n\n"
 },
 
 {
@@ -373,7 +389,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.cangetattribute",
     "category": "Function",
-    "text": "cangetattribute(m::AbstractMathProgModel, attr::AbstractAttribute)::Bool\n\nReturn a Bool indicating whether the model m currently has a value for the attributed specified by attribute type attr.\n\n\n\n"
+    "text": "cangetattribute(s::AbstractMathProgSolver, attr::AbstractSolverOrModelAttribute)::Bool\n\nReturn a Bool indicating whether it is possible to query attribute attr from the solver s.\n\ncangetattribute(m::AbstractMathProgModel, attr::AbstractVariableAttribute, R::Type{VariableReference})::Bool\ncangetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{VariablewiseConstraintReference{T})::Bool\ncangetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{AffineConstraintReference{T})::Bool\ncangetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{QuadraticConstraintReference{T})::Bool\n\nReturn a Bool indicating whether the model m currently has a value for the attributed specified by attribute type attr applied to the reference type R.\n\nExamples\n\n```julia cangetattribute(GurobiSolver(), SupportsAffineConstraint{Zero}()) cangetattribute(m, ObjectiveValue()) cangetattribute(m, VariablePrimalStart(), varref) cangetattribute(m, ConstraintPrimal(), conref)\n\n\n\n"
 },
 
 {
@@ -381,7 +397,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.getattribute",
     "category": "Function",
-    "text": "getattribute(m::AbstractMathProgModel, attr::AbstractAttribute, extra_args...)\n\nReturn an attribute of the model m specified by attribute type attr.\n\nExamples\n\ngetattribute(m, ObjectiveValue())\ngetattribute(m, VariableResult(), ref)\ngetattribute(m, VariableResult(5), [ref1,ref2])\ngetattribute(m, OtherAttribute(\"something specific to cplex\"))\n\n\n\n"
+    "text": "getattribute(s::AbstractMathProgSolver, attr::AbstractSolverOrModelAttribute)\n\nReturn an attribute attr of the solver s.\n\ngetattribute(m::AbstractMathProgModel, attr::AbstractSolverOrModelAttribute)\n\nReturn an attribute attr of the model m.\n\ngetattribute(m::AbstractMathProgModel, attr::AbstractVariableAttribute, v::VariableReference)\n\nReturn an attribute attr of the variable v in model m.\n\ngetattribute(m::AbstractMathProgModel, attr::AbstractVariableAttribute, v::Vector{VariableReference})\n\nReturn a vector of attributes corresponding to each variable in the collection v in the model m.\n\ngetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::ConstraintReference)\n\nReturn an attribute attr of the constraint c in model m.\n\ngetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{VariablewiseConstraintReference{T}})\ngetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{AffineConstraintReference{T}})\ngetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{QuadraticConstraintReference{T}})\n\nReturn a vector of attributes corresponding to each constraint in the collection c in the model m.\n\nExamples\n\ngetattribute(m, ObjectiveValue())\ngetattribute(m, VariableResult(), ref)\ngetattribute(m, VariableResult(5), [ref1,ref2])\ngetattribute(m, OtherAttribute(\"something specific to cplex\"))\n\n\n\n"
 },
 
 {
@@ -389,7 +405,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.getattribute!",
     "category": "Function",
-    "text": "getattribute!(output, m::AbstractMathProgModel, attr::AbstractAttribute, extra_args...)\n\nAn in-place version of getattribute. Return an attribute of the model m specified by attribute type attr into output vector attr.\n\n\n\n"
+    "text": "getattribute!(output, m::AbstractMathProgModel, args...)\n\nAn in-place version of getattribute. The signature matches that of getattribute except that the the result is placed in the vector output.\n\n\n\n"
 },
 
 {
@@ -397,7 +413,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.cansetattribute",
     "category": "Function",
-    "text": "cansetattribute(m::AbstractMathProgModel, attr::AbstractAttribute)::Bool\n\nReturn a Bool indicating whether the model m will accept a setattribute! call for the attributed specified by attribute type attr.\n\n\n\n"
+    "text": "cansetattribute(s::AbstractMathProgSolver, attr::AbstractSolverOrModelAttribute)::Bool\n\nReturn a Bool indicating whether it is possible to set attribute attr in the solver s.\n\ncansetattribute(m::AbstractMathProgModel, attr::AbstractVariableAttribute, R::Type{VariableReference})::Bool\ncansetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{VariablewiseConstraintReference{T})::Bool\ncangetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{AffineConstraintReference{T})::Bool\ncangetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{QuadraticConstraintReference{T})::Bool\n\nReturn a Bool indicating whether it is possible to set attribute attr applied to the reference type R in the model m.\n\nExamples\n\n```julia cansetattribute(GurobiSolver(), SupportsAffineConstraint{Zero}()) cansetattribute(m, ObjectiveValue()) cansetattribute(m, VariablePrimalStart(), VariableReference) cansetattribute(m, ConstraintPrimal(), AffineConstraintReference{NonNegative})\n\n\n\n"
 },
 
 {
@@ -405,7 +421,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.setattribute!",
     "category": "Function",
-    "text": "setattribute!(m::AbstractMathProgModel, attr::AbstractAttribute, ...)\n\nSet an attribute of the model m specified by attribute type attr.\n\n\n\n"
+    "text": "setattribute!(s::AbstractMathProgSolver, attr::AbstractSolverOrModelAttribute, value)\n\nAssign value to the attribute attr of the solver s.\n\nsetattribute!(m::AbstractMathProgModel, attr::AbstractSolverOrModelAttribute, value)\n\nAssign value to the attribute attr of the model m.\n\nsetattribute!(m::AbstractMathProgModel, attr::AbstractVariableAttribute, v::VariableReference, value)\n\nAssign value to the attribute attr of variable v in model m.\n\nsetattribute!(m::AbstractMathProgModel, attr::AbstractVariableAttribute, v::Vector{VariableReference}, vector_of_values)\n\nAssign a value respectively to the attribute attr of each variable in the collection v in model m.\n\nsetattribute!(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::ConstraintReference, value)\n\nAssign a value to the attribute attr of constraint c in model m.\n\nsetattribute!(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{VariablewiseConstraintReference{T}})\nsetattribute!(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{AffineConstraintReference{T}})\nsetattribute!(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{QuadraticConstraintReference{T}})\n\nAssign a value respectively to the attribute attr of each constraint in the collection c in model m.\n\n\n\n"
 },
 
 {
@@ -413,7 +429,55 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "Attributes",
     "category": "section",
-    "text": "These are used to get and set properties of the model.AbstractAttribute\ncangetattribute\ngetattribute\ngetattribute!\ncansetattribute\nsetattribute!"
+    "text": "These are used to get and set properties of the model or solver.AbstractSolverOrModelAttribute\nAbstractVariableAttribute\nAbstractConstraintAttribute\ncangetattribute\ngetattribute\ngetattribute!\ncansetattribute\nsetattribute!"
+},
+
+{
+    "location": "apireference.html#MathProgBase.ReturnsDuals",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.ReturnsDuals",
+    "category": "Type",
+    "text": "ReturnsDuals()\n\nA Bool indicating if the solver should be expected to return dual solutions when appropriate. A solver attribute.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.SupportsAddConstraintAfterSolve",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.SupportsAddConstraintAfterSolve",
+    "category": "Type",
+    "text": "SupportsAddConstraintAfterSolver()\n\nA Bool indicating if the solver supports adding constraints after a solve. If false, then a new model should be constructed instead. A solver attribute.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.SupportsDeleteConstraint",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.SupportsDeleteConstraint",
+    "category": "Type",
+    "text": "SupportsDeleteConstraint()\n\nA Bool indicating if the solver supports deleting constraints from a model. A solver attribute.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.SupportsAddVariableAfterSolver",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.SupportsAddVariableAfterSolver",
+    "category": "Type",
+    "text": "SupportsAddVariableAfterSolve()\n\nA Bool indicating if the solver supports adding variables after a solve. In the context of linear programming, this is known as column generation. A solver attribute.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.SupportsQuadraticObjective",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.SupportsQuadraticObjective",
+    "category": "Type",
+    "text": "SupportsQuadraticObjective()\n\nA Bool indicating if the solver supports quadratic objectives. A solver attribute.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.SupportsConicThroughQuadratic",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.SupportsConicThroughQuadratic",
+    "category": "Type",
+    "text": "SupportsConicThroughQuadratic()\n\nA Bool indicating if the solver interprets certain quadratic constraints as second-order cone constraints. A solver attribute.\n\n\n\n"
 },
 
 {
@@ -421,7 +485,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.ObjectiveValue",
     "category": "Type",
-    "text": "ObjectiveValue(resultidx::Int=1, objectiveindex::Int=1)\n\nThe objective value of the resultindex'th primal result of the objectiveindex'th objective.\n\nBoth resultindex and objectiveindex default to 1.\n\n\n\n"
+    "text": "ObjectiveValue(resultidx::Int=1, objectiveindex::Int=1)\n\nThe objective value of the resultindex'th primal result of the objectiveindex'th objective. A model attribute.\n\nBoth resultindex and objectiveindex default to 1.\n\n\n\n"
 },
 
 {
@@ -429,7 +493,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.ObjectiveBound",
     "category": "Type",
-    "text": "ObjectiveBound()\n\nThe best known bound on the optimal objective value.\n\n\n\n"
+    "text": "ObjectiveBound()\n\nThe best known bound on the optimal objective value. A model attribute.\n\n\n\n"
 },
 
 {
@@ -437,7 +501,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.RelativeGap",
     "category": "Type",
-    "text": "RelativeGap()\n\nThe final relative optimality gap as optimization terminated. That is, fracb-ff, where b is the best bound and f is the best feasible objective value.\n\n\n\n"
+    "text": "RelativeGap()\n\nThe final relative optimality gap as optimization terminated. That is, fracb-ff, where b is the best bound and f is the best feasible objective value. A model attribute.\n\n\n\n"
 },
 
 {
@@ -445,7 +509,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.SolveTime",
     "category": "Type",
-    "text": "SolveTime()\n\nThe total elapsed solution time (in seconds) as reported by the solver.\n\n\n\n"
+    "text": "SolveTime()\n\nThe total elapsed solution time (in seconds) as reported by the solver. A model attribute.\n\n\n\n"
 },
 
 {
@@ -453,7 +517,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.Sense",
     "category": "Type",
-    "text": "Sense()\n\nThe optimization sense of the model, an OptimizationSense with value MinSense or MaxSense.\n\n\n\n"
+    "text": "Sense()\n\nThe optimization sense of the model, an OptimizationSense with value MinSense or MaxSense. A model attribute.\n\n\n\n"
 },
 
 {
@@ -461,7 +525,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.SimplexIterations",
     "category": "Type",
-    "text": "SimplexIterations()\n\nThe cumulative number of simplex iterations during the optimization process. In particular, for a MIP the total simplex iterations for all nodes.\n\n\n\n"
+    "text": "SimplexIterations()\n\nThe cumulative number of simplex iterations during the optimization process. In particular, for a MIP the total simplex iterations for all nodes. A model attribute.\n\n\n\n"
 },
 
 {
@@ -469,7 +533,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.BarrierIterations",
     "category": "Type",
-    "text": "BarrierIterations()\n\nThe cumulative number of barrier iterations during the optimization process.\n\n\n\n"
+    "text": "BarrierIterations()\n\nThe cumulative number of barrier iterations during the optimization process. A model attribute.\n\n\n\n"
 },
 
 {
@@ -477,7 +541,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.NodeCount",
     "category": "Type",
-    "text": "NodeCount()\n\nThe total number of branch-and-bound nodes explored.\n\n\n\n"
+    "text": "NodeCount()\n\nThe total number of branch-and-bound nodes explored. A model attribute.\n\n\n\n"
 },
 
 {
@@ -485,7 +549,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.RawSolver",
     "category": "Type",
-    "text": "RawSolver()\n\nAn object that may be used to access a solver-specific API for this model.\n\n\n\n"
+    "text": "RawSolver()\n\nAn object that may be used to access a solver-specific API for this model. A model attribute.\n\n\n\n"
 },
 
 {
@@ -493,23 +557,39 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.ResultCount",
     "category": "Type",
-    "text": "ResultCount()\n\nThe number of results available.\n\n\n\n"
+    "text": "ResultCount()\n\nThe number of results available. A model attribute.\n\n\n\n"
 },
 
 {
-    "location": "apireference.html#MathProgBase.VariableCount",
+    "location": "apireference.html#MathProgBase.NumberOfVariables",
     "page": "Solver Interface API",
-    "title": "MathProgBase.VariableCount",
+    "title": "MathProgBase.NumberOfVariables",
     "category": "Type",
-    "text": "VariableCount()\n\nThe number of variables in the model.\n\n\n\n"
+    "text": "NumberOfVariables()\n\nThe number of variables in the model. A model attribute.\n\n\n\n"
 },
 
 {
-    "location": "apireference.html#MathProgBase.ConstraintCount",
+    "location": "apireference.html#MathProgBase.NumberOfVariablewiseConstraints",
     "page": "Solver Interface API",
-    "title": "MathProgBase.ConstraintCount",
+    "title": "MathProgBase.NumberOfVariablewiseConstraints",
     "category": "Type",
-    "text": "ConstraintCount{T}()\n\nThe number of constraints of type T in the model.\n\n\n\n"
+    "text": "NumberOfVariablewiseConstraints{T}()\n\nThe number of variablewise constraints of type T in the model. A model attribute.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.NumberOfAffineConstraints",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.NumberOfAffineConstraints",
+    "category": "Type",
+    "text": "NumberOfAffineConstraints{T}()\n\nThe number of affine constraints of type T in the model. A model attribute.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.NumberOfQuadraticConstraints",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.NumberOfQuadraticConstraints",
+    "category": "Type",
+    "text": "NumberOfQuadraticConstraints{T}()\n\nThe number of quadratic constraints of type T in the model. A model attribute.\n\n\n\n"
 },
 
 {
@@ -517,7 +597,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.SupportsVariablewiseConstraint",
     "category": "Type",
-    "text": "SupportsVariablewiseConstraint{T}()\n\nA Bool indicating whether the solver or model supports a variablewise constraint in the set S which is a set of type T.\n\n\n\n"
+    "text": "SupportsVariablewiseConstraint{T}()\n\nA Bool indicating whether the solver or model supports a variablewise constraint in the set S which is a set of type T. A solver and model attribute.\n\n\n\n"
 },
 
 {
@@ -525,7 +605,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.SupportsAffineConstraint",
     "category": "Type",
-    "text": "SupportsAffineConstraint{T}()\n\nA Bool indicating whether the solver or model supports a constraint of of the form \"affine expression\" in S where S is a set of type T.\n\n\n\n"
+    "text": "SupportsAffineConstraint{T}()\n\nA Bool indicating whether the solver or model supports a constraint of of the form \"affine expression\" in S where S is a set of type T. A solver and model attribute.\n\n\n\n"
 },
 
 {
@@ -533,7 +613,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.SupportsQuadraticConstraint",
     "category": "Type",
-    "text": "SupportsQuadraticConstraint{T}()\n\nA Bool indicating whether the solver or model supports a constraint of of the form \"quadratic expression\" in S where S is a set of type T.\n\n\n\n"
+    "text": "SupportsQuadraticConstraint{T}()\n\nA Bool indicating whether the solver or model supports a constraint of of the form \"quadratic expression\" in S where S is a set of type T. A solver and model attribute.\n\n\n\n"
 },
 
 {
@@ -541,7 +621,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.TerminationStatus",
     "category": "Type",
-    "text": "TerminationStatus()\n\nA TerminationStatusCode explaining why the solver stopped.\n\n\n\n"
+    "text": "TerminationStatus()\n\nA TerminationStatusCode explaining why the solver stopped. A model attribute.\n\n\n\n"
 },
 
 {
@@ -549,7 +629,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.PrimalStatus",
     "category": "Type",
-    "text": "PrimalStatus(N)\nPrimalStatus()\n\nThe ResultStatusCode of the primal result N. If N is omitted, it defaults to 1.\n\n\n\n"
+    "text": "PrimalStatus(N)\nPrimalStatus()\n\nThe ResultStatusCode of the primal result N. If N is omitted, it defaults to 1. A model attribute.\n\n\n\n"
 },
 
 {
@@ -557,15 +637,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.DualStatus",
     "category": "Type",
-    "text": "DualStatus(N)\nDualStatus()\n\nThe ResultStatusCode of the dual result N. If N is omitted, it defaults to 1.\n\n\n\n"
+    "text": "DualStatus(N)\nDualStatus()\n\nThe ResultStatusCode of the dual result N. If N is omitted, it defaults to 1. A model attribute.\n\n\n\n"
 },
 
 {
-    "location": "apireference.html#Scalar-Attributes-1",
+    "location": "apireference.html#Solver-or-Model-Attributes-1",
     "page": "Solver Interface API",
-    "title": "Scalar Attributes",
+    "title": "Solver or Model Attributes",
     "category": "section",
-    "text": "ObjectiveValue\nObjectiveBound\nRelativeGap\nSolveTime\nSense\nSimplexIterations\nBarrierIterations\nNodeCount\nRawSolver\nResultCount\nVariableCount\nConstraintCount\nSupportsVariablewiseConstraint\nSupportsAffineConstraint\nSupportsQuadraticConstraint\nTerminationStatus\nPrimalStatus\nDualStatus"
+    "text": "These attribute apply to solver or model objects, as noted.ReturnsDuals\nSupportsAddConstraintAfterSolve\nSupportsDeleteConstraint\nSupportsAddVariableAfterSolver\nSupportsQuadraticObjective\nSupportsConicThroughQuadratic\nObjectiveValue\nObjectiveBound\nRelativeGap\nSolveTime\nSense\nSimplexIterations\nBarrierIterations\nNodeCount\nRawSolver\nResultCount\nNumberOfVariables\nNumberOfVariablewiseConstraints\nNumberOfAffineConstraints\nNumberOfQuadraticConstraints\nSupportsVariablewiseConstraint\nSupportsAffineConstraint\nSupportsQuadraticConstraint\nTerminationStatus\nPrimalStatus\nDualStatus"
 },
 
 {
@@ -645,7 +725,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "Variable Attributes",
     "category": "section",
-    "text": "These attributes are associated with variables. Calls to getattribute and setattribute! should include as an argument a single VariableReference or a vector of VariableReference objects.VariablePrimalStart\nVariableLowerBoundDualStart\nVariableUpperBoundDualStart\nVariableLowerBound\nVariableUpperBound\nVariablePrimal\nVariableLowerBoundDual\nVariableUpperBoundDual\nVariableBasisStatus"
+    "text": "These attributes are associated with variables. Calls to getattribute and setattribute! should include as an argument a single VariableReference or a vector of VariableReference objects. By convention, the name of a variable attributes begins with Variable.VariablePrimalStart\nVariableLowerBoundDualStart\nVariableUpperBoundDualStart\nVariableLowerBound\nVariableUpperBound\nVariablePrimal\nVariableLowerBoundDual\nVariableUpperBoundDual\nVariableBasisStatus"
 },
 
 {
@@ -693,7 +773,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "Constraint Attributes",
     "category": "section",
-    "text": "These attributes are associated with constraints. Calls to getattribute and setattribute! should include as an argument a single ConstraintReference or a vector of ConstriaintReference{T} objects.ConstraintPrimalStart\nConstraintDualStart\nConstraintPrimal\nConstraintDual\nConstraintBasisStatus"
+    "text": "These attributes are associated with constraints. Calls to getattribute and setattribute! should include as an argument a single ConstraintReference or a vector of ConstriaintReference{T} objects. By convention, the name of a variable attributes begins with Variable.ConstraintPrimalStart\nConstraintDualStart\nConstraintPrimal\nConstraintDual\nConstraintBasisStatus"
 },
 
 {
