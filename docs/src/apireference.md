@@ -76,10 +76,12 @@ SOS2
 
 ## Attributes
 
-These are used to get and set properties of the model.
+These are used to get and set properties of the model or solver.
 
 ```@docs
-AbstractAttribute
+AbstractSolverOrModelAttribute
+AbstractVariableAttribute
+AbstractConstraintAttribute
 cangetattribute
 getattribute
 getattribute!
@@ -87,9 +89,17 @@ cansetattribute
 setattribute!
 ```
 
-### Scalar Attributes
+### Solver or Model Attributes
+
+These attribute apply to solver or model objects, as noted.
 
 ```@docs
+ReturnsDuals
+SupportsAddConstraintAfterSolve
+SupportsDeleteConstraint
+SupportsAddVariableAfterSolver
+SupportsQuadraticObjective
+SupportsConicThroughQuadratic
 ObjectiveValue
 ObjectiveBound
 RelativeGap
@@ -100,8 +110,10 @@ BarrierIterations
 NodeCount
 RawSolver
 ResultCount
-VariableCount
-ConstraintCount
+NumberOfVariables
+NumberOfVariablewiseConstraints
+NumberOfAffineConstraints
+NumberOfQuadraticConstraints
 SupportsVariablewiseConstraint
 SupportsAffineConstraint
 SupportsQuadraticConstraint
@@ -112,7 +124,7 @@ DualStatus
 
 ### Variable Attributes
 
-These attributes are associated with variables. Calls to `getattribute` and `setattribute!` should include as an argument a single `VariableReference` or a vector of `VariableReference` objects.
+These attributes are associated with variables. Calls to `getattribute` and `setattribute!` should include as an argument a single `VariableReference` or a vector of `VariableReference` objects. By convention, the name of a variable attributes begins with `Variable`.
 
 ```@docs
 VariablePrimalStart
@@ -128,7 +140,8 @@ VariableBasisStatus
 
 ### Constraint Attributes
 
-These attributes are associated with constraints. Calls to `getattribute` and `setattribute!` should include as an argument a single `ConstraintReference` or a vector of `ConstriaintReference{T}` objects.
+These attributes are associated with constraints. Calls to `getattribute` and `setattribute!` should include as an argument a single `ConstraintReference` or a vector of `ConstriaintReference{T}` objects. By convention, the name of a variable attributes begins with `Variable`.
+
 
 ```@docs
 ConstraintPrimalStart

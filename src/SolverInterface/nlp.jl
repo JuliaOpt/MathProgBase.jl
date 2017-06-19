@@ -12,7 +12,7 @@ export AbstractNLPEvaluator
 
 The assignment to the NLP constraint dual values in result `N`. If `N` is omitted, it is 1 by default.
 """
-struct ConstraintNLPDual <: AbstractAttribute
+struct ConstraintNLPDual <: AbstractConstraintAttribute
     N::Int
 end
 ConstraintNLPDual() = ConstraintNLPDual(1)
@@ -24,7 +24,7 @@ ConstraintNLPDual() = ConstraintNLPDual(1)
 An initial assignment of the NLP constriant duals that the solver may use
 to warm-start the solve.
 """
-struct ConstraintNLPDualStart <: AbstractAttribute end
+struct ConstraintNLPDualStart <: AbstractConstraintAttribute end
 
 
 ### methods for AbstractNLPEvaluator ###

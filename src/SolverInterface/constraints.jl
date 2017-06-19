@@ -60,6 +60,8 @@ where `varref` is a vector of variable references to specifiy the subset of the 
 """
 function addconstraint! end
 
+# TODO: method to query if solver supports this type of modification
+
 """
     modifyconstraint!(m::AbstractMathProgModel, c::ConstraintReference, i::Int, args...)
 
