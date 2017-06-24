@@ -68,6 +68,8 @@ NonPositive
 Zero
 Interval
 SecondOrderCone
+PositiveSemidefiniteConeTriangle
+PositiveSemidefiniteConeScaled
 Integers
 Binaries
 SOS1

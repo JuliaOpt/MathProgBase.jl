@@ -60,7 +60,56 @@ struct SecondOrderCone <: AbstractSet
 end
 
 #ExponentialCone
-#PositiveSemidefiniteCone
+
+"""
+    PositiveSemidefiniteConeTriangle(n)
+
+The cone of symmetric ``n \\times n`` matrices that are positive semidefinite.
+The dimension of the cone is ``n(n+1)/2`` since the matrices are symmetric.
+The entries of the upper triangular part of the matrix are given row by row (or equivalently, the entries of the lower triangular part are given column by column).
+The scalar product is the sum of the pairwise product of the diagonal entries plus twice the sum of the pairwise product of the upper diagonal entries.
+
+### Examples
+
+The matrix
+```math
+\\begin{bmatrix}
+  1 & 2 & 3\\\\
+  2 & 4 & 5\\\\
+  3 & 5 & 6
+\\end{bmatrix}
+```
+corresponds to ``(1, 2, 3, 4, 5, 6)`` for `PositiveSemidefiniteConeTriangle`
+"""
+struct PositiveSemidefiniteConeTriangle <: AbstractSet
+    dim::Int
+end
+
+"""
+    PositiveSemidefiniteConeScaled(n)
+
+The cone of symmetric ``n \\times n`` matrices that are positive semidefinite.
+The dimension of the cone is ``n(n+1)/2`` since the matrices are symmetric.
+The entries of the upper triangular part of the matrix are given row by row (or equivalently, the entries of the lower triangular part are given column by column).
+The off-diagonal entries of the matrices of both the cone and its dual are scaled by ``\\sqrt{2}`` and the scalar product is simply the sum of the pairwise product of the entries.
+
+### Examples
+
+The matrix
+```math
+\\begin{bmatrix}
+  1 & 2 & 3\\\\
+  2 & 4 & 5\\\\
+  3 & 5 & 6
+\\end{bmatrix}
+```
+and to ``(1, 2\\sqrt{2}, 3\\sqrt{2}, 4, 5\\sqrt{2}, 6)`` for `PositiveSemidefiniteConeScaled`.
+"""
+struct PositiveSemidefiniteConeScaled <: AbstractSet
+    dim::Int
+end
+
+dimension(s::Union{PositiveSemidefiniteConeScaled, PositiveSemidefiniteConeTriangle}) = (s.dim * (s.dim + 1)) / 2
 
 """
     Integers(n)
