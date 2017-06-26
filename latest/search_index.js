@@ -285,7 +285,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.NonNegative",
     "category": "Type",
-    "text": "NonNegative(n)\n\nThe nonnegative orthant  x in mathbbR^n  x ge 0  where the dimension n is specified by the field n.\n\n\n\n"
+    "text": "NonNegative(dim)\n\nThe nonnegative orthant  x in mathbbR^dim  x ge 0  of dimension dim.\n\n\n\n"
 },
 
 {
@@ -293,7 +293,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.NonPositive",
     "category": "Type",
-    "text": "NonPositive(n)\n\nThe nonpositive orthant  x in mathbbR^n  x le 0  where the dimension n is specified by the field n.\n\n\n\n"
+    "text": "NonPositive(dim)\n\nThe nonpositive orthant  x in mathbbR^dim  x le 0  of dimension dim.\n\n\n\n"
 },
 
 {
@@ -301,7 +301,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.Zero",
     "category": "Type",
-    "text": "Zero(n)\n\nThe set 0^n where the dimension n is specified by the field n.\n\n\n\n"
+    "text": "Zero(dim)\n\nThe set  0 ^dim (containing only the origin) of dimension dim.\n\n\n\n"
 },
 
 {
@@ -309,7 +309,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.Interval",
     "category": "Type",
-    "text": "Interval(lower,upper)\n\nThe set lu subseteq mathbbR^n where l and u are specified by lower and upper, respectively. We allow lower and upper to be -Inf or Inf, in which case the set is interpreted as a one-sided interval.\n\n\n\n"
+    "text": "Interval(lower,upper)\n\nThe box lower upper subseteq mathbbR^dim where lower and upper are vectors of dimension dim. If lower or upper is all -Inf or Inf, the set is interpreted as a one-sided interval.\n\n\n\n"
 },
 
 {
@@ -317,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.SecondOrderCone",
     "category": "Type",
-    "text": "SecondOrderCone(n)\n\nThe second-order cone or the Lorenz cone of dimension n defined as\n\n (tx) in mathbbR^n  t ge x_2 \n\n\n\n"
+    "text": "SecondOrderCone(dim)\n\nThe second-order cone (or Lorenz cone)  (tx) in mathbbR^dim  t ge  x _2  of dimension dim.\n\n\n\n"
 },
 
 {
@@ -325,7 +325,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.PositiveSemidefiniteConeTriangle",
     "category": "Type",
-    "text": "PositiveSemidefiniteConeTriangle(n)\n\nThe cone of symmetric n times n matrices that are positive semidefinite. The dimension of the cone is n(n+1)2 since the matrices are symmetric. The entries of the upper triangular part of the matrix are given row by row (or equivalently, the entries of the lower triangular part are given column by column). The scalar product is the sum of the pairwise product of the diagonal entries plus twice the sum of the pairwise product of the upper diagonal entries.\n\nExamples\n\nThe matrix\n\nbeginbmatrix\n  1  2  3\n  2  4  5\n  3  5  6\nendbmatrix\n\ncorresponds to (1 2 3 4 5 6) for PositiveSemidefiniteConeTriangle\n\n\n\n"
+    "text": "PositiveSemidefiniteConeTriangle(dim)\n\nThe cone of symmetric dim times dim matrices that are positive semidefinite. The dimension of the cone is dim (dim + 1)2 since the matrices are symmetric. The entries of the upper triangular part of the matrix are given row by row (or equivalently, the entries of the lower triangular part are given column by column). The scalar product is the sum of the pairwise product of the diagonal entries plus twice the sum of the pairwise product of the upper diagonal entries.\n\nExamples\n\nThe matrix\n\nbeginbmatrix\n  1  2  3\n  2  4  5\n  3  5  6\nendbmatrix\n\ncorresponds to (1 2 3 4 5 6) for PositiveSemidefiniteConeTriangle\n\n\n\n"
 },
 
 {
@@ -333,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.PositiveSemidefiniteConeScaled",
     "category": "Type",
-    "text": "PositiveSemidefiniteConeScaled(n)\n\nThe cone of symmetric n times n matrices that are positive semidefinite. The dimension of the cone is n(n+1)2 since the matrices are symmetric. The entries of the upper triangular part of the matrix are given row by row (or equivalently, the entries of the lower triangular part are given column by column). The off-diagonal entries of the matrices of both the cone and its dual are scaled by sqrt2 and the scalar product is simply the sum of the pairwise product of the entries.\n\nExamples\n\nThe matrix\n\nbeginbmatrix\n  1  2  3\n  2  4  5\n  3  5  6\nendbmatrix\n\nand to (1 2sqrt2 3sqrt2 4 5sqrt2 6) for PositiveSemidefiniteConeScaled.\n\n\n\n"
+    "text": "PositiveSemidefiniteConeScaled(n)\n\nThe cone of symmetric dim times dim matrices that are positive semidefinite. The dimension of the cone is dim (dim + 1)2 since the matrices are symmetric. The entries of the upper triangular part of the matrix are given row by row (or equivalently, the entries of the lower triangular part are given column by column). The off-diagonal entries of the matrices of both the cone and its dual are scaled by sqrt2 and the scalar product is simply the sum of the pairwise product of the entries.\n\nExamples\n\nThe matrix\n\nbeginbmatrix\n  1  2  3\n  2  4  5\n  3  5  6\nendbmatrix\n\nand to (1 2sqrt2 3sqrt2 4 5sqrt2 6) for PositiveSemidefiniteConeScaled.\n\n\n\n"
 },
 
 {
@@ -341,7 +341,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.Integers",
     "category": "Type",
-    "text": "Integers(n)\n\nThe set of integers mathbbZ^n.\n\n\n\n"
+    "text": "Integers(dim)\n\nThe set of integers mathbbZ^dim.\n\n\n\n"
 },
 
 {
@@ -349,7 +349,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.Binaries",
     "category": "Type",
-    "text": "Binaries(n)\n\nThe set of binary vectors 01^n.\n\n\n\n"
+    "text": "Binaries(dim)\n\nThe set of binary vectors  0 1 ^dim.\n\n\n\n"
 },
 
 {
@@ -357,7 +357,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.SOS1",
     "category": "Type",
-    "text": "SOS1(weights::Vector{T}) where T\n\nThe set corresponding to the special ordered set (SOS) constraint of type 1. Of the variables in the set, at most one can be nonzero. The weights induce an ordering of the variables; as such, they should be unique values. The k-th element in the set corresponds to the k-th weight in weights.\n\nSee here for a description of SOS constraints and their potential uses.\n\n\n\n"
+    "text": "SOS1(weights)\n\nThe set corresponding to the special ordered set (SOS) constraint of type 1. Of the variables in the set, at most one can be nonzero. The weights induce an ordering of the variables; as such, they should be unique values. The k-th element in the set corresponds to the k-th weight in weights. See here for a description of SOS constraints and their potential uses.\n\n\n\n"
 },
 
 {
@@ -365,7 +365,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.SOS2",
     "category": "Type",
-    "text": "SOS2(weights::Vector{T}) where T\n\nThe set corresponding to the special ordered set (SOS) constraint of type 2. Of the variables in the set, at most two can be nonzero, and if two are nonzero, they must be adjacent in the ordering of the set. The weights induce an ordering of the variables; as such, they should be unique values. The k-th element in the set corresponds to the k-th weight in weights.\n\nSee here for a description of SOS constraints and their potential uses.\n\n\n\n"
+    "text": "SOS2(weights)\n\nThe set corresponding to the special ordered set (SOS) constraint of type 2. Of the variables in the set, at most two can be nonzero, and if two are nonzero, they must be adjacent in the ordering of the set. The weights induce an ordering of the variables; as such, they should be unique values. The k-th element in the set corresponds to the k-th weight in weights. See here for a description of SOS constraints and their potential uses.\n\n\n\n"
 },
 
 {
