@@ -37,7 +37,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface Manual",
     "title": "Concepts",
     "category": "section",
-    "text": ""
+    "text": "beginalign\n     min_x in mathbbR^n  f_0(x)\n    \n     textst  f_i(x)  in mathcalS_i  i = 1 ldots m\n    \n      x  in l u\nendalign"
 },
 
 {
@@ -305,6 +305,30 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "apireference.html#MathProgBase.AbstractSet",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.AbstractSet",
+    "category": "Type",
+    "text": "AbstractSet\n\nAbstract supertype for set objects used to encode constraints.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.Reals",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.Reals",
+    "category": "Type",
+    "text": "Reals(dim)\n\nThe set mathbbR^dim (containing all points) of dimension dim.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.Zero",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.Zero",
+    "category": "Type",
+    "text": "Zero(dim)\n\nThe set  0 ^dim (containing only the origin) of dimension dim.\n\n\n\n"
+},
+
+{
     "location": "apireference.html#MathProgBase.NonNegative",
     "page": "Solver Interface API",
     "title": "MathProgBase.NonNegative",
@@ -318,14 +342,6 @@ var documenterSearchIndex = {"docs": [
     "title": "MathProgBase.NonPositive",
     "category": "Type",
     "text": "NonPositive(dim)\n\nThe nonpositive orthant  x in mathbbR^dim  x le 0  of dimension dim.\n\n\n\n"
-},
-
-{
-    "location": "apireference.html#MathProgBase.Zero",
-    "page": "Solver Interface API",
-    "title": "MathProgBase.Zero",
-    "category": "Type",
-    "text": "Zero(dim)\n\nThe set  0 ^dim (containing only the origin) of dimension dim.\n\n\n\n"
 },
 
 {
@@ -345,11 +361,43 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "apireference.html#MathProgBase.ExponentialCone",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.ExponentialCone",
+    "category": "Type",
+    "text": "ExponentialCone()\n\nThe 3-dimensional exponential cone  (xyz) in mathbbR^3  y exp (xy) le z y  0 .\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.DualExponentialCone",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.DualExponentialCone",
+    "category": "Type",
+    "text": "DualExponentialCone()\n\nThe 3-dimensional dual exponential cone  (uvw) in mathbbR^3  -u exp (vu) le exp(1) w u  0 .\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.PowerCone",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.PowerCone",
+    "category": "Type",
+    "text": "PowerCone(a)\n\nThe 3-dimensional power cone  (xyz) in mathbbR^3  x^a y^1-a = z x ge 0 y ge 0  with parameter a.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.DualPowerCone",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.DualPowerCone",
+    "category": "Type",
+    "text": "DualPowerCone(a)\n\nThe 3-dimensional power cone  (uvw) in mathbbR^3  (ua)^a (v(1-a))^1-a = w u ge 0 v ge 0  with parameter a.\n\n\n\n"
+},
+
+{
     "location": "apireference.html#MathProgBase.PositiveSemidefiniteConeTriangle",
     "page": "Solver Interface API",
     "title": "MathProgBase.PositiveSemidefiniteConeTriangle",
     "category": "Type",
-    "text": "PositiveSemidefiniteConeTriangle(dim)\n\nThe (vectorized) cone of symmetric positive semidefinite matrices, with off-diagonals unscaled. The entries of the upper triangular part of the matrix are given row by row (or equivalently, the entries of the lower triangular part are given column by column).  An n times n matrix has n(n+1)2 lower-triangular elements, so for the vectorized cone of dimension dim, the corresponding symmetric matrix has side dimension sqrt (14 + 2 dim) - 12 elements.  The scalar product is the sum of the pairwise product of the diagonal entries plus twice the sum of the pairwise product of the upper diagonal entries.\n\nExamples\n\nThe matrix\n\nbeginbmatrix\n  1  2  3\n  2  4  5\n  3  5  6\nendbmatrix\n\ncorresponds to (1 2 3 4 5 6) for PositiveSemidefiniteConeTriangle\n\n\n\n"
+    "text": "PositiveSemidefiniteConeTriangle(dim)\n\nThe (vectorized) cone of symmetric positive semidefinite matrices, with off-diagonals unscaled. The entries of the upper triangular part of the matrix are given row by row (or equivalently, the entries of the lower triangular part are given column by column). An n times n matrix has n(n+1)2 lower-triangular elements, so for the vectorized cone of dimension dim, the corresponding symmetric matrix has side dimension sqrt (14 + 2 dim) - 12 elements. The scalar product is the sum of the pairwise product of the diagonal entries plus twice the sum of the pairwise product of the upper diagonal entries.\n\nExamples\n\nThe matrix\n\nbeginbmatrix\n  1  2  3\n  2  4  5\n  3  5  6\nendbmatrix\n\ncorresponds to (1 2 3 4 5 6) for PositiveSemidefiniteConeTriangle\n\n\n\n"
 },
 
 {
@@ -357,7 +405,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.PositiveSemidefiniteConeScaled",
     "category": "Type",
-    "text": "PositiveSemidefiniteConeScaled(dim)\n\nThe (vectorized) cone of symmetric positive semidefinite matrices, with off-diagonals scaled. The entries of the upper triangular part of the matrix are given row by row (or equivalently, the entries of the lower triangular part are given column by column).  An n times n matrix has n(n+1)2 lower-triangular elements, so for the vectorized cone of dimension dim, the corresponding symmetric matrix has side dimension sqrt (14 + 2 dim) - 12 elements.  The off-diagonal entries of the matrices of both the cone and its dual are scaled by sqrt2 and the scalar product is simply the sum of the pairwise product of the entries. \n\nExamples\n\nThe matrix\n\nbeginbmatrix\n  1  2  3\n  2  4  5\n  3  5  6\nendbmatrix\n\nand to (1 2sqrt2 3sqrt2 4 5sqrt2 6) for PositiveSemidefiniteConeScaled.\n\n\n\n"
+    "text": "PositiveSemidefiniteConeScaled(dim)\n\nThe (vectorized) cone of symmetric positive semidefinite matrices, with off-diagonals scaled. The entries of the upper triangular part of the matrix are given row by row (or equivalently, the entries of the lower triangular part are given column by column). An n times n matrix has n(n+1)2 lower-triangular elements, so for the vectorized cone of dimension dim, the corresponding symmetric matrix has side dimension sqrt (14 + 2 dim) - 12 elements. The off-diagonal entries of the matrices of both the cone and its dual are scaled by sqrt2 and the scalar product is simply the sum of the pairwise product of the entries.\n\nExamples\n\nThe matrix\n\nbeginbmatrix\n  1  2  3\n  2  4  5\n  3  5  6\nendbmatrix\n\nand to (1 2sqrt2 3sqrt2 4 5sqrt2 6) for PositiveSemidefiniteConeScaled.\n\n\n\n"
 },
 
 {
@@ -397,71 +445,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "Sets",
     "category": "section",
-    "text": "List of sets.NonNegative\nNonPositive\nZero\nInterval\nSecondOrderCone\nPositiveSemidefiniteConeTriangle\nPositiveSemidefiniteConeScaled\nIntegers\nBinaries\nSOS1\nSOS2"
-},
-
-{
-    "location": "apireference.html#MathProgBase.AbstractSolverOrModelAttribute",
-    "page": "Solver Interface API",
-    "title": "MathProgBase.AbstractSolverOrModelAttribute",
-    "category": "Type",
-    "text": "AbstractSolverOrModelAttribute\n\nAbstract supertype for attribute objects that can be used to set or get attributes (properties) of the model or solver.\n\n\n\n"
-},
-
-{
-    "location": "apireference.html#MathProgBase.AbstractVariableAttribute",
-    "page": "Solver Interface API",
-    "title": "MathProgBase.AbstractVariableAttribute",
-    "category": "Type",
-    "text": "AbstractVariableAttribute\n\nAbstract supertype for attribute objects that can be used to set or get attributes (properties) of variables in the model.\n\n\n\n"
-},
-
-{
-    "location": "apireference.html#MathProgBase.AbstractConstraintAttribute",
-    "page": "Solver Interface API",
-    "title": "MathProgBase.AbstractConstraintAttribute",
-    "category": "Type",
-    "text": "AbstractConstraintAttribute\n\nAbstract supertype for attribute objects that can be used to set or get attributes (properties) of constraints in the model.\n\n\n\n"
-},
-
-{
-    "location": "apireference.html#MathProgBase.cangetattribute",
-    "page": "Solver Interface API",
-    "title": "MathProgBase.cangetattribute",
-    "category": "Function",
-    "text": "cangetattribute(s::AbstractMathProgSolver, attr::AbstractSolverOrModelAttribute)::Bool\n\nReturn a Bool indicating whether it is possible to query attribute attr from the solver s.\n\ncangetattribute(m::AbstractMathProgModel, attr::AbstractVariableAttribute, R::Type{VariableReference})::Bool\ncangetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{VariablewiseConstraintReference{T})::Bool\ncangetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{AffineConstraintReference{T})::Bool\ncangetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{QuadraticConstraintReference{T})::Bool\n\nReturn a Bool indicating whether the model m currently has a value for the attributed specified by attribute type attr applied to the reference type R.\n\nExamples\n\n```julia cangetattribute(GurobiSolver(), SupportsAffineConstraint{Zero}()) cangetattribute(m, ObjectiveValue()) cangetattribute(m, VariablePrimalStart(), varref) cangetattribute(m, ConstraintPrimal(), conref)\n\n\n\n"
-},
-
-{
-    "location": "apireference.html#MathProgBase.getattribute",
-    "page": "Solver Interface API",
-    "title": "MathProgBase.getattribute",
-    "category": "Function",
-    "text": "getattribute(s::AbstractMathProgSolver, attr::AbstractSolverOrModelAttribute)\n\nReturn an attribute attr of the solver s.\n\ngetattribute(m::AbstractMathProgModel, attr::AbstractSolverOrModelAttribute)\n\nReturn an attribute attr of the model m.\n\ngetattribute(m::AbstractMathProgModel, attr::AbstractVariableAttribute, v::VariableReference)\n\nReturn an attribute attr of the variable v in model m.\n\ngetattribute(m::AbstractMathProgModel, attr::AbstractVariableAttribute, v::Vector{VariableReference})\n\nReturn a vector of attributes corresponding to each variable in the collection v in the model m.\n\ngetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::ConstraintReference)\n\nReturn an attribute attr of the constraint c in model m.\n\ngetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{VariablewiseConstraintReference{T}})\ngetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{AffineConstraintReference{T}})\ngetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{QuadraticConstraintReference{T}})\n\nReturn a vector of attributes corresponding to each constraint in the collection c in the model m.\n\nExamples\n\ngetattribute(m, ObjectiveValue())\ngetattribute(m, VariableResult(), ref)\ngetattribute(m, VariableResult(5), [ref1,ref2])\ngetattribute(m, OtherAttribute(\"something specific to cplex\"))\n\n\n\n"
-},
-
-{
-    "location": "apireference.html#MathProgBase.getattribute!",
-    "page": "Solver Interface API",
-    "title": "MathProgBase.getattribute!",
-    "category": "Function",
-    "text": "getattribute!(output, m::AbstractMathProgModel, args...)\n\nAn in-place version of getattribute. The signature matches that of getattribute except that the the result is placed in the vector output.\n\n\n\n"
-},
-
-{
-    "location": "apireference.html#MathProgBase.cansetattribute",
-    "page": "Solver Interface API",
-    "title": "MathProgBase.cansetattribute",
-    "category": "Function",
-    "text": "cansetattribute(s::AbstractMathProgSolver, attr::AbstractSolverOrModelAttribute)::Bool\n\nReturn a Bool indicating whether it is possible to set attribute attr in the solver s.\n\ncansetattribute(m::AbstractMathProgModel, attr::AbstractVariableAttribute, R::Type{VariableReference})::Bool\ncansetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{VariablewiseConstraintReference{T})::Bool\ncangetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{AffineConstraintReference{T})::Bool\ncangetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{QuadraticConstraintReference{T})::Bool\n\nReturn a Bool indicating whether it is possible to set attribute attr applied to the reference type R in the model m.\n\nExamples\n\n```julia cansetattribute(GurobiSolver(), SupportsAffineConstraint{Zero}()) cansetattribute(m, ObjectiveValue()) cansetattribute(m, VariablePrimalStart(), VariableReference) cansetattribute(m, ConstraintPrimal(), AffineConstraintReference{NonNegative})\n\n\n\n"
-},
-
-{
-    "location": "apireference.html#MathProgBase.setattribute!",
-    "page": "Solver Interface API",
-    "title": "MathProgBase.setattribute!",
-    "category": "Function",
-    "text": "setattribute!(s::AbstractMathProgSolver, attr::AbstractSolverOrModelAttribute, value)\n\nAssign value to the attribute attr of the solver s.\n\nsetattribute!(m::AbstractMathProgModel, attr::AbstractSolverOrModelAttribute, value)\n\nAssign value to the attribute attr of the model m.\n\nsetattribute!(m::AbstractMathProgModel, attr::AbstractVariableAttribute, v::VariableReference, value)\n\nAssign value to the attribute attr of variable v in model m.\n\nsetattribute!(m::AbstractMathProgModel, attr::AbstractVariableAttribute, v::Vector{VariableReference}, vector_of_values)\n\nAssign a value respectively to the attribute attr of each variable in the collection v in model m.\n\nsetattribute!(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::ConstraintReference, value)\n\nAssign a value to the attribute attr of constraint c in model m.\n\nsetattribute!(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{VariablewiseConstraintReference{T}})\nsetattribute!(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{AffineConstraintReference{T}})\nsetattribute!(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{QuadraticConstraintReference{T}})\n\nAssign a value respectively to the attribute attr of each constraint in the collection c in model m.\n\n\n\n"
+    "text": "List of sets.AbstractSet\nReals\nZero\nNonNegative\nNonPositive\nInterval\nSecondOrderCone\nExponentialCone\nDualExponentialCone\nPowerCone\nDualPowerCone\nPositiveSemidefiniteConeTriangle\nPositiveSemidefiniteConeScaled\nIntegers\nBinaries\nSOS1\nSOS2Functions for getting and setting properties of sets.dimension"
 },
 
 {
@@ -469,7 +453,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "Attributes",
     "category": "section",
-    "text": "These are used to get and set properties of the model or solver.AbstractSolverOrModelAttribute\nAbstractVariableAttribute\nAbstractConstraintAttribute\ncangetattribute\ngetattribute\ngetattribute!\ncansetattribute\nsetattribute!"
+    "text": ""
 },
 
 {
@@ -681,11 +665,75 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "apireference.html#MathProgBase.AbstractSolverOrModelAttribute",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.AbstractSolverOrModelAttribute",
+    "category": "Type",
+    "text": "AbstractSolverOrModelAttribute\n\nAbstract supertype for attribute objects that can be used to set or get attributes (properties) of the model or solver.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.AbstractVariableAttribute",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.AbstractVariableAttribute",
+    "category": "Type",
+    "text": "AbstractVariableAttribute\n\nAbstract supertype for attribute objects that can be used to set or get attributes (properties) of variables in the model.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.AbstractConstraintAttribute",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.AbstractConstraintAttribute",
+    "category": "Type",
+    "text": "AbstractConstraintAttribute\n\nAbstract supertype for attribute objects that can be used to set or get attributes (properties) of constraints in the model.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.cangetattribute",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.cangetattribute",
+    "category": "Function",
+    "text": "cangetattribute(s::AbstractMathProgSolver, attr::AbstractSolverOrModelAttribute)::Bool\n\nReturn a Bool indicating whether it is possible to query attribute attr from the solver s.\n\ncangetattribute(m::AbstractMathProgModel, attr::AbstractVariableAttribute, R::Type{VariableReference})::Bool\ncangetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{VariablewiseConstraintReference{T})::Bool\ncangetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{AffineConstraintReference{T})::Bool\ncangetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{QuadraticConstraintReference{T})::Bool\n\nReturn a Bool indicating whether the model m currently has a value for the attributed specified by attribute type attr applied to the reference type R.\n\nExamples\n\n```julia cangetattribute(GurobiSolver(), SupportsAffineConstraint{Zero}()) cangetattribute(m, ObjectiveValue()) cangetattribute(m, VariablePrimalStart(), varref) cangetattribute(m, ConstraintPrimal(), conref)\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.getattribute",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.getattribute",
+    "category": "Function",
+    "text": "getattribute(s::AbstractMathProgSolver, attr::AbstractSolverOrModelAttribute)\n\nReturn an attribute attr of the solver s.\n\ngetattribute(m::AbstractMathProgModel, attr::AbstractSolverOrModelAttribute)\n\nReturn an attribute attr of the model m.\n\ngetattribute(m::AbstractMathProgModel, attr::AbstractVariableAttribute, v::VariableReference)\n\nReturn an attribute attr of the variable v in model m.\n\ngetattribute(m::AbstractMathProgModel, attr::AbstractVariableAttribute, v::Vector{VariableReference})\n\nReturn a vector of attributes corresponding to each variable in the collection v in the model m.\n\ngetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::ConstraintReference)\n\nReturn an attribute attr of the constraint c in model m.\n\ngetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{VariablewiseConstraintReference{T}})\ngetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{AffineConstraintReference{T}})\ngetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{QuadraticConstraintReference{T}})\n\nReturn a vector of attributes corresponding to each constraint in the collection c in the model m.\n\nExamples\n\ngetattribute(m, ObjectiveValue())\ngetattribute(m, VariableResult(), ref)\ngetattribute(m, VariableResult(5), [ref1,ref2])\ngetattribute(m, OtherAttribute(\"something specific to cplex\"))\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.getattribute!",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.getattribute!",
+    "category": "Function",
+    "text": "getattribute!(output, m::AbstractMathProgModel, args...)\n\nAn in-place version of getattribute. The signature matches that of getattribute except that the the result is placed in the vector output.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.cansetattribute",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.cansetattribute",
+    "category": "Function",
+    "text": "cansetattribute(s::AbstractMathProgSolver, attr::AbstractSolverOrModelAttribute)::Bool\n\nReturn a Bool indicating whether it is possible to set attribute attr in the solver s.\n\ncansetattribute(m::AbstractMathProgModel, attr::AbstractVariableAttribute, R::Type{VariableReference})::Bool\ncansetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{VariablewiseConstraintReference{T})::Bool\ncangetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{AffineConstraintReference{T})::Bool\ncangetattribute(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, R::Type{QuadraticConstraintReference{T})::Bool\n\nReturn a Bool indicating whether it is possible to set attribute attr applied to the reference type R in the model m.\n\nExamples\n\n```julia cansetattribute(GurobiSolver(), SupportsAffineConstraint{Zero}()) cansetattribute(m, ObjectiveValue()) cansetattribute(m, VariablePrimalStart(), VariableReference) cansetattribute(m, ConstraintPrimal(), AffineConstraintReference{NonNegative})\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.setattribute!",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.setattribute!",
+    "category": "Function",
+    "text": "setattribute!(s::AbstractMathProgSolver, attr::AbstractSolverOrModelAttribute, value)\n\nAssign value to the attribute attr of the solver s.\n\nsetattribute!(m::AbstractMathProgModel, attr::AbstractSolverOrModelAttribute, value)\n\nAssign value to the attribute attr of the model m.\n\nsetattribute!(m::AbstractMathProgModel, attr::AbstractVariableAttribute, v::VariableReference, value)\n\nAssign value to the attribute attr of variable v in model m.\n\nsetattribute!(m::AbstractMathProgModel, attr::AbstractVariableAttribute, v::Vector{VariableReference}, vector_of_values)\n\nAssign a value respectively to the attribute attr of each variable in the collection v in model m.\n\nsetattribute!(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::ConstraintReference, value)\n\nAssign a value to the attribute attr of constraint c in model m.\n\nsetattribute!(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{VariablewiseConstraintReference{T}})\nsetattribute!(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{AffineConstraintReference{T}})\nsetattribute!(m::AbstractMathProgModel, attr::AbstractConstraintAttribute, c::Vector{QuadraticConstraintReference{T}})\n\nAssign a value respectively to the attribute attr of each constraint in the collection c in model m.\n\n\n\n"
+},
+
+{
     "location": "apireference.html#Solver-or-Model-Attributes-1",
     "page": "Solver Interface API",
     "title": "Solver or Model Attributes",
     "category": "section",
-    "text": "These attribute apply to solver or model objects, as noted.ReturnsDuals\nSupportsAddConstraintAfterSolve\nSupportsDeleteConstraint\nSupportsAddVariableAfterSolver\nSupportsQuadraticObjective\nSupportsConicThroughQuadratic\nObjectiveValue\nObjectiveBound\nRelativeGap\nSolveTime\nSense\nSimplexIterations\nBarrierIterations\nNodeCount\nRawSolver\nResultCount\nNumberOfVariables\nNumberOfVariablewiseConstraints\nNumberOfAffineConstraints\nNumberOfQuadraticConstraints\nSupportsVariablewiseConstraint\nSupportsAffineConstraint\nSupportsQuadraticConstraint\nTerminationStatus\nPrimalStatus\nDualStatus"
+    "text": "List of solver or model attributes.ReturnsDuals\nSupportsAddConstraintAfterSolve\nSupportsDeleteConstraint\nSupportsAddVariableAfterSolver\nSupportsQuadraticObjective\nSupportsConicThroughQuadratic\nObjectiveValue\nObjectiveBound\nRelativeGap\nSolveTime\nSense\nSimplexIterations\nBarrierIterations\nNodeCount\nRawSolver\nResultCount\nNumberOfVariables\nNumberOfVariablewiseConstraints\nNumberOfAffineConstraints\nNumberOfQuadraticConstraints\nSupportsVariablewiseConstraint\nSupportsAffineConstraint\nSupportsQuadraticConstraint\nTerminationStatus\nPrimalStatus\nDualStatusFunctions for getting and setting model or solver attributes.AbstractSolverOrModelAttribute\nAbstractVariableAttribute\nAbstractConstraintAttribute\ncangetattribute\ngetattribute\ngetattribute!\ncansetattribute\nsetattribute!"
 },
 
 {
@@ -765,7 +813,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "Variable Attributes",
     "category": "section",
-    "text": "These attributes are associated with variables. Calls to getattribute and setattribute! should include as an argument a single VariableReference or a vector of VariableReference objects. By convention, the name of a variable attributes begins with Variable.VariablePrimalStart\nVariableLowerBoundDualStart\nVariableUpperBoundDualStart\nVariableLowerBound\nVariableUpperBound\nVariablePrimal\nVariableLowerBoundDual\nVariableUpperBoundDual\nVariableBasisStatus"
+    "text": "List of attributes associated with variables. Calls to getattribute and setattribute! should include as an argument a single VariableReference or a vector of VariableReference objects.VariablePrimalStart\nVariableLowerBoundDualStart\nVariableUpperBoundDualStart\nVariableLowerBound\nVariableUpperBound\nVariablePrimal\nVariableLowerBoundDual\nVariableUpperBoundDual\nVariableBasisStatus"
 },
 
 {
@@ -813,7 +861,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "Constraint Attributes",
     "category": "section",
-    "text": "These attributes are associated with constraints. Calls to getattribute and setattribute! should include as an argument a single ConstraintReference or a vector of ConstriaintReference{T} objects. By convention, the name of a variable attributes begins with Variable.ConstraintPrimalStart\nConstraintDualStart\nConstraintPrimal\nConstraintDual\nConstraintBasisStatus"
+    "text": "List of attributes associated with constraints. Calls to getattribute and setattribute! should include as an argument a single ConstraintReference or a vector of ConstriaintReference{T} objects.ConstraintPrimalStart\nConstraintDualStart\nConstraintPrimal\nConstraintDual\nConstraintBasisStatus"
 },
 
 {
