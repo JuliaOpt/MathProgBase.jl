@@ -8,11 +8,11 @@ abstract type AbstractSet end
 dimension(s::AbstractSet) = s.dim
 
 """
-    Free(dim)
+    Reals(dim)
 
 The set ``\\mathbb{R}^{dim}`` (containing all points) of dimension ``dim``.
 """
-struct Zero <: AbstractSet
+struct Free <: AbstractSet
     dim::Int
 end
 
@@ -46,9 +46,9 @@ end
 """
     Interval(lower,upper)
 
-The box ``[lower, upper] \\subseteq \\mathbb{R}^{dim}`` where ``lower`` and ``upper`` are vectors of dimension ``dim``. If ``lower`` or ``upper`` is all ``-Inf`` or ``Inf``, the set is interpreted as a one-sided interval.
+The box ``[lower, upper] \\subseteq \\mathbb{R}^{dim}`` where ``lower`` and ``upper`` are scalars (1-dimensional) or vectors of dimension ``dim``. If ``lower`` or ``upper`` is all ``-Inf`` or ``Inf``, the set is interpreted as a one-sided interval.
 """
-struct Interval{T <: Real} <: AbstractSet
+struct Interval{T} <: AbstractSet
     lower::T
     upper::T
 end
@@ -119,7 +119,7 @@ corresponds to ``(1, 2, 3, 4, 5, 6)`` for `PositiveSemidefiniteConeTriangle`
 """
 struct PositiveSemidefiniteConeTriangle <: AbstractSet
     dim::Int
-    sidedim::Int
+    matrix_dim::Int
 end
 
 """
@@ -141,7 +141,7 @@ and to ``(1, 2\\sqrt{2}, 3\\sqrt{2}, 4, 5\\sqrt{2}, 6)`` for `PositiveSemidefini
 """
 struct PositiveSemidefiniteConeScaled <: AbstractSet
     dim::Int
-    sidedim::Int
+    matrix_dim::Int
 end
 
 """
