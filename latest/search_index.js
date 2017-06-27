@@ -17,6 +17,30 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "apimanual.html#",
+    "page": "Solver Interface Manual",
+    "title": "Solver Interface Manual",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "apimanual.html#Solver-Interface-Manual-1",
+    "page": "Solver Interface Manual",
+    "title": "Solver Interface Manual",
+    "category": "section",
+    "text": ""
+},
+
+{
+    "location": "apimanual.html#Concepts-1",
+    "page": "Solver Interface Manual",
+    "title": "Concepts",
+    "category": "section",
+    "text": ""
+},
+
+{
     "location": "apireference.html#",
     "page": "Solver Interface API",
     "title": "Solver Interface API",
