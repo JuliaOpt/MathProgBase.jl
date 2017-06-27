@@ -5,6 +5,7 @@ makedocs(
     sitename = "MathProgBase",
     pages = [
         "Introduction" => "index.md",
+        "Solver Interface Manual" => "apimanual.md",
         "Solver Interface API" => "apireference.md",
         "High-level Interfaces" => "highlevel.md",
         "Choosing Solvers" => "choosingsolver.md"
