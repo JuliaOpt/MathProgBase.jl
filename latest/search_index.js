@@ -309,7 +309,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.Interval",
     "category": "Type",
-    "text": "Interval(lower,upper)\n\nThe box lower upper subseteq mathbbR^dim where lower and upper are vectors of dimension dim. If lower or upper is all -Inf or Inf, the set is interpreted as a one-sided interval.\n\n\n\n"
+    "text": "Interval(lower,upper)\n\nThe box lower upper subseteq mathbbR^dim where lower and upper are scalars (1-dimensional) or vectors of dimension dim. If lower or upper is all -Inf or Inf, the set is interpreted as a one-sided interval.\n\n\n\n"
 },
 
 {
