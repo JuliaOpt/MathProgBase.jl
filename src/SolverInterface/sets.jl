@@ -12,7 +12,7 @@ dimension(s::AbstractSet) = s.dim
 
 The set ``\\mathbb{R}^{dim}`` (containing all points) of dimension ``dim``.
 """
-struct Free <: AbstractSet
+struct Reals <: AbstractSet
     dim::Int
 end
 
@@ -67,7 +67,7 @@ end
 """
     ExponentialCone()
 
-The 3-dimensional exponential cone ``\\{ (x,y,z) \\in \\mathbb{R}^3 : y \\exp{x/y} \\le z, y > 0 \\}``.
+The 3-dimensional exponential cone ``\\{ (x,y,z) \\in \\mathbb{R}^3 : y \\exp (x/y) \\le z, y > 0 \\}``.
 """
 struct ExponentialCone <: AbstractSet
 end
@@ -75,7 +75,7 @@ end
 """
     DualExponentialCone()
 
-The 3-dimensional dual exponential cone ``\\{ (u,v,w) \\in \\mathbb{R}^3 : -u \\exp{v/u} \\le \\exp{1} w, u < 0 \\}``.
+The 3-dimensional dual exponential cone ``\\{ (u,v,w) \\in \\mathbb{R}^3 : -u \\exp (v/u) \\le \\exp(1) w, u < 0 \\}``.
 """
 struct DualExponentialCone <: AbstractSet
 end
@@ -104,8 +104,8 @@ dimension(s::Union{ExponentialCone, DualExponentialCone, PowerCone, DualPowerCon
     PositiveSemidefiniteConeTriangle(dim)
 
 The (vectorized) cone of symmetric positive semidefinite matrices, with off-diagonals unscaled.
-The entries of the upper triangular part of the matrix are given row by row (or equivalently, the entries of the lower triangular part are given column by column). 
-An ``n \\times n`` matrix has ``n(n+1)/2`` lower-triangular elements, so for the vectorized cone of dimension ``dim``, the corresponding symmetric matrix has side dimension ``\\sqrt (1/4 + 2 dim) - 1/2`` elements. 
+The entries of the upper triangular part of the matrix are given row by row (or equivalently, the entries of the lower triangular part are given column by column).
+An ``n \\times n`` matrix has ``n(n+1)/2`` lower-triangular elements, so for the vectorized cone of dimension ``dim``, the corresponding symmetric matrix has side dimension ``\\sqrt (1/4 + 2 dim) - 1/2`` elements.
 The scalar product is the sum of the pairwise product of the diagonal entries plus twice the sum of the pairwise product of the upper diagonal entries.
 
 ### Examples
@@ -128,9 +128,9 @@ end
     PositiveSemidefiniteConeScaled(dim)
 
 The (vectorized) cone of symmetric positive semidefinite matrices, with off-diagonals scaled.
-The entries of the upper triangular part of the matrix are given row by row (or equivalently, the entries of the lower triangular part are given column by column). 
-An ``n \\times n`` matrix has ``n(n+1)/2`` lower-triangular elements, so for the vectorized cone of dimension ``dim``, the corresponding symmetric matrix has side dimension ``\\sqrt (1/4 + 2 dim) - 1/2`` elements. 
-The off-diagonal entries of the matrices of both the cone and its dual are scaled by ``\\sqrt{2}`` and the scalar product is simply the sum of the pairwise product of the entries. 
+The entries of the upper triangular part of the matrix are given row by row (or equivalently, the entries of the lower triangular part are given column by column).
+An ``n \\times n`` matrix has ``n(n+1)/2`` lower-triangular elements, so for the vectorized cone of dimension ``dim``, the corresponding symmetric matrix has side dimension ``\\sqrt (1/4 + 2 dim) - 1/2`` elements.
+The off-diagonal entries of the matrices of both the cone and its dual are scaled by ``\\sqrt{2}`` and the scalar product is simply the sum of the pairwise product of the entries.
 
 ### Examples
 

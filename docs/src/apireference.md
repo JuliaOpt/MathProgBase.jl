@@ -12,7 +12,6 @@ AbstractNLPModel
 AbstractMathProgSolver
 ```
 
-
 ```@docs
 Model
 NLPModel
@@ -21,7 +20,6 @@ freemodel!
 ```
 
 ## Variables
-
 
 ```@docs
 VariableReference
@@ -63,11 +61,17 @@ getconstraintquadratic
 
 List of sets.
 ```@docs
+AbstractSet
+Reals
+Zero
 NonNegative
 NonPositive
-Zero
 Interval
 SecondOrderCone
+ExponentialCone
+DualExponentialCone
+PowerCone
+DualPowerCone
 PositiveSemidefiniteConeTriangle
 PositiveSemidefiniteConeScaled
 Integers
@@ -76,25 +80,16 @@ SOS1
 SOS2
 ```
 
-## Attributes
-
-These are used to get and set properties of the model or solver.
-
+Functions for getting and setting properties of sets.
 ```@docs
-AbstractSolverOrModelAttribute
-AbstractVariableAttribute
-AbstractConstraintAttribute
-cangetattribute
-getattribute
-getattribute!
-cansetattribute
-setattribute!
+dimension
 ```
+
+## Attributes
 
 ### Solver or Model Attributes
 
-These attribute apply to solver or model objects, as noted.
-
+List of solver or model attributes.
 ```@docs
 ReturnsDuals
 SupportsAddConstraintAfterSolve
@@ -124,10 +119,21 @@ PrimalStatus
 DualStatus
 ```
 
+Functions for getting and setting model or solver attributes.
+```@docs
+AbstractSolverOrModelAttribute
+AbstractVariableAttribute
+AbstractConstraintAttribute
+cangetattribute
+getattribute
+getattribute!
+cansetattribute
+setattribute!
+```
+
 ### Variable Attributes
 
-These attributes are associated with variables. Calls to `getattribute` and `setattribute!` should include as an argument a single `VariableReference` or a vector of `VariableReference` objects. By convention, the name of a variable attributes begins with `Variable`.
-
+List of attributes associated with variables. Calls to `getattribute` and `setattribute!` should include as an argument a single `VariableReference` or a vector of `VariableReference` objects.
 ```@docs
 VariablePrimalStart
 VariableLowerBoundDualStart
@@ -142,9 +148,7 @@ VariableBasisStatus
 
 ### Constraint Attributes
 
-These attributes are associated with constraints. Calls to `getattribute` and `setattribute!` should include as an argument a single `ConstraintReference` or a vector of `ConstriaintReference{T}` objects. By convention, the name of a variable attributes begins with `Variable`.
-
-
+List of attributes associated with constraints. Calls to `getattribute` and `setattribute!` should include as an argument a single `ConstraintReference` or a vector of `ConstriaintReference{T}` objects.
 ```@docs
 ConstraintPrimalStart
 ConstraintDualStart
@@ -158,7 +162,6 @@ ConstraintBasisStatus
 ### Termination Status
 
 The `TerminationStatus` attribute is meant to explain the reason why the solver stopped executing. The value of the attribute is of type `TerminationStatusCode`.
-
 ```@docs
 TerminationStatusCode
 ```
@@ -166,7 +169,6 @@ TerminationStatusCode
 ### Result Status
 
 The `PrimalStatus` and `DualStatus` attributes are meant to explain how to interpret the result returned by the solver. The value of the attributes are of type `ResultStatusCode`.
-
 ```@docs
 ResultStatusCode
 ```
