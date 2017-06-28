@@ -321,27 +321,43 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "apireference.html#MathProgBase.Zero",
+    "location": "apireference.html#MathProgBase.Zeros",
     "page": "Solver Interface API",
-    "title": "MathProgBase.Zero",
+    "title": "MathProgBase.Zeros",
     "category": "Type",
-    "text": "Zero(dim)\n\nThe set  0 ^dim (containing only the origin) of dimension dim.\n\n\n\n"
+    "text": "Zeros(dim)\n\nThe set  0 ^dim (containing only the origin) of dimension dim.\n\n\n\n"
 },
 
 {
-    "location": "apireference.html#MathProgBase.NonNegative",
+    "location": "apireference.html#MathProgBase.NonNegatives",
     "page": "Solver Interface API",
-    "title": "MathProgBase.NonNegative",
+    "title": "MathProgBase.NonNegatives",
     "category": "Type",
-    "text": "NonNegative(dim)\n\nThe nonnegative orthant  x in mathbbR^dim  x ge 0  of dimension dim.\n\n\n\n"
+    "text": "NonNegatives(dim)\n\nThe nonnegative orthant  x in mathbbR^dim  x ge 0  of dimension dim.\n\n\n\n"
 },
 
 {
-    "location": "apireference.html#MathProgBase.NonPositive",
+    "location": "apireference.html#MathProgBase.NonPositives",
     "page": "Solver Interface API",
-    "title": "MathProgBase.NonPositive",
+    "title": "MathProgBase.NonPositives",
     "category": "Type",
-    "text": "NonPositive(dim)\n\nThe nonpositive orthant  x in mathbbR^dim  x le 0  of dimension dim.\n\n\n\n"
+    "text": "NonPositives(dim)\n\nThe nonpositive orthant  x in mathbbR^dim  x le 0  of dimension dim.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.GreaterThan",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.GreaterThan",
+    "category": "Type",
+    "text": "GreaterThan(lower)\n\nThe set lowerinfty subseteq mathbbR.\n\n\n\n"
+},
+
+{
+    "location": "apireference.html#MathProgBase.LessThan",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.LessThan",
+    "category": "Type",
+    "text": "LessThan(upper)\n\nThe set (-inftyupper subseteq mathbbR.\n\n\n\n"
 },
 
 {
@@ -349,7 +365,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.Interval",
     "category": "Type",
-    "text": "Interval(lower,upper)\n\nThe box lower upper subseteq mathbbR^dim where lower and upper are scalars (1-dimensional) or vectors of dimension dim. If lower or upper is all -Inf or Inf, the set is interpreted as a one-sided interval.\n\n\n\n"
+    "text": "Interval(lower,upper)\n\nThe interval lower upper subseteq mathbbR. If lower or upper is -Inf or Inf, respectively, the set is interpreted as a one-sided interval.\n\n\n\n"
 },
 
 {
@@ -413,15 +429,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.Integers",
     "category": "Type",
-    "text": "Integers(dim)\n\nThe set of integers mathbbZ^dim.\n\n\n\n"
+    "text": "Integers()\n\nThe set of integers mathbbZ.\n\n\n\n"
 },
 
 {
-    "location": "apireference.html#MathProgBase.Binaries",
+    "location": "apireference.html#MathProgBase.ZeroOne",
     "page": "Solver Interface API",
-    "title": "MathProgBase.Binaries",
+    "title": "MathProgBase.ZeroOne",
     "category": "Type",
-    "text": "Binaries(dim)\n\nThe set of binary vectors  0 1 ^dim.\n\n\n\n"
+    "text": "ZeroOne()\n\nThe set  0 1 .\n\n\n\n"
 },
 
 {
@@ -441,11 +457,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "apireference.html#MathProgBase.dimension",
+    "page": "Solver Interface API",
+    "title": "MathProgBase.dimension",
+    "category": "Function",
+    "text": "dimension(s::AbstractSet)\n\nReturn the dimension (number of vector components) in the set s.\n\n\n\n"
+},
+
+{
     "location": "apireference.html#Sets-1",
     "page": "Solver Interface API",
     "title": "Sets",
     "category": "section",
-    "text": "List of sets.AbstractSet\nReals\nZero\nNonNegative\nNonPositive\nInterval\nSecondOrderCone\nExponentialCone\nDualExponentialCone\nPowerCone\nDualPowerCone\nPositiveSemidefiniteConeTriangle\nPositiveSemidefiniteConeScaled\nIntegers\nBinaries\nSOS1\nSOS2Functions for getting and setting properties of sets.dimension"
+    "text": "List of sets.AbstractSet\nReals\nZeros\nNonNegatives\nNonPositives\nGreaterThan\nLessThan\nInterval\nSecondOrderCone\nExponentialCone\nDualExponentialCone\nPowerCone\nDualPowerCone\nPositiveSemidefiniteConeTriangle\nPositiveSemidefiniteConeScaled\nIntegers\nZeroOne\nSOS1\nSOS2Functions for getting and setting properties of sets.dimension"
 },
 
 {
