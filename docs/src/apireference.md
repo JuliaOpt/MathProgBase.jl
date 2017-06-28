@@ -63,9 +63,11 @@ List of sets.
 ```@docs
 AbstractSet
 Reals
-Zero
-NonNegative
-NonPositive
+Zeros
+NonNegatives
+NonPositives
+GreaterThan
+LessThan
 Interval
 SecondOrderCone
 ExponentialCone
@@ -75,7 +77,7 @@ DualPowerCone
 PositiveSemidefiniteConeTriangle
 PositiveSemidefiniteConeScaled
 Integers
-Binaries
+ZeroOne
 SOS1
 SOS2
 ```

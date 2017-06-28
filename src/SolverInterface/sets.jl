@@ -5,6 +5,11 @@ Abstract supertype for set objects used to encode constraints.
 """
 abstract type AbstractSet end
 
+"""
+    dimension(s::AbstractSet)
+
+Return the dimension (number of vector components) in the set `s`.
+"""
 dimension(s::AbstractSet) = s.dim
 
 """
@@ -17,43 +22,61 @@ struct Reals <: AbstractSet
 end
 
 """
-    Zero(dim)
+    Zeros(dim)
 
 The set ``\\{ 0 \\}^{dim}`` (containing only the origin) of dimension ``dim``.
 """
-struct Zero <: AbstractSet
+struct Zeros <: AbstractSet
     dim::Int
 end
 
 """
-    NonNegative(dim)
+    NonNegatives(dim)
 
 The nonnegative orthant ``\\{ x \\in \\mathbb{R}^{dim} : x \\ge 0 \\}`` of dimension ``dim``.
 """
-struct NonNegative <: AbstractSet
+struct NonNegatives <: AbstractSet
     dim::Int
 end
 
 """
-    NonPositive(dim)
+    NonPositives(dim)
 
 The nonpositive orthant ``\\{ x \\in \\mathbb{R}^{dim} : x \\le 0 \\}`` of dimension ``dim``.
 """
-struct NonPositive <: AbstractSet
+struct NonPositives <: AbstractSet
     dim::Int
+end
+
+"""
+    GreaterThan(lower)
+
+The set ``[lower,\\infty] \\subseteq \\mathbb{R}``.
+"""
+struct GreaterThan{T <: Real} <: AbstractSet
+    lower::T
+end
+
+"""
+    LessThan(upper)
+
+The set ``(-\\infty,upper] \\subseteq \\mathbb{R}``.
+"""
+struct LessThan{T <: Real} <: AbstractSet
+    upper::T
 end
 
 """
     Interval(lower,upper)
 
-The box ``[lower, upper] \\subseteq \\mathbb{R}^{dim}`` where ``lower`` and ``upper`` are scalars (1-dimensional) or vectors of dimension ``dim``. If ``lower`` or ``upper`` is all ``-Inf`` or ``Inf``, the set is interpreted as a one-sided interval.
+The interval ``[lower, upper] \\subseteq \\mathbb{R}``. If ``lower`` or ``upper`` is ``-Inf`` or ``Inf``, respectively, the set is interpreted as a one-sided interval.
 """
-struct Interval{T} <: AbstractSet
+struct Interval{T <: Real} <: AbstractSet
     lower::T
     upper::T
 end
 
-dimension(s::Interval) = length(s.lower)
+dimension(s::Union{Interval,GreaterThan,LessThan}) = 1
 
 """
     SecondOrderCone(dim)
@@ -149,20 +172,18 @@ struct PositiveSemidefiniteConeScaled <: AbstractSet
 end
 
 """
-    Integers(dim)
+    Integers()
 
-The set of integers ``\\mathbb{Z}^{dim}``.
+The set of integers ``\\mathbb{Z}``.
 """
-struct Integers <: AbstractSet
-    dim::Int
-end
+struct Integers <: AbstractSet end
 
 """
-    Binaries(dim)
+    ZeroOne()
 
-The set of binary vectors ``\\{ 0, 1 \\}^{dim}``.
+The set ``\\{ 0, 1 \\}``.
 """
-struct Binaries <: AbstractSet
+struct ZeroOne <: AbstractSet
     dim::Int
 end
 
