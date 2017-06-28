@@ -51,7 +51,7 @@ end
 """
     GreaterThan(lower)
 
-The set ``[lower,\\infty] \\subseteq \\mathbb{R}``.
+The set ``[lower,\\infty) \\subseteq \\mathbb{R}``.
 """
 struct GreaterThan{T <: Real} <: AbstractSet
     lower::T
@@ -183,9 +183,9 @@ struct Integers <: AbstractSet end
 
 The set ``\\{ 0, 1 \\}``.
 """
-struct ZeroOne <: AbstractSet
-    dim::Int
-end
+struct ZeroOne <: AbstractSet end
+
+dimension(s::Union{Integers,ZeroOne}) = 1
 
 """
     SOS1(weights)
