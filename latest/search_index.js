@@ -349,7 +349,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "MathProgBase.GreaterThan",
     "category": "Type",
-    "text": "GreaterThan(lower)\n\nThe set lowerinfty subseteq mathbbR.\n\n\n\n"
+    "text": "GreaterThan(lower)\n\nThe set lowerinfty) subseteq mathbbR.\n\n\n\n"
 },
 
 {
