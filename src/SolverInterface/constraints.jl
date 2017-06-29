@@ -57,6 +57,15 @@ Add the constraint
 x_{varref} \\in S
 ```
 where `varref` is a vector of variable references to specifiy the subset of the subvector of `x`.
+
+    addconstraint!(m::AbstractMathProgModel, varref::VariableReference, S::AbstractSet)::VariablewiseConstraintReference{typeof(S)}
+
+A specialized version of `addconstraint!` for one-dimensional variablewise constraints.
+Add the constraint
+```math
+x_{varref} \\in S
+```
+where `varref` is a single variable references to specifiy the index of `x`.
 """
 function addconstraint! end
 
