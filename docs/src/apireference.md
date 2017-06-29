@@ -138,13 +138,7 @@ setattribute!
 List of attributes associated with variables. Calls to `getattribute` and `setattribute!` should include as an argument a single `VariableReference` or a vector of `VariableReference` objects.
 ```@docs
 VariablePrimalStart
-VariableLowerBoundDualStart
-VariableUpperBoundDualStart
-VariableLowerBound
-VariableUpperBound
 VariablePrimal
-VariableLowerBoundDual
-VariableUpperBoundDual
 VariableBasisStatus
 ```
 
@@ -180,10 +174,6 @@ ResultStatusCode
 ```@docs
 BasisStatusCode
 ```
-
-## Duals
-
-We take the convention that duals on variable lower bounds should be nonnegative, duals on variable upper bounds should be nonpositive, and duals on closed convex cones should belong to the dual cone.
 
 ## Nonlinear Programming (NLP)
 

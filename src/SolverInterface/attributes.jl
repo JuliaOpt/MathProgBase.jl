@@ -357,36 +357,6 @@ to warm-start the solve.
 struct VariablePrimalStart <: AbstractVariableAttribute end
 
 """
-    VariableLowerBoundDualStart()
-
-An initial assignment of the variable lower-bound duals that the solver may use
-to warm-start the solve.
-"""
-struct VariableLowerBoundDualStart <: AbstractVariableAttribute end
-
-"""
-    VariableUpperBoundDualStart()
-
-An initial assignment of the variable upper-bound duals that the solver may use
-to warm-start the solve.
-"""
-struct VariableUpperBoundDualStart <: AbstractVariableAttribute end
-
-"""
-    VariableLowerBound()
-
-Lower-bound constraints on variables. `-Inf` is valid as no bound.
-"""
-struct VariableLowerBound <: AbstractVariableAttribute end
-
-"""
-    VariableUpperBound()
-
-Upper-bound constraints for the variables. `Inf` is valid as no bound.
-"""
-struct VariableUpperBound <: AbstractVariableAttribute end
-
-"""
     VariablePrimal(N)
     VariablePrimal()
 
@@ -396,26 +366,6 @@ struct VariablePrimal <: AbstractVariableAttribute
     N::Int
 end
 VariablePrimal() = VariablePrimal(1)
-
-"""
-    VariableLowerBoundDual(N)
-
-The assignment to the duals on the variable lower bounds in result `N`. If `N` is omitted, it is interpreted as 1.
-"""
-struct VariableLowerBoundDual <: AbstractVariableAttribute
-    N::Int
-end
-VariableLowerBoundDual() = VariableLowerBoundDual(1)
-
-"""
-    VariableUpperBoundDual(N)
-
-The assignment to the duals on the variable upper bounds in result `N`. If `N` is omitted, it is interpreted as 1.
-"""
-struct VariableUpperBoundDual <: AbstractVariableAttribute
-    N::Int
-end
-VariableUpperBoundDual() = VariableUpperBoundDual(1)
 
 """
     VariableBasisStatus()
