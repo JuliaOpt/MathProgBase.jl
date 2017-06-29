@@ -37,7 +37,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface Manual",
     "title": "Concepts",
     "category": "section",
-    "text": "beginalign\n     min_x in mathbbR^n  f_0(x)\n    \n     textst  f_i(x)  in mathcalS_i  i = 1 ldots m\n    \n      x  in l u\nendalign"
+    "text": "We define the standard form problem as:beginalign\n     min_x in mathbbR^n  f_0(x)\n    \n     textst  f_i(x)  in mathcalS_i  i = 1 ldots m\nendalignAt the moment all functions are described compactly with lists, vectors, and matrices. NLP is a special case discussed later. An objective function f_0 can be affine or quadratic. The constraint functions f_i can be variablewise, affine, or quadratic (to be defined)."
+},
+
+{
+    "location": "apimanual.html#Duals-1",
+    "page": "Solver Interface Manual",
+    "title": "Duals",
+    "category": "section",
+    "text": "We take the convention that duals on lower bounds (GreaterThan) should be nonnegative, duals on upper bounds (LessThan) should be nonpositive, and duals on closed convex cones should belong to the dual cone.For minimization problems in conic form, we can define the primal  as:beginalign\n min_x in mathbbR^n  b_0^Tx\n\n textst  A_ix + b_i  in mathcalC_i  forall i\nendalignand the dual as:beginalign\n max_y_i forall i  -sum_i b_i^T y_i\n\n textst  b_0 - sum_i A_i^T y_i = 0\n\n  y_i in mathcalC_i^*  forall i\nendaligna^Tx + b ge c should be interpreted (for the purposes of duals) as a^Tx + b - c in mathbbR_+, and similarly a^Tx + b le c should be interpreted (for the purposes of duals) as a^Tx + b - c in mathbbR_-. Variablewise constraints should be interpreted as affine constraints with the appropriate identity mapping in place of A_i."
 },
 
 {
@@ -769,59 +777,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "apireference.html#MathProgBase.VariableLowerBoundDualStart",
-    "page": "Solver Interface API",
-    "title": "MathProgBase.VariableLowerBoundDualStart",
-    "category": "Type",
-    "text": "VariableLowerBoundDualStart()\n\nAn initial assignment of the variable lower-bound duals that the solver may use to warm-start the solve.\n\n\n\n"
-},
-
-{
-    "location": "apireference.html#MathProgBase.VariableUpperBoundDualStart",
-    "page": "Solver Interface API",
-    "title": "MathProgBase.VariableUpperBoundDualStart",
-    "category": "Type",
-    "text": "VariableUpperBoundDualStart()\n\nAn initial assignment of the variable upper-bound duals that the solver may use to warm-start the solve.\n\n\n\n"
-},
-
-{
-    "location": "apireference.html#MathProgBase.VariableLowerBound",
-    "page": "Solver Interface API",
-    "title": "MathProgBase.VariableLowerBound",
-    "category": "Type",
-    "text": "VariableLowerBound()\n\nLower-bound constraints on variables. -Inf is valid as no bound.\n\n\n\n"
-},
-
-{
-    "location": "apireference.html#MathProgBase.VariableUpperBound",
-    "page": "Solver Interface API",
-    "title": "MathProgBase.VariableUpperBound",
-    "category": "Type",
-    "text": "VariableUpperBound()\n\nUpper-bound constraints for the variables. Inf is valid as no bound.\n\n\n\n"
-},
-
-{
     "location": "apireference.html#MathProgBase.VariablePrimal",
     "page": "Solver Interface API",
     "title": "MathProgBase.VariablePrimal",
     "category": "Type",
     "text": "VariablePrimal(N)\nVariablePrimal()\n\nThe assignment to the primal variables in result N. If N is omitted, it is 1 by default.\n\n\n\n"
-},
-
-{
-    "location": "apireference.html#MathProgBase.VariableLowerBoundDual",
-    "page": "Solver Interface API",
-    "title": "MathProgBase.VariableLowerBoundDual",
-    "category": "Type",
-    "text": "VariableLowerBoundDual(N)\n\nThe assignment to the duals on the variable lower bounds in result N. If N is omitted, it is interpreted as 1.\n\n\n\n"
-},
-
-{
-    "location": "apireference.html#MathProgBase.VariableUpperBoundDual",
-    "page": "Solver Interface API",
-    "title": "MathProgBase.VariableUpperBoundDual",
-    "category": "Type",
-    "text": "VariableUpperBoundDual(N)\n\nThe assignment to the duals on the variable upper bounds in result N. If N is omitted, it is interpreted as 1.\n\n\n\n"
 },
 
 {
@@ -837,7 +797,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Solver Interface API",
     "title": "Variable Attributes",
     "category": "section",
-    "text": "List of attributes associated with variables. Calls to getattribute and setattribute! should include as an argument a single VariableReference or a vector of VariableReference objects.VariablePrimalStart\nVariableLowerBoundDualStart\nVariableUpperBoundDualStart\nVariableLowerBound\nVariableUpperBound\nVariablePrimal\nVariableLowerBoundDual\nVariableUpperBoundDual\nVariableBasisStatus"
+    "text": "List of attributes associated with variables. Calls to getattribute and setattribute! should include as an argument a single VariableReference or a vector of VariableReference objects.VariablePrimalStart\nVariablePrimal\nVariableBasisStatus"
 },
 
 {
@@ -942,14 +902,6 @@ var documenterSearchIndex = {"docs": [
     "title": "Basis Status",
     "category": "section",
     "text": "BasisStatusCode"
-},
-
-{
-    "location": "apireference.html#Duals-1",
-    "page": "Solver Interface API",
-    "title": "Duals",
-    "category": "section",
-    "text": "We take the convention that duals on variable lower bounds should be nonnegative, duals on variable upper bounds should be nonpositive, and duals on closed convex cones should belong to the dual cone."
 },
 
 {
