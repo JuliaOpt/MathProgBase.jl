@@ -4,7 +4,11 @@ makedocs(
     format = :html,
     sitename = "MathProgBase",
     pages = [
-        "index.md",
+        "Introduction" => "index.md",
+        "Solver Interface Manual" => "apimanual.md",
+        "Solver Interface API" => "apireference.md",
+        "High-level Interfaces" => "highlevel.md",
+        "Choosing Solvers" => "choosingsolver.md"
     ]
 )
 
@@ -14,5 +18,6 @@ deploydocs(
     osname = "linux",
     julia  = "0.6",
     deps   = nothing,
-    make   = nothing
+    make   = nothing,
+    latest = "break_everything"
 )

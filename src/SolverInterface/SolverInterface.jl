@@ -1,92 +1,107 @@
-module SolverInterface
-
 using Base.Meta
 
-const methods_by_tag = Dict{Symbol,Vector{Symbol}}()
+export AbstractMathProgModel, AbstractMathProgSolver
 
-macro define_interface(args)
-    @assert args.head == :block
-    code = quote end
-    for line in args.args
-        (isexpr(line, :line) && continue)
-        (isa(line,Symbol) || isexpr(line,:tuple)) || error("Unexpected code in block")
-        if isa(line,Symbol)
-            fname = line
-            tags = []
-        else
-            @assert isexpr(line,:tuple)
-            fname = line.args[1]
-            tags = line.args[2:end]
-        end
-        func = esc(fname)
-        code = quote
-            $code
-            $(func)() = throw(MethodError($(func),()))
-            function $(func)(::Int)
-                q = Any[1]
-                return q[1] # infer Any return type, workaround for julia issue #9479
-            end
-        end
-        for t in tags
-            t = quot(t)
-            code = quote
-                $code
-                if haskey(methods_by_tag,$t)
-                    push!(methods_by_tag[$t],$(quot(fname)))
-                else
-                    methods_by_tag[$t] = [$(quot(fname))]
-                end
-            end
-        end
-        push!(code.args, Expr(:export, func))
-    end
-    return code
-end
-
-abstract type AbstractMathProgModel end
-export AbstractMathProgModel
+# not sure if this should still be here
+rewrap_methods = [:getobjbound,
+                  :getobjgap,
+                  :getrawsolver,
+                  :getsolvetime,
+                 ]
 
 # immutable type which we dispatch solvers on
+"""
+    AbstractMathProgSolver
+
+Abstract supertype for "solver" objects. A solver is a lightweight object used for selecting solvers and parameters. It does not store any instance data.
+"""
 abstract type AbstractMathProgSolver end
-export AbstractMathProgSolver
 
-# create dummy method to define function so that we can attach methods in other modules
-# these are the common methods for AbstractMathProgModel
-@define_interface begin
-    getsolution
-    getobjval
-    optimize!
-    status
-    getobjbound, rewrap
-    getobjgap, rewrap
-    getrawsolver, rewrap
-    getsolvetime, rewrap
-    setsense!
-    getsense
-    numvar
-    numconstr
-    freemodel!
-    setvartype!
-    getvartype
-    loadproblem!
-    setwarmstart!
-end
+"""
+    AbstractNLPModel
 
+Abstract supertype which represents a solver's in-memory representation of a
+non-linear optimization problem.
+"""
+abstract type AbstractNLPModel end
+
+"""
+    NLPModel(solver::AbstractMathProgSolver)
+
+Create an instance of `AbstractNLPModel` using the given solver.
+"""
+function NLPModel end
+
+"""
+    AbstractModel
+
+Abstract supertype which represents a solver's in-memory representation of an
+optimization problem.
+"""
+abstract type AbstractModel end
+
+"""
+    Model(solver::AbstractMathProgSolver)
+
+Create an instance of `AbstractModel` using the given solver.
+"""
+function Model end
+
+"""
+    AbstractMathProgModel
+
+Union type of both `AbstractNLPModel` and `AbstractModel`.
+"""
+const AbstractMathProgModel = Union{AbstractNLPModel, AbstractModel}
+
+# basic methods methods for AbstractMathProgModel
+
+"""
+    optimize!(m::AbstractMathProgModel)
+
+Start the solution procedure.
+"""
+function optimize! end
+
+"""
+    freemodel!(m::AbstractMathProgModel)
+
+Release any resources and memory used by the model. Note that the
+Julia garbage collector takes care of this automatically, but
+automatic collection cannot always be forced. This method is useful for more
+precise control of resources, especially in the case of commercial solvers
+with licensing restrictions on the number of concurrent runs.
+Users must discard the model object after this method is invoked.
+"""
+function freemodel! end
+
+# TODO
+function loadproblem! end
+
+"""
+    writeproblem(m::AbstractModel, filename::String)
+
+Writes the current problem data to the given file. Supported file types are solver-dependent.
+"""
+function writeproblem end
+
+# these could change to attributes that can be set on a model *or solver*
 # solver parameters, may be implemented by AbstractMathProgModel or AbstractMathProgSolver
-@define_interface begin
-    setparameters!
-end
+function setparameters! end
 
+include("variables.jl")
+include("references.jl")
+include("constraints.jl")
+include("sets.jl")
+include("attributes.jl")
+include("objectives.jl")
+include("nlp.jl")
 
-include("LinearQuadratic.jl")
-include("callbacks.jl")
-include("Nonlinear.jl")
-include("Conic.jl")
+#include("LinearQuadratic.jl")
+#include("callbacks.jl")
+#include("Conic.jl")
 
 # Solver conversion routines
-include("conic_to_lpqp.jl")
-include("lpqp_to_conic.jl")
-include("nonlinear_to_lpqp.jl")
-
-
-end
+#include("conic_to_lpqp.jl")
+#include("lpqp_to_conic.jl")
+#include("nonlinear_to_lpqp.jl")

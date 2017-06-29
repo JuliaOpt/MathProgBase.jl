@@ -1,5 +1,7 @@
 using GLPKMathProgInterface, Ipopt, ECOS
 
+const MPB = MathProgBase
+
 lp_solver = GLPKSolverLP()
 ip_solver = GLPKSolverMIP()
 conic_solver = ECOSSolver(verbose=false)

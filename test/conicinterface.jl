@@ -8,7 +8,8 @@
 using Base.Test
 using MathProgBase
 
-function coniclineartest(solver::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e-6)
+"""
+function coniclineartest(solver::MathProgBase.AbstractMathProgSolver; duals=false, tol=1e-6)
     @testset "Testing linear problems through conic interface with $solver" begin
         # Problem LIN1 - all vars in nonneg cone
         # min -3x - 2y - 4z
@@ -22,21 +23,48 @@ function coniclineartest(solver::MathProgBase.AbstractMathProgSolver;duals=false
             A = [ 1.0   1.0   1.0;
                   0.0   1.0   1.0]
             b = [ 3.0,  2.0]
-            m = MathProgBase.ConicModel(solver)
-            MathProgBase.loadproblem!(m, c, A, b, [(:Zero,1:2)], [(:NonNeg, 1:3)])
+            m = MPB.Model(solver)
+            
+            #MathProgBase.loadproblem!(m, c, A, b, [(:Zero,1:2)], [(:NonNeg, 1:3)])
+            v = MPB.addvariables!(m, 3)
+
+            MPB.setattribute!(m, MPB.Sense(), MPB.MinSense)
+
+            vc = MPB.addconstraint!(m, v, MPB.NonNegative(3))
+            c = MPB.addconstraint!(m, b, -A, MPB.Zero(2))
+
+            MPB.setobjective!(m, 1, 0.0, v, c)
+
             MathProgBase.optimize!(m)
-            @test MathProgBase.status(m) == :Optimal
-            @test isapprox(MathProgBase.getobjval(m), -11, atol=tol)
-            @test isapprox(MathProgBase.getsolution(m)[1], 1.0, atol=tol)
-            @test isapprox(MathProgBase.getsolution(m)[2], 0.0, atol=tol)
-            @test isapprox(MathProgBase.getsolution(m)[3], 2.0, atol=tol)
+
+            termination_status = MPB.getattribute(m, MPB.TerminationStatus())
+            @test termination_status == MPB.Success
+
+            primal_status = MPB.getattribute(m, MPB.PrimalStatus())
+            @test primal_status == MPB.FeasiblePoint
+
+            obj = MPB.getattribute(m, MPB.ObjectiveValue())
+            @test isapprox(obj, -11, atol=tol)
+
+            p_sol = MPB.getattribute(m, MPB.VariablePrimal(), v)
+            @test isapprox(p_sol[1], 1.0, atol=tol)
+            @test isapprox(p_sol[2], 0.0, atol=tol)
+            @test isapprox(p_sol[3], 2.0, atol=tol)
             if duals
-                d = MathProgBase.getdual(m)
-                @test isapprox(d[1], 3.0, atol=tol)
-                @test isapprox(d[2], 1.0, atol=tol)
-                vardual = c + A'd
-                var = MathProgBase.getvardual(m)
-                @test isapprox(vardual, var, atol=tol)
+                @test MPB.cangetattribute(m, MPB.DualStatus())
+                @test MPB.cangetattribute(m, MPB.ConstraintDual(), c)
+                @test MPB.cangetattribute(m, MPB.ConstraintDual(), vc)
+
+                dual_status = MPB.getattribute(m, MPB.DualStatus())
+                @test dual_status == MPB.FeasiblePoint
+
+                d_sol = MPB.getattribute(m, MPB.ConstraintDual(), c)
+                @test isapprox(d_sol[1], 3.0, atol=tol)
+                @test isapprox(d_sol[2], 1.0, atol=tol)
+
+                vardual = c + A'd_sol
+                vd_sol = MPB.getattribute(m, MPB.ConstraintDual(), vc)
+                @test isapprox(vardual, vd_sol, atol=tol)
             end
         end
 
@@ -58,7 +86,7 @@ function coniclineartest(solver::MathProgBase.AbstractMathProgSolver;duals=false
                   0.0   1.0   0.0;
                   0.0   0.0  -1.0]
             b = [ 3.0,  2.0,  0.0,  0.0,  0.0]
-            m = MathProgBase.ConicModel(solver)
+            m = MPB.ConicModel(solver)
             MathProgBase.loadproblem!(m,c, A, b, [(:Zero,1:2),(:NonPos,3:4),(:NonNeg,5)],
             [(:Free, 1:3)])
             MathProgBase.optimize!(m)
@@ -820,3 +848,4 @@ function conicSDPtest(solver::MathProgBase.AbstractMathProgSolver;duals=true, to
         end
     end
 end
+"""

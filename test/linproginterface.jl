@@ -2,45 +2,90 @@ using Base.Test
 using MathProgBase
 using MathProgBase.SolverInterface
 
+const MPB = MathProgBase
+
+function test_result(m, v, c, termstatus, primalstatus, dualstatus, objval, varprim, vupdual, vlodual, conprim, condual)
+    @test MPB.cangetattribute(m, MPB.TerminationStatus())
+    @test MPB.getattribute(m, MPB.TerminationStatus()) == termstatus
+
+    @test MPB.cangetattribute(m, MPB.PrimalStatus())
+    @test MPB.getattribute(m, MPB.PrimalStatus()) == primalstatus
+
+    @test MPB.cangetattribute(m, MPB.DualStatus())
+    # maybe solver doesn't return dual?
+    @test MPB.getattribute(m, MPB.DualStatus()) == dualstatus
+
+    @test MPB.cangetattribute(m, MPB.ObjectiveValue())
+    @test isapprox(MPB.getattribute(m, MPB.ObjectiveValue()), objval, atol=eps)
+
+    @test MPB.cangetattribute(m, MPB.VariablePrimal(), v)
+    @test isapprox(MPB.getattribute(m, MPB.VariablePrimal(), v), varprim, atol=eps)
+
+    @test MPB.cangetattribute(m, MPB.VariableUpperBoundDual(), v)
+    @test isapprox(MPB.getattribute(m, MPB.VariableUpperBoundDual(), v), vupdual, atol=eps)
+
+    @test MPB.cangetattribute(m, MPB.VariableLowerBoundDual(), v)
+    @test isapprox(MPB.getattribute(m, MPB.VariableLowerBoundDual(), v), vlodual, atol=eps)
+
+    @test MPB.cangetattribute(m, MPB.ConstraintPrimal(), c)
+    @test isapprox(MPB.getattribute(m, MPB.ConstraintPrimal(), c), conprim, atol=eps)
+
+    @test MPB.cangetattribute(m, MPB.ConstraintDual(), c)
+    @test isapprox(MPB.getattribute(m, MPB.ConstraintDual(), c), condual, atol=eps)
+end
+
 function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefault(Float64))
     @testset "Testing LP interface with $solver" begin
         @testset "Basic interface" begin
-            m = LinearQuadraticModel(solver)
+            # Min -x                  Min -x
+            # s.t. x + y <= 1   or    s.t. x + y - 1 ∈ NonPositive
+            # x, y >= 0               x, y >= 0
+            m = MPB.Model(solver)
 
-            # Min -x
-            # s.t. x + y <= 1
-            # x, y >= 0
-            loadproblem!(m, [1. 1.], [0.,0.], [Inf, Inf], [-1.,0.], [-Inf],[1.], :Min)
-            @test numvar(m) == 2
-            @test numconstr(m) == 1
-            @test getvarLB(m) == [0.,0.]
-            @test getvarUB(m)[1] >= 1e20
-            @test getvarUB(m)[2] >= 1e20
-            @test getconstrLB(m)[1] < -1e30
-            @test getconstrUB(m)[1] == 1.0
-            @test getobj(m) == [-1.,0.]
-            @test getsense(m) == :Min
+            v = MPB.addvariables!(m, 2)
 
-            optimize!(m)
-            @test status(m) == :Optimal
-            @test isapprox(getobjval(m), -1, atol=eps)
-            @test isapprox(norm(getsolution(m) - [1.0, 0.0]), 0.0, atol=eps)
-            @test isapprox(getconstrsolution(m)[1], 1.0, atol=eps)
-            @test isapprox(getconstrduals(m)[1], -1.0, atol=eps)
-            @test isapprox(norm(getreducedcosts(m) - [0.0, 1.0]), 0.0, atol=eps)
+            @test MPB.cansetattribute(m, MPB.VariableLowerBound())
+            MPB.setattribute!(m, MPB.VariableLowerBound(), v, [0, 0])
 
-            setsense!(m, :Max)
-            # max x
-            setobj!(m, [1.0,0.0])
-            optimize!(m)
+            @test MPB.cangetattribute(m, MPB.VariableLowerBound())
+            @test isapprox(MPB.getattribute(m, MPB.VariableLowerBound(), v), [0.0, 0.0], atol=eps)
 
-            @test status(m) == :Optimal
-            @test isapprox(getobjval(m), 1, atol=eps)
-            @test isapprox(norm(getsolution(m) - [1.0, 0.0]), 0.0, atol=eps)
-            @test isapprox(getconstrsolution(m)[1], 1.0, atol=eps)
-            @test isapprox(getconstrduals(m)[1], 1.0, atol=eps)
-            @test isapprox(norm(getreducedcosts(m) - [0.0, -1.0]), 0.0, atol=eps)
+            @test MPB.cangetattribute(m, MPB.VariableUpperBound())
+            @test all(MPB.getattribute(m, MPB.VariableUpperBound(), v) .>= 1e20)
 
+            @test MPB.getattribute(m, SupportsAffineConstraint{MPB.NonPositive}())
+            c = MPB.addconstraint!(m, -1, v, [1, 1], MPB.NonPositive(1))
+
+            @test MPB.getattribute(m, MPB.VariableCount()) == 2
+            @test MPB.getattribute(m, MPB.ConstraintCount()) == 1
+
+            MPB.setattribute!(m, MPB.Sense(), MPB.MinSense)
+
+            MPB.setobjective!(m, 0.0, v, [-1.0, 0.0])
+
+            # TODO: query objective
+            # (b, a_varref, a_coef, qi, qj, qc) = MPB.getobjective(m)
+            # @test isapprox(b, 0.0, atol=eps)
+            # @test a_varref == v
+            # @test isapprox(a_coef, [-1.0, 0.0], atol=eps)
+
+            MPB.optimize!(m)
+
+            test_result(m, v, c, MPB.Success, MPB.FeasiblePoint, MPB.FeasiblePoint, -1, [1.0, 0.0], [0.0, 0.0], [0.0, 1.0], [1.0], [-1.0])
+
+            # change objective to Max +x
+            @test MPB.cansetattribute(m, MPB.Sense())
+            MPB.setattribute!(m, MPB.Sense(), MPB.MaxSense)
+            MPB.modifyobjective!(m, 1, v[1], 1.0)
+
+            MPB.optimize!(m)
+
+            test_result(m, v, c, MPB.Success, MPB.FeasiblePoint, MPB.FeasiblePoint, 1, [1.0, 0.0], [0.0, -1.0], [0.0, 0.0], [1.0], [1.0])
+
+        end
+    end
+end
+"""
             # add new variable to get:
             # max x + 2z
             # s.t. x + y + z <= 1
@@ -100,35 +145,53 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
             @test isapprox(norm(getreducedcosts(m) - [0.0, 0.0, -1.5]), 0.0, atol=eps)
         end
 
+"""
 
+function linprogsolvertest2(solver::AbstractMathProgSolver, eps = Base.rtoldefault(Float64))
+    @testset "Testing LP interface with $solver part 2" begin
         @testset "addvar! interface" begin
             m = LinearQuadraticModel(solver)
 
             # Min -x
             # s.t. x + y <= 1
             # x, y >= 0
-            addvar!(m, 0, Inf, -1)
-            addvar!(m, 0, Inf, 0)
-            addconstr!(m, [1, 2], [1.0, 1.0], -Inf, 1.0)
-            @test numvar(m) == 2
-            @test numconstr(m) == 1
-            @test getvarLB(m) == [0.,0.]
-            @test getvarUB(m)[1] >= 1e20
-            @test getvarUB(m)[2] >= 1e20
-            @test getconstrLB(m)[1] <= -1e20
-            @test getconstrUB(m)[1] == 1.0
-            @test getobj(m) == [-1.,0.]
-            @test getsense(m) == :Min
+            m = MPB.Model(solver)
+
+            x = MPB.addvariable!(m)
+            y = MPB.addvariable!(m)
+
+            MPB.setattribute!(m, MPB.VariableLowerBound(), [x, y], [0, 0])
+
+            c = MPB.addconstraint!(m, -1, [x, y], [1.0, 1.0], MPB.NonPositive(1))
+
+            MPB.setattribute!(m, MPB.Sense(), MPB.MinSense)
+            MPB.setobjective!(m, 0.0, x, -1.0)
+
+            @test MPB.getattribute(m, MPB.VariableCount()) == 2
+            @test MPB.getattribute(m, MPB.ConstraintCount()) == 1
+
+            # getters #190
+            # @test getvarLB(m) == [0.,0.]
+            # @test getvarUB(m)[1] >= 1e20
+            # @test getvarUB(m)[2] >= 1e20
+            # @test getconstrLB(m)[1] <= -1e20
+            # @test getconstrUB(m)[1] == 1.0
+            # @test getobj(m) == [-1.,0.]
+            # @test getsense(m) == :Min
 
             optimize!(m)
-            @test status(m) == :Optimal
-            @test isapprox(getobjval(m), -1, atol=eps)
-            @test isapprox(norm(getsolution(m) - [1.0, 0.0]), 0.0, atol=eps)
-            @test isapprox(getconstrsolution(m)[1], 1.0, atol=eps)
-            @test isapprox(getconstrduals(m)[1], -1.0, atol=eps)
-            @test isapprox(norm(getreducedcosts(m) - [0.0, 1.0]), 0.0, atol=eps)
-        end
+            @test MPB.getattribute(m, MPB.TerminationStatus()) == :Success
+            @test MPB.getattribute(m, MPB.PrimalStatus()) == MPB.FeasiblePoint
+            @test MPB.getattribute(m, MPB.DualStatus()) == MPB.FeasiblePoint
 
+            @test isapprox(MPB.getattribute(m, MPB.ObjectiveValue()), -1.0, atol=eps)
+            @test isapprox(MPB.getattribute(m, MPB.VariablePrimal(), [x, y]), [1.0, 0.0], atol=eps)
+
+            @test isapprox(MPB.getattribute(m, MPB.ConstraintPrimal()), 0.0, atol=eps)
+
+            @test isapprox(MPB.getattribute(m, MPB.ConstraintDual()), -1.0, atol=eps)
+            @test isapprox(MPB.getattribute(m, MPB.VariableDual(), [x, y]), [0.0, 1.0], atol=eps)
+        end
 
         @testset "setconstrLB! and setconstrUB!" begin
             ####################################
@@ -139,66 +202,99 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
             #   Setting upper and lower bound to same value works
             #
 
-            m = LinearQuadraticModel(solver)
+            m = MPB.Model(solver)
+
+            x = MPB.addvariable!(m)
+            y = MPB.addvariable!(m)
+
             # Min  x - y
-            # s.t. 0.0 <= x
-            #             y <= 0.0
+            # s.t. 0.0 <= x          (c1)
+            #             y <= 0.0   (c2)
             # x,y unbounded
+            c1 = MPB.addconstraint!(m, 0.0, x, [1.0, 0.0], MPB.NonNegative(1))
+            c2 = MPB.addconstraint!(m, 0.0, y, [0.0, 1.0], MPB.NonPositive(1))
 
-            loadproblem!(m, [ 1.0 0.0 ; 0.0 1.0 ], [-Inf, -Inf], [Inf,Inf], [1.0, -1.0], [0.0,-Inf], [Inf,0.0], :Min)
+            MPB.setattribute!(m, MPB.Sense(), MPB.MinSense)
 
-            optimize!(m)
+            MPB.setobjective!(m, 0.0, [x, y], [1.0, -1.0])
 
-            @test status(m) == :Optimal
-            @test isapprox(getobjval(m), 0.0, atol=eps)
-            @test isapprox(norm(getsolution(m)), 0.0, atol=eps)
+            MPB.optimize!(m)
+
+            @test MPB.getattribute(m, MPB.TerminationStatus()) == :Success
+            @test MPB.getattribute(m, MPB.PrimalStatus()) == MPB.FeasiblePoint
+            @test MPB.getattribute(m, MPB.DualStatus()) == MPB.FeasiblePoint
+            @test isapprox(MPB.getattribute(m, MPB.ObjectiveValue()), 0.0, atol=eps)
+            @test isapprox(MPB.getattribute(m, MPB.VariablePrimal(), [x, y]), [0.0, 0.0], atol=eps)
 
             # Min  x - y
-            # s.t. 100.0 <= x
+            # s.t. 100.0 <= x          or -100 + x \in NonNegative
             #               y <= 0.0
             # x,y unbounded
-            setconstrLB!(m,[100.0,-Inf])
+            modifyconstraint!(m, c1, 1, -100.0)
             optimize!(m)
-            @test status(m) == :Optimal
-            @test isapprox(getobjval(m), 100.0, atol=eps)
-            @test isapprox(norm(getsolution(m) - [ 100.0, 0.0 ]), 0.0, atol=eps)
+            @test MPB.getattribute(m, MPB.TerminationStatus()) == :Success
+            @test MPB.getattribute(m, MPB.PrimalStatus()) == MPB.FeasiblePoint
+            @test MPB.getattribute(m, MPB.DualStatus()) == MPB.FeasiblePoint
+            @test isapprox(MPB.getattribute(m, MPB.ObjectiveValue()), 100.0, atol=eps)
+            @test isapprox(MPB.getattribute(m, MPB.VariablePrimal(), [x, y]), [100.0, 0.0], atol=eps)
 
             # Min  x - y
             # s.t. 100.0 <= x
             #               y <= -100.0
             # x,y unbounded
-            setconstrUB!(m,[Inf,-100.0])
+            modifyconstraint!(m, c2, 1, 100.0)
             optimize!(m)
-            @test status(m) == :Optimal
-            @test isapprox(getobjval(m), 200.0, atol=eps)
-            @test isapprox(norm(getsolution(m) - [ 100.0, -100.0 ]), 0.0, atol=eps)
+            @test MPB.getattribute(m, MPB.TerminationStatus()) == :Success
+            @test MPB.getattribute(m, MPB.PrimalStatus()) == MPB.FeasiblePoint
+            @test MPB.getattribute(m, MPB.DualStatus()) == MPB.FeasiblePoint
+            @test isapprox(MPB.getattribute(m, MPB.ObjectiveValue()), 200.0, atol=eps)
+            @test isapprox(MPB.getattribute(m, MPB.VariablePrimal(), [x, y]), [100.0, -100.0], atol=eps)
         end
 
         @testset "Issue #40 from Gurobi.jl" begin
             # Test issue #40 from Gurobi.jl
             # min  x
-            # s.t. x >= 0
-            #      x >= 3
-            m = LinearQuadraticModel(solver)
-            loadproblem!(m, [1.0 1.0]', [-Inf], [Inf], [1.0], [0.0, 3.0], [Inf, Inf], :Min)
-            optimize!(m)
-            for i = 1:length(getconstrLB(m))
-                @test getconstrLB(m)[i] <= getconstrsolution(m)[i] + eps
-                @test getconstrsolution(m)[i] <= getconstrUB(m)[i] + eps
+            # s.t. x >= 0 (c1)
+            #      x >= 3 (c2)
+
+            m = MPB.Model(solver)
+
+            x = MPB.addvariable!(m)
+
+            c = MPB.addconstraint!(m, [0.0 -3.0], [x x], [1.0 1.0], MPB.NonNegative(2))
+
+            MPB.setattribute!(m, MPB.Sense(), MPB.MinSense)
+
+            MPB.setobjective!(m, 0.0, [x], [1.0])
+
+            MPB.optimize!(m)
+
+            for i = 1:MPB.getattribute(m, MPB.ConstraintCount())
+                # Get Bounds #190
+                # @test getconstrLB(m)[i] <= getconstrsolution(m)[i] + eps
+                # @test getconstrsolution(m)[i] <= getconstrUB(m)[i] + eps
             end
 
             # min  x
             # s.t. x <= 0
             #      x <= 3
-            m = LinearQuadraticModel(solver)
-            loadproblem!(m, [1.0 1.0]', [-Inf], [Inf], [1.0], [-Inf, -Inf], [0.0, 3.0], :Max)
-            optimize!(m)
-            for i = 1:length(getconstrLB(m))
-                @test getconstrLB(m)[i] <= getconstrsolution(m)[i] + eps
-                @test getconstrsolution(m)[i] <= getconstrUB(m)[i] + eps
+            m = MPB.Model(solver)
+
+            x = MPB.addvariable!(m)
+
+            c = MPB.addconstraint!(m, [0.0 -3.0], [x x], [1.0 1.0], MPB.NonPositive(2))
+
+            MPB.setattribute!(m, MPB.Sense(), MPB.MinSense)
+
+            MPB.setobjective!(m, 0.0, [x], [1.0])
+
+            MPB.optimize!(m)
+            for i = 1:MPB.getattribute(m, MPB.ConstraintCount())
+                # Get Bounds #190
+                # @test getconstrLB(m)[i] <= getconstrsolution(m)[i] + eps
+                # @test getconstrsolution(m)[i] <= getconstrUB(m)[i] + eps
             end
         end
-
 
         @testset "Change coeffs, del constr, del var" begin
             #####################################
@@ -211,29 +307,48 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
 
             #   maximize x + y
             #
-            #   s.t. 2 x + 1 y <= 4
-            #        1 x + 2 y <= 4
+            #   s.t. 2 x + 1 y <= 4 (c1)
+            #        1 x + 2 y <= 4 (c2)
             #        x >= 0, y >= 0
             #
             #   solution: x = 1.3333333, y = 1.3333333, objv = 2.66666666
 
-            m = LinearQuadraticModel(solver)
+            m = MPB.Model(solver)
 
-            loadproblem!(m, [ 2.0 1.0 ; 1.0 2.0 ], [0.0,0.0], [Inf,Inf], [1.0, 1.0], [-Inf, -Inf], [4.0,4.0], :Max)
+            v = MPB.addvariables!(m, 2)
+            
+            MPB.setattribute!(m, MPB.VariableLowerBound(), v, [0, 0])
 
-            optimize!(m)
-            @test status(m) == :Optimal
-            @test isapprox(getobjval(m), 2.6666666666, atol=eps)
-            @test isapprox(norm(getsolution(m) - [1.3333333333, 1.3333333333]), 0.0, atol=eps)
+            c1 = MPB.addconstraint!(m, -4, v, [2, 1], MPB.NonPositive(1))
+            c2 = MPB.addconstraint!(m, -4, v, [1, 2], MPB.NonPositive(1))
+
+            MPB.setattribute!(m, MPB.Sense(), MPB.MaxSense)
+
+            MPB.setobjective!(m, 0.0, v, [1.0, 1.0])
+
+            MPB.optimize!(m)
+
+            @test MPB.getattribute(m, MPB.TerminationStatus()) == :Success
+            @test MPB.getattribute(m, MPB.PrimalStatus()) == MPB.FeasiblePoint
+            @test MPB.getattribute(m, MPB.DualStatus()) == MPB.FeasiblePoint
+
+            @test isapprox(MPB.getattribute(m, MPB.ObjectiveValue()), 2.6666666666, atol=eps)
+
+            @test isapprox(MPB.getattribute(m, MPB.VariablePrimal(), v), [1.3333333333, 1.3333333333], atol=eps)
 
             # copy and solve again
-
-            if applicable(copy, m)
+            
+            if applicable(copy, m) # see 188
                 m2 = copy(m)
+                
                 optimize!(m2)
-                @test status(m2) == :Optimal
-                @test isapprox(getobjval(m2), 2.6666666666, atol=eps)
-                @test isapprox(norm(getsolution(m2) - [1.3333333333, 1.3333333333]), 0.0, atol=eps)
+
+                @test MPB.getattribute(m, MPB.TerminationStatus()) == :Success
+                @test MPB.getattribute(m, MPB.PrimalStatus()) == MPB.FeasiblePoint
+                @test MPB.getattribute(m, MPB.DualStatus()) == MPB.FeasiblePoint
+
+                @test isapprox(MPB.getattribute(m, MPB.ObjectiveValue()), 2.6666666666, atol=eps)
+                @test isapprox(MPB.getattribute(m, MPB.VariablePrimal(), v), [1.3333333333, 1.3333333333], atol=eps)
             end
 
 
@@ -246,11 +361,18 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
             #
             #   solution: x = 0, y = 2, objv = 2
             if applicable(changecoeffs!, m, [1], [2],  [2.])
-                changecoeffs!(m, [1], [2],  [2.])
+                modifyconstraint!(m, c1, v[2], 2.0)
                 optimize!(m)
-                @test status(m) == :Optimal
-                @test isapprox(getobjval(m), 2.0, atol=eps)
-                @test isapprox(norm(getsolution(m) - [0.0, 2.0]), 0.0, atol=eps)
+
+                MPB.optimize!(m)
+
+                @test MPB.getattribute(m, MPB.TerminationStatus()) == :Success
+                @test MPB.getattribute(m, MPB.PrimalStatus()) == MPB.FeasiblePoint
+                @test MPB.getattribute(m, MPB.DualStatus()) == MPB.FeasiblePoint
+
+                @test isapprox(MPB.getattribute(m, MPB.ObjectiveValue()), 2.0, atol=eps)
+
+                @test isapprox(MPB.getattribute(m, MPB.VariablePrimal(), v), [0.0, 2.0], atol=eps)
             end
 
 
@@ -261,12 +383,18 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
             #        x >= 0, y >= 0
             #
             #   solution: x = 4, y = 0, objv = 4
-            if applicable(delconstrs!, m, [1])
-                delconstrs!(m, [1])
+            if applicable(delete!, m, [1])
+                delete!(m, c1)
+
                 optimize!(m)
-                @test status(m) == :Optimal
-                @test isapprox(getobjval(m), 4.0, atol=eps)
-                @test isapprox(norm(getsolution(m) - [4.0, 0.0]), 0.0, atol=eps)
+                
+                @test MPB.getattribute(m, MPB.TerminationStatus()) == :Success
+                @test MPB.getattribute(m, MPB.PrimalStatus()) == MPB.FeasiblePoint
+                @test MPB.getattribute(m, MPB.DualStatus()) == MPB.FeasiblePoint
+
+                @test isapprox(MPB.getattribute(m, MPB.ObjectiveValue()), 4.0, atol=eps)
+
+                @test isapprox(MPB.getattribute(m, MPB.VariablePrimal(), v), [4.0, 0.0], atol=eps)
             end
 
             # delvars and solve
@@ -276,18 +404,24 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
             #           y >= 0
             #
             #   solution: y = 2, objv = 2
-            if applicable(delvars!, m, [1])
-                delvars!(m, [1])
+            if applicable(delete!, m, [1])
+                delete!(m, v[1])
+
                 optimize!(m)
-                @test status(m) == :Optimal
-                @test isapprox(getobjval(m), 2.0, atol=eps)
-                @test isapprox(getsolution(m)[1], 2.0, atol=eps)
+
+                @test MPB.getattribute(m, MPB.TerminationStatus()) == :Success
+                @test MPB.getattribute(m, MPB.PrimalStatus()) == MPB.FeasiblePoint
+                @test MPB.getattribute(m, MPB.DualStatus()) == MPB.FeasiblePoint
+
+                @test isapprox(MPB.getattribute(m, MPB.ObjectiveValue()), 2.0, atol=eps)
+
+                @test isapprox(MPB.getattribute(m, MPB.VariablePrimal(), v[2]), 2.0, atol=eps)
             end
         end
     end
 end
 
-
+"""
 
 function linprogsolvertestextra(solver::AbstractMathProgSolver; eps = Base.rtoldefault(Float64))
     @testset "Testing LP interface extra with $solver" begin
@@ -471,3 +605,4 @@ function linprogsolvertestextra(solver::AbstractMathProgSolver; eps = Base.rtold
         end
     end
 end
+"""
