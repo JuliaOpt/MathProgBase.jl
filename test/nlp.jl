@@ -114,6 +114,9 @@ function nlptest(solver)
         MathProgBase.optimize!(m)
         stat = MathProgBase.status(m)
         @test stat == :Optimal
+        if method_exists(MathProgBase.freemodel!, Tuple{typeof(m)})
+            MathProgBase.freemodel!(m)
+        end
     end
 end
 
@@ -177,6 +180,9 @@ function nlptest_nohessian(solver)
         MathProgBase.optimize!(m)
         stat = MathProgBase.status(m)
         @test stat == :Optimal
+        if method_exists(MathProgBase.freemodel!, Tuple{typeof(m)})
+            MathProgBase.freemodel!(m)
+        end
     end
 end
 
@@ -256,6 +262,9 @@ function convexnlptest(solver)
         MathProgBase.optimize!(m)
         stat = MathProgBase.status(m)
         @test stat == :Optimal
+        if method_exists(MathProgBase.freemodel!, Tuple{typeof(m)})
+            MathProgBase.freemodel!(m)
+        end
     end
 end
 
@@ -324,5 +333,8 @@ function rosenbrocktest(solver)
         MathProgBase.optimize!(m)
         stat = MathProgBase.status(m)
         @test stat == :Optimal
+        if method_exists(MathProgBase.freemodel!, Tuple{typeof(m)})
+            MathProgBase.freemodel!(m)
+        end
     end
 end
