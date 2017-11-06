@@ -3,7 +3,7 @@ using MathProgBase
 
 # Here the type represents the complete instance, but it
 # could also store instance data.
-type HS071 <: MathProgBase.AbstractNLPEvaluator
+mutable struct HS071 <: MathProgBase.AbstractNLPEvaluator
 end
 
 # hs071
@@ -121,7 +121,7 @@ function nlptest(solver)
 end
 
 # Same as above but no hessian callback
-type HS071_2 <: MathProgBase.AbstractNLPEvaluator
+mutable struct HS071_2 <: MathProgBase.AbstractNLPEvaluator
 end
 
 # hs071
@@ -188,7 +188,7 @@ end
 
 # a test for convex nonlinear solvers
 
-type QCQP <: MathProgBase.AbstractNLPEvaluator
+mutable struct QCQP <: MathProgBase.AbstractNLPEvaluator
 end
 
 # min x - y
@@ -271,7 +271,7 @@ end
 
 # a test for unconstrained nonlinear solvers
 
-type Rosenbrock <: MathProgBase.AbstractNLPEvaluator
+mutable struct Rosenbrock <: MathProgBase.AbstractNLPEvaluator
 end
 
 # min (1-x)^2 + 100*(y-x^2)^2

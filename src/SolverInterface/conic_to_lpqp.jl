@@ -3,7 +3,7 @@
 # To enable LPQP support from a Conic solver, define, e.g.,
 # LinearQuadraticModel(s::ECOSSolver) = ConicToLPQPBridge(ConicModel(s))
 
-type ConicToLPQPBridge <: AbstractLinearQuadraticModel
+mutable struct ConicToLPQPBridge <: AbstractLinearQuadraticModel
     m::AbstractConicModel
     A::SparseMatrixCSC{Float64,Int}
     collb::Vector{Float64}
@@ -303,13 +303,13 @@ end
 function setsense!(wrap::ConicToLPQPBridge, sense)
     wrap.sense = sense
 end
-function addvar!{T<:Integer}(wrap::ConicToLPQPBridge, constridx::AbstractArray{T}, constrcoef, l, u, objcoef)
+function addvar!(wrap::ConicToLPQPBridge, constridx::AbstractArray{T}, constrcoef, l, u, objcoef) where T<:Integer
     wrap.A = [wrap.A sparsevec(constridx, constrcoef, size(wrap.A, 1))]
     push!(wrap.collb, l)
     push!(wrap.colub, u)
     push!(wrap.obj, objcoef)
 end
-function addconstr!{T<:Integer}(wrap::ConicToLPQPBridge, varidx::AbstractArray{T}, coef, lb, ub)
+function addconstr!(wrap::ConicToLPQPBridge, varidx::AbstractArray{T}, coef, lb, ub) where T<:Integer
     wrap.A = [wrap.A; sparsevec(varidx, coef, size(wrap.A, 2))']
     push!(wrap.rowlb, lb)
     push!(wrap.rowub, ub)

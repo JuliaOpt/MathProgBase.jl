@@ -1,5 +1,5 @@
 
-type MixintprogSolution
+mutable struct MixintprogSolution
     status
     objval
     sol

@@ -3,7 +3,7 @@
 # To enable LPQP support from a Nonlinear solver, define, e.g.,
 # LinearQuadraticModel(s::IpoptSolver) = NonlinearToLPQPBridge(NonlinearModel(s))
 
-type QuadConstr
+mutable struct QuadConstr
     linearidx::Vector{Int}
     linearval::Vector{Float64}
     quadrowidx::Vector{Int}
@@ -14,7 +14,7 @@ type QuadConstr
 end
 getdata(q::QuadConstr) = q.linearidx, q.linearval, q.quadrowidx, q.quadcolidx, q.quadval
 
-type NonlinearToLPQPBridge <: AbstractLinearQuadraticModel
+mutable struct NonlinearToLPQPBridge <: AbstractLinearQuadraticModel
     nlpmodel::AbstractNonlinearModel
     LPdata
     Qobj::Tuple{Vector{Int},Vector{Int},Vector{Float64}}
@@ -105,7 +105,7 @@ function getquadconstrduals(model::NonlinearToLPQPBridge)
     return du[(numlinconstr(model)+1):end]
 end
 
-type LPQPEvaluator <: AbstractNLPEvaluator
+mutable struct LPQPEvaluator <: AbstractNLPEvaluator
     A::SparseMatrixCSC{Float64,Int}
     c::Vector{Float64}
     Qi::Vector{Int} # quadratic objective terms
