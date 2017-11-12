@@ -5,7 +5,7 @@
 # Must also implement supportedcones(). List SOC as a supported cone if it can
 # be passed as a quadratic constraint.
 
-type LPQPtoConicBridge <: AbstractConicModel
+mutable struct LPQPtoConicBridge <: AbstractConicModel
     lpqpmodel::AbstractLinearQuadraticModel
     qcp::Bool
     c
@@ -276,7 +276,7 @@ for f in methods_by_tag[:rewrap]
     @eval $f(model::LPQPtoConicBridge) = $f(model.lpqpmodel)
 end
 
-type LPQPWrapperCallbackData <: MathProgCallbackData
+mutable struct LPQPWrapperCallbackData <: MathProgCallbackData
     lpqpcb::MathProgCallbackData
     model::LPQPtoConicBridge
     solvec::Vector{Float64}

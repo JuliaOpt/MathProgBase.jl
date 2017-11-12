@@ -1,5 +1,5 @@
 
-type QuadprogSolution
+mutable struct QuadprogSolution
     status
     objval
     sol
