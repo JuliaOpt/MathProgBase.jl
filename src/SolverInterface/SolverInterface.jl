@@ -8,7 +8,7 @@ macro define_interface(args)
     @assert args.head == :block
     code = quote end
     for line in args.args
-        (isexpr(line, :line) && continue)
+        (isexpr(line, :line) || isa(line, LineNumberNode)) && continue
         (isa(line,Symbol) || isexpr(line,:tuple)) || error("Unexpected code in block")
         if isa(line,Symbol)
             fname = line
