@@ -269,6 +269,31 @@ function conicSOCtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
                 @test isapprox(d[3], -1.0, atol=tol)
                 @test isapprox(d[4], -1.0, atol=tol)
             end
+            # Permute indices - used to cause Mosek failure
+            m = MathProgBase.ConicModel(solver)
+            MathProgBase.loadproblem!(m,
+            [ 0.0, -1.0, -1.0],
+            [ 1.0   0.0   0.0;
+              0.0   0.0  -1.0;
+              0.0  -1.0   0.0;
+             -1.0   0.0   0.0],
+            [ 1.0, 0.0, 0.0, 0.0],
+            Any[(:Zero,1),(:SOC,[4,3,2])],
+            [(:Free,1:3)])
+            MathProgBase.optimize!(m)
+            @test MathProgBase.status(m) == :Optimal
+            @test isapprox(MathProgBase.getobjval(m), -sqrt(2.0), atol=tol)
+            @test isapprox(MathProgBase.getsolution(m)[1], 1.0, atol=tol)
+            @test isapprox(MathProgBase.getsolution(m)[2], 1.0/sqrt(2.0), atol=tol)
+            @test isapprox(MathProgBase.getsolution(m)[3], 1.0/sqrt(2.0), atol=tol)
+            if duals
+                d = MathProgBase.getdual(m)
+                @test isapprox(d[1], sqrt(2.0), atol=tol)
+                @test isapprox(d[4], sqrt(2.0), atol=tol)
+                @test isapprox(d[3], -1.0, atol=tol)
+                @test isapprox(d[2], -1.0, atol=tol)
+            end
+
         end
 
         # Problem SOC2
@@ -546,9 +571,7 @@ function conicEXPtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
             A = [0.0 1.0 0.0;
                  1.0 0.0 0.0]
             b = [2.0, 1.0]
-            MathProgBase.loadproblem!(m, c, A, b,
-                                      [(:Zero,1:2)],
-            [(:ExpPrimal, 1:3)])
+            MathProgBase.loadproblem!(m, c, A, b, [(:Zero,1:2)], [(:ExpPrimal, 1:3)])
             MathProgBase.optimize!(m)
             @test MathProgBase.status(m) == :Optimal
             @test isapprox(MathProgBase.getobjval(m), (2*exp(1/2)+3), atol=tol)
@@ -560,6 +583,31 @@ function conicEXPtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
                 d = MathProgBase.getdual(m)
                 @test isapprox(-dot(b,d), MathProgBase.getobjval(m), atol=tol)
                 u,v,w = c+A'd
+                # should belong to the ExpDual cone
+                @test u < 0
+                @test -u*exp(v/w) ≤ exp(1)*w + tol
+                s = MathProgBase.getvardual(m)
+                @test isapprox(norm(s - (c+A'd)), 0.0, atol=tol)
+            end
+
+            # Permute indices - used to cause Mosek failure
+            m = MathProgBase.ConicModel(solver)
+            c = [1.0, 1.0, 1.0]
+            A = [0.0 1.0 0.0;
+                 0.0 0.0 1.0]
+            b = [2.0, 1.0]
+            MathProgBase.loadproblem!(m, c, A, b, [(:Zero,1:2)], [(:ExpPrimal, [3,2,1])])
+            MathProgBase.optimize!(m)
+            @test MathProgBase.status(m) == :Optimal
+            @test isapprox(MathProgBase.getobjval(m), (2*exp(1/2)+3), atol=tol)
+            @test isapprox(MathProgBase.getsolution(m)[3], 1.0, atol=tol)
+            @test isapprox(MathProgBase.getsolution(m)[2], 2.0, atol=tol)
+            @test isapprox(MathProgBase.getsolution(m)[1], 2*exp(1/2), atol=tol)
+
+            if duals
+                d = MathProgBase.getdual(m)
+                @test isapprox(-dot(b,d), MathProgBase.getobjval(m), atol=tol)
+                w,v,u = c+A'd
                 # should belong to the ExpDual cone
                 @test u < 0
                 @test -u*exp(v/w) ≤ exp(1)*w + tol
@@ -581,7 +629,7 @@ function conicEXPtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
             b = [2.0, 1.0, 0.0, 0.0, 0.0]
             MathProgBase.loadproblem!(m, c, A, b,
             [(:Zero,1:2), (:ExpPrimal, 3:5)],
-            [(:Free, 1:3)])
+            [(:Free, [2,3,1])])
             MathProgBase.optimize!(m)
             @test MathProgBase.status(m) == :Optimal
             @test isapprox(MathProgBase.getobjval(m), (2*exp(1/2)+3), atol=tol)
@@ -594,6 +642,37 @@ function conicEXPtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
                 @test isapprox(-dot(b,d), MathProgBase.getobjval(m), atol=tol)
                 @test isapprox(norm(c+A'd), 0.0, atol=tol)
                 u,v,w = d[3:5]
+                # should belong to the ExpDual cone
+                @test u < 0
+                @test -u*exp(v/w) ≤ exp(1)*w + tol
+                s = MathProgBase.getvardual(m)
+                @test isapprox(norm(s), 0.0, atol=tol)
+            end
+
+            # Permute indices - used to cause Mosek failure
+            m = MathProgBase.ConicModel(solver)
+            c = [1.0, 1.0, 1.0]
+            A = [0.0 1.0 0.0;
+                -1.0 0.0 0.0;
+                 1.0 0.0 0.0;
+                 0.0 -1.0 0.0;
+                 0.0 0.0 -1.0]
+            b = [2.0, 0.0, 1.0, 0.0, 0.0]
+            MathProgBase.loadproblem!(m, c, A, b,
+            [(:Zero,[1,3]), (:ExpPrimal, [2,4,5])],
+            [(:Free, [3,2,1])])
+            MathProgBase.optimize!(m)
+            @test MathProgBase.status(m) == :Optimal
+            @test isapprox(MathProgBase.getobjval(m), (2*exp(1/2)+3), atol=tol)
+            @test isapprox(MathProgBase.getsolution(m)[1], 1.0, atol=tol)
+            @test isapprox(MathProgBase.getsolution(m)[2], 2.0, atol=tol)
+            @test isapprox(MathProgBase.getsolution(m)[3], 2*exp(1/2), atol=tol)
+
+            if duals
+                d = MathProgBase.getdual(m)
+                @test isapprox(-dot(b,d), MathProgBase.getobjval(m), atol=tol)
+                @test isapprox(norm(c+A'd), 0.0, atol=tol)
+                u,v,w = d[2],d[4],d[5]
                 # should belong to the ExpDual cone
                 @test u < 0
                 @test -u*exp(v/w) ≤ exp(1)*w + tol
@@ -703,6 +782,30 @@ function conicEXPtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
                 @test y[5] ≥ -tol
             end
         end
+
+        # Problem EXPSOC1
+        # A problem where MOSEK was failing
+        @testset "EXPSOC1" begin
+            m = MathProgBase.ConicModel(solver)
+            c = [0.0, 0.0, 1.0, 0.0, 0.0]
+            A = [-1.0 0.0 0.0 0.0 0.0; 1.0 3.0 1.0 0.0 0.0; 0.0 -1.0 0.0 0.0 0.0; -1.0 0.0 0.0 0.0 0.0; 2.0 3.0 0.0 0.0 0.0; 0.0 0.0 0.0 -1.0 0.0; 0.0 0.0 0.0 1.0 0.0; -2.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 -1.0; 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 -1.0 0.0; 0.0 1.0 0.0 0.0 1.0]
+            b = [0.0, 0.0, -1.0, 2.0, 30.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 7.0]
+            con_cones = Tuple{Symbol,Array{Int64,1}}[(:NonNeg, [1]), (:Zero, [2]), (:NonNeg, [3]), (:NonNeg, [4]), (:NonNeg, [5]), (:SOC, [6, 7, 8]), (:NonNeg, [9]), (:ExpPrimal, [12, 11, 10]), (:NonNeg, [13])]
+            var_cones = Tuple{Symbol,Array{Int64,1}}[(:Free, [1, 2, 3, 4, 5])]
+            MathProgBase.loadproblem!(m, c, A, b, con_cones, var_cones)
+            MathProgBase.optimize!(m)
+            @test MathProgBase.status(m) == :Optimal
+            @test isapprox(MathProgBase.getobjval(m), -18.082226, atol=tol)
+
+            if duals
+                d = MathProgBase.getdual(m)
+                @test isapprox(-dot(b,d), MathProgBase.getobjval(m), atol=tol)
+                u,v,w = d[12],d[11],d[10]
+                # should belong to the ExpDual cone
+                @test u < 0
+                @test -u*exp(v/w) ≤ exp(1)*w + tol
+            end
+        end
     end
 end
 
@@ -771,6 +874,40 @@ function conicSDPtest(solver::MathProgBase.AbstractMathProgSolver;duals=true, to
                 M = [s[4]    s[5]/s2 s[6]/s2
                      s[5]/s2 s[7]    s[8]/s2
                      s[6]/s2 s[8]/s2 s[9]]
+
+                @test eigmin(M) > -tol
+            end
+
+            # Reverse row and column indices to check nonconsecutive conic indices
+            m = MathProgBase.ConicModel(solver)
+            row = collect(2:-1:1)
+            col = collect(9:-1:1)
+            MathProgBase.loadproblem!(m, c[col], A[row,col], b[row], [(:Zero,row)], [(:SOC,col[1:3]),(:SDP,col[4:9])] )
+            MathProgBase.optimize!(m)
+            @test MathProgBase.status(m) == :Optimal
+            pobj = MathProgBase.getobjval(m)
+            @test isapprox(pobj, 7.05710509e-01, atol=tol)
+
+            xx = MathProgBase.getsolution(m)
+            x123 = xx[col[1:3]]
+            X = xx[col[4:9]]
+
+            if duals
+                y = MathProgBase.getdual(m)
+                # Check primal objective
+                comp_pobj = dot(X,[2.0,s2,0.0, 2.0,s2, 2.0]) + x123[1]
+                # Check dual objective
+                comp_dobj = -dot(y,b[row])
+                @test isapprox(comp_pobj, comp_dobj, atol=tol)
+
+                var = c[col] + A[row,col]' * y
+                @test (var[col[2]]^2 + var[col[3]]^2 - var[col[1]]^2) < tol # (var[1],var[2],var[3]) in SOC
+                s = MathProgBase.getvardual(m)
+                @test isapprox(norm(var - s), 0.0, atol=tol)
+
+                M = [s[col[4]]    s[col[5]]/s2 s[col[6]]/s2
+                     s[col[5]]/s2 s[col[7]]    s[col[8]]/s2
+                     s[col[6]]/s2 s[col[8]]/s2 s[col[9]]]
 
                 @test eigmin(M) > -tol
             end
