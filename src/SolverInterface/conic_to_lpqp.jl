@@ -129,7 +129,7 @@ function optimize!(wrap::ConicToLPQPBridge)
             push!(I,extrarows)
             push!(J,j)
             push!(b,collb[j])
-            push!(constr_cones, (:Zero,extrarows))
+            push!(constr_cones, (:Zero,extrarows:extrarows))
             push!(wrap.varboundmap, j)
             continue
         end
@@ -139,7 +139,7 @@ function optimize!(wrap::ConicToLPQPBridge)
             push!(I,extrarows)
             push!(J,j)
             push!(b, collb[j])
-            push!(constr_cones, (:NonPos,extrarows))
+            push!(constr_cones, (:NonPos,extrarows:extrarows))
             push!(wrap.varboundmap, j)
         end
         if colub[j] != Inf
@@ -148,7 +148,7 @@ function optimize!(wrap::ConicToLPQPBridge)
             push!(I,extrarows)
             push!(J,j)
             push!(b, colub[j])
-            push!(constr_cones, (:NonNeg,extrarows))
+            push!(constr_cones, (:NonNeg,extrarows:extrarows))
             push!(wrap.varboundmap, j)
         end
     end
@@ -159,7 +159,7 @@ function optimize!(wrap::ConicToLPQPBridge)
         if rowlb[it] == rowub[it]
             # a'x = b ==> b - a'x = 0
             push!(b, rowlb[it])
-            push!(constr_cones,(:Zero,it+extrarows))
+            push!(constr_cones,(:Zero,it+(extrarows:extrarows)))
         # Range constraint - not supported
         elseif rowlb[it] != -Inf && rowub[it] != Inf
             error("Ranged constraints unsupported!")
@@ -167,12 +167,12 @@ function optimize!(wrap::ConicToLPQPBridge)
         elseif rowlb[it] == -Inf
             # a'x <= b ==> b - a'x >= 0
             push!(b, rowub[it])
-            push!(constr_cones,(:NonNeg,it+extrarows))
+            push!(constr_cones,(:NonNeg,it+(extrarows:extrarows)))
         # Greater-than constraint
         else
             # a'x >= b ==> b - a'x <= 0
             push!(b, rowlb[it])
-            push!(constr_cones,(:NonPos,it+extrarows))
+            push!(constr_cones,(:NonPos,it+(extrarows:extrarows)))
         end
     end
 
