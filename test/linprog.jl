@@ -53,16 +53,20 @@ function linprogtest(solver; objtol = 1e-7, primaltol = 1e-6)
                 sol = solvelp(m)
                 @test sol.status == :Infeasible
 
-                r = sol.attrs[:infeasibilityray][1]
-                @test isapprox(r/abs(r), -1.0)
+                r = sol.attrs[:infeasibilityray]
+                @test length(r) == 1
+                r[1] = sol.attrs[:infeasibilityray][1]
+                @test isapprox(r[1]/abs(r[1]), -1.0)
             end
 
             @testset "with linprog" begin
                 sol = linprog([1,0],[2 1],'<',-1,solver)
                 @test sol.status == :Infeasible
 
-                r = sol.attrs[:infeasibilityray][1]
-                @test isapprox(r/abs(r), -1.0)
+                r = sol.attrs[:infeasibilityray]
+                @test length(r) == 1
+                r[1] = sol.attrs[:infeasibilityray][1]
+                @test isapprox(r[1]/abs(r[1]), -1.0)
             end
         end
 
