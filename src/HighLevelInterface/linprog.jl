@@ -47,8 +47,8 @@ function buildlp(c::InputVector, A::AbstractMatrix, rowlb::InputVector, rowub::I
         rhs = rowubtmp
         @assert realtype <: Real
 
-        rowlb = Array{realtype}(nrow)
-        rowub = Array{realtype}(nrow)
+        rowlb = Array{realtype}(undef, nrow)
+        rowub = Array{realtype}(undef, nrow)
         for i in 1:nrow
             if sense[i] == '<'
                 rowlb[i] = typemin(realtype)
@@ -86,7 +86,7 @@ function solvelp(m)
         try
             attrs[:infeasibilityray] = getinfeasibilityray(m)
         catch
-            warn("Problem is infeasible, but infeasibility ray (\"Farkas proof\") is unavailable; check that the proper solver options are set.")
+            Compat.@warn("Problem is infeasible, but infeasibility ray (\"Farkas proof\") is unavailable; check that the proper solver options are set.")
         end
         return LinprogSolution(stat, nothing, [], attrs)
     elseif stat == :Unbounded
@@ -94,7 +94,7 @@ function solvelp(m)
         try
             attrs[:unboundedray] = getunboundedray(m)
         catch
-            warn("Problem is unbounded, but unbounded ray is unavailable; check that the proper solver options are set.")
+            Compat.@warn("Problem is unbounded, but unbounded ray is unavailable; check that the proper solver options are set.")
         end
         return LinprogSolution(stat, nothing, [], attrs)
     else

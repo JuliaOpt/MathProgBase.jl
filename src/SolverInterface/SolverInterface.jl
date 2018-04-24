@@ -1,6 +1,8 @@
 module SolverInterface
 
 using Base.Meta
+using Compat.SparseArrays
+using Compat.LinearAlgebra
 
 const methods_by_tag = Dict{Symbol,Vector{Symbol}}()
 

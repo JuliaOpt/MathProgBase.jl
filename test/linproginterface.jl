@@ -1,5 +1,6 @@
-using Base.Test
-using MathProgBase
+using Compat.Test
+using Compat.LinearAlgebra
+#using MathProgBase
 using MathProgBase.SolverInterface
 
 function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefault(Float64))
