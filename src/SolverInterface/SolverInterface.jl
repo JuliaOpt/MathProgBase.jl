@@ -1,6 +1,7 @@
 module SolverInterface
 
 using Base.Meta
+using Compat
 using Compat.SparseArrays
 using Compat.LinearAlgebra
 
