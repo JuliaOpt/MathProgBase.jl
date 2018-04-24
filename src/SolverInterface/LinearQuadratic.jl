@@ -76,9 +76,9 @@ setquadobj!(m::AbstractLinearQuadraticModel,Q::Matrix) = setquadobj!(m,sparse(fl
 function setquadobj!(m::AbstractLinearQuadraticModel,Q::SparseMatrixCSC{Float64})
     if issymmetric(Q) || istriu(Q)
         nnz_q = nnz(Q)
-        qr = Array{Cint}(nnz_q)
-        qc = Array{Cint}(nnz_q)
-        qv = Array{Cdouble}(nnz_q)
+        qr = Array{Cint}(undef, nnz_q)
+        qc = Array{Cint}(undef, nnz_q)
+        qv = Array{Cdouble}(undef, nnz_q)
         k = 0
         colptr::Vector{Int} = Q.colptr
         nzval::Vector{Float64} = Q.nzval

@@ -2,6 +2,7 @@ module HighLevelInterface
 
 using ..SolverInterface
 using ..MathProgBase
+using Compat
 
 function warn_no_inf(T)
     if !(isinf(typemin(T)) && isinf(typemax(T)))

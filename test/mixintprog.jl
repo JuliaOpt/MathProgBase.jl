@@ -1,4 +1,5 @@
-using Base.Test
+using Compat.Test
+using Compat.LinearAlgebra
 using MathProgBase
 
 function mixintprogtest(solver)

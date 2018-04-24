@@ -5,7 +5,9 @@
 # Test the MathProgBase.jl interface for a provided conic solver.
 #############################################################################
 
-using Base.Test
+using Compat.Test
+using Compat.LinearAlgebra
+using Compat.SparseArrays
 using MathProgBase
 
 function coniclineartest(solver::MathProgBase.AbstractMathProgSolver;duals=false, tol=1e-6)
