@@ -18,7 +18,7 @@ mutable struct ConicToLPQPBridge <: AbstractLinearQuadraticModel
     vartypes::Vector{Symbol}
 end
 
-ConicToLPQPBridge(s::AbstractConicModel) = ConicToLPQPBridge(s, sparse(Int[],Int[],Float64[]), Float64[], Float64[], Float64[], Float64[], Float64[], :Min, Int[], Array{Vector{Int}}(0),Array{Vector{Int}}(0), Symbol[])
+ConicToLPQPBridge(s::AbstractConicModel) = ConicToLPQPBridge(s, sparse(Int[],Int[],Float64[]), Float64[], Float64[], Float64[], Float64[], Float64[], :Min, Int[], Array{Vector{Int}}(undef, 0),Array{Vector{Int}}(undef, 0), Symbol[])
 
 export ConicToLPQPBridge
 
@@ -113,7 +113,7 @@ function optimize!(wrap::ConicToLPQPBridge)
     (nvar = length(collb)) == length(colub) || error("Unequal lengths for column bounds")
     (nrow = length(rowlb)) == length(rowub) || error("Unequal lengths for row bounds")
 
-    constr_cones = Array{Any}(0)
+    constr_cones = []
     var_cones = [(:Free,1:nvar)]
 
     # for each variable bound, create a new constraint
@@ -159,7 +159,7 @@ function optimize!(wrap::ConicToLPQPBridge)
         if rowlb[it] == rowub[it]
             # a'x = b ==> b - a'x = 0
             push!(b, rowlb[it])
-            push!(constr_cones,(:Zero,it+(extrarows:extrarows)))
+            push!(constr_cones,(:Zero,it.+(extrarows:extrarows)))
         # Range constraint - not supported
         elseif rowlb[it] != -Inf && rowub[it] != Inf
             error("Ranged constraints unsupported!")
@@ -167,12 +167,12 @@ function optimize!(wrap::ConicToLPQPBridge)
         elseif rowlb[it] == -Inf
             # a'x <= b ==> b - a'x >= 0
             push!(b, rowub[it])
-            push!(constr_cones,(:NonNeg,it+(extrarows:extrarows)))
+            push!(constr_cones,(:NonNeg,it.+(extrarows:extrarows)))
         # Greater-than constraint
         else
             # a'x >= b ==> b - a'x <= 0
             push!(b, rowlb[it])
-            push!(constr_cones,(:NonPos,it+(extrarows:extrarows)))
+            push!(constr_cones,(:NonPos,it.+(extrarows:extrarows)))
         end
     end
 

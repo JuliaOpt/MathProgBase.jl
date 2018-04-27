@@ -1,6 +1,6 @@
-using Base.Test
+using Compat.Test
+using Compat.LinearAlgebra
 using MathProgBase
-using MathProgBase.SolverInterface
 
 function quadprogtest(solver)
     @testset "Testing quadprog with $solver" begin
@@ -10,30 +10,30 @@ function quadprogtest(solver)
         @test isapprox(norm(sol.sol[1:3] - [0.5714285714285715,0.4285714285714285,0.8571428571428572]), 0.0, atol=1e-6)
 
         @testset "QP1" begin
-            m = LinearQuadraticModel(solver)
-            loadproblem!(m, [1. 2. 3.; 1. 1. 0.],[-Inf,-Inf,-Inf],[Inf,Inf,Inf],[0.,0.,0.],[4., 1.],[Inf,Inf], :Min)
+            m = MathProgBase.LinearQuadraticModel(solver)
+            MathProgBase.loadproblem!(m, [1. 2. 3.; 1. 1. 0.],[-Inf,-Inf,-Inf],[Inf,Inf,Inf],[0.,0.,0.],[4., 1.],[Inf,Inf], :Min)
 
-            setquadobj!(m,diagm([10.0,10.0,10.0]))
+            MathProgBase.setquadobj!(m,diagm([10.0,10.0,10.0]))
             rows = [1, 2, 2, 2, 3, 3, 3]
             cols = [1, 1, 1, 2, 2, 3, 3]
             vals = Float64[2, 0.5, 0.5, 2, 1, 1, 1]
-            setquadobj!(m,rows,cols,vals)
-            optimize!(m)
-            stat = status(m)
+            MathProgBase.setquadobj!(m,rows,cols,vals)
+            MathProgBase.optimize!(m)
+            stat = MathProgBase.status(m)
             @test stat == :Optimal
-            @test isapprox(getobjval(m), 130/70, atol=1e-6)
-            @test isapprox(norm(getsolution(m) - [0.5714285714285715,0.4285714285714285,0.8571428571428572]), 0.0, atol=1e-6)
+            @test isapprox(MathProgBase.getobjval(m), 130/70, atol=1e-6)
+            @test isapprox(norm(MathProgBase.getsolution(m) - [0.5714285714285715,0.4285714285714285,0.8571428571428572]), 0.0, atol=1e-6)
         end
 
         @testset "QP2" begin
-            m = LinearQuadraticModel(solver)
-            loadproblem!(m, [-1. 1.; 1. 1.], [0.,0.], [Inf,Inf], [1.,1.], [0.,0.], [Inf,Inf], :Max)
-            addquadconstr!(m, [2], [1.], [1], [1], [1.], '<', 2)
-            optimize!(m)
-            stat = status(m)
+            m = MathProgBase.LinearQuadraticModel(solver)
+            MathProgBase.loadproblem!(m, [-1. 1.; 1. 1.], [0.,0.], [Inf,Inf], [1.,1.], [0.,0.], [Inf,Inf], :Max)
+            MathProgBase.addquadconstr!(m, [2], [1.], [1], [1], [1.], '<', 2)
+            MathProgBase.optimize!(m)
+            stat = MathProgBase.status(m)
             @test stat == :Optimal
-            @test isapprox(getobjval(m), 2.25, atol=1e-6)
-            @test isapprox(norm(getsolution(m) - [0.5,1.75]), 0.0, atol=1e-3)
+            @test isapprox(MathProgBase.getobjval(m), 2.25, atol=1e-6)
+            @test isapprox(norm(MathProgBase.getsolution(m) - [0.5,1.75]), 0.0, atol=1e-3)
         end
     end
 end
@@ -43,37 +43,37 @@ function qpdualtest(solver)
         # max x
         # s.t. x^2 <= 2
         @testset "QP1" begin
-            m = LinearQuadraticModel(solver)
-            loadproblem!(m, Array{Float64}(0,1), [-Inf], [Inf], [1.0], Float64[], Float64[], :Max)
-            addquadconstr!(m, [], [], [1], [1], [1.0], '<', 2.0)
-            optimize!(m)
-            stat = status(m)
+            m = MathProgBase.LinearQuadraticModel(solver)
+            MathProgBase.loadproblem!(m, Array{Float64}(0,1), [-Inf], [Inf], [1.0], Float64[], Float64[], :Max)
+            MathProgBase.addquadconstr!(m, [], [], [1], [1], [1.0], '<', 2.0)
+            MathProgBase.optimize!(m)
+            stat = MathProgBase.status(m)
 
-            @test numlinconstr(m) == 0
-            @test numquadconstr(m) == 1
-            @test numconstr(m) == 1
+            @test MathProgBase.numlinconstr(m) == 0
+            @test MathProgBase.numquadconstr(m) == 1
+            @test MathProgBase.numconstr(m) == 1
             @test stat == :Optimal
-            @test isapprox(getobjval(m), sqrt(2), atol=1e-6)
-            @test isapprox(getsolution(m)[1], sqrt(2), atol=1e-6)
-            @test isapprox(getquadconstrduals(m)[1], 0.5/sqrt(2), atol=1e-6)
+            @test isapprox(MathProgBase.getobjval(m), sqrt(2), atol=1e-6)
+            @test isapprox(MathProgBase.getsolution(m)[1], sqrt(2), atol=1e-6)
+            @test isapprox(MathProgBase.getquadconstrduals(m)[1], 0.5/sqrt(2), atol=1e-6)
         end
 
         # min -x
         # s.t. x^2 <= 2
         @testset "QP2" begin
-            m = LinearQuadraticModel(solver)
-            loadproblem!(m, Array{Float64}(0,1), [-Inf], [Inf], [-1.0], Float64[], Float64[], :Min)
-            addquadconstr!(m, [], [], [1], [1], [1.0], '<', 2.0)
-            optimize!(m)
-            stat = status(m)
+            m = MathProgBase.LinearQuadraticModel(solver)
+            MathProgBase.loadproblem!(m, Array{Float64}(0,1), [-Inf], [Inf], [-1.0], Float64[], Float64[], :Min)
+            MathProgBase.addquadconstr!(m, [], [], [1], [1], [1.0], '<', 2.0)
+            MathProgBase.optimize!(m)
+            stat = MathProgBase.status(m)
 
-            @test numlinconstr(m) == 0
-            @test numquadconstr(m) == 1
-            @test numconstr(m) == 1
+            @test MathProgBase.numlinconstr(m) == 0
+            @test MathProgBase.numquadconstr(m) == 1
+            @test MathProgBase.numconstr(m) == 1
             @test stat == :Optimal
-            @test isapprox(getobjval(m), -sqrt(2), atol=1e-6)
-            @test isapprox(getsolution(m)[1], sqrt(2), atol=1e-6)
-            @test isapprox(getquadconstrduals(m)[1], -0.5/sqrt(2), atol=1e-6)
+            @test isapprox(MathProgBase.getobjval(m), -sqrt(2), atol=1e-6)
+            @test isapprox(MathProgBase.getsolution(m)[1], sqrt(2), atol=1e-6)
+            @test isapprox(MathProgBase.getquadconstrduals(m)[1], -0.5/sqrt(2), atol=1e-6)
         end
     end
 end
@@ -84,14 +84,14 @@ function socptest(solver)
         # s.t. x + y >= 1
         #      x^2 + y^2 <= t^2
         #      t >= 0
-        m = LinearQuadraticModel(solver)
-        loadproblem!(m, [ 1.0 1.0 0.0 ], [-Inf,-Inf,0.0], [Inf,Inf,Inf], [0.0,0.0,1.0], [1.0],[Inf], :Min)
-        addquadconstr!(m, [], [], [1,2,3], [1,2,3], [1.0,1.0,-1.0],'<',0.0)
-        optimize!(m)
-        stat = status(m)
+        m = MathProgBase.LinearQuadraticModel(solver)
+        MathProgBase.loadproblem!(m, [ 1.0 1.0 0.0 ], [-Inf,-Inf,0.0], [Inf,Inf,Inf], [0.0,0.0,1.0], [1.0],[Inf], :Min)
+        MathProgBase.addquadconstr!(m, [], [], [1,2,3], [1,2,3], [1.0,1.0,-1.0],'<',0.0)
+        MathProgBase.optimize!(m)
+        stat = MathProgBase.status(m)
 
         @test stat == :Optimal
-        @test isapprox(getobjval(m), sqrt(1/2), atol=1e-6)
-        @test isapprox(norm(getsolution(m) - [0.5,0.5,sqrt(1/2)]), 0.0, atol=1e-3)
+        @test isapprox(MathProgBase.getobjval(m), sqrt(1/2), atol=1e-6)
+        @test isapprox(norm(MathProgBase.getsolution(m) - [0.5,0.5,sqrt(1/2)]), 0.0, atol=1e-3)
     end
 end
