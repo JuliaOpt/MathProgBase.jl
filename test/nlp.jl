@@ -1,5 +1,6 @@
 using Base.Test
 using MathProgBase
+using Compat
 
 # Here the type represents the complete instance, but it
 # could also store instance data.
@@ -114,7 +115,7 @@ function nlptest(solver)
         MathProgBase.optimize!(m)
         stat = MathProgBase.status(m)
         @test stat == :Optimal
-        if method_exists(MathProgBase.freemodel!, Tuple{typeof(m)})
+        if hasmethod(MathProgBase.freemodel!, Tuple{typeof(m)})
             MathProgBase.freemodel!(m)
         end
     end
@@ -180,7 +181,7 @@ function nlptest_nohessian(solver)
         MathProgBase.optimize!(m)
         stat = MathProgBase.status(m)
         @test stat == :Optimal
-        if method_exists(MathProgBase.freemodel!, Tuple{typeof(m)})
+        if hasmethod(MathProgBase.freemodel!, Tuple{typeof(m)})
             MathProgBase.freemodel!(m)
         end
     end
@@ -262,7 +263,7 @@ function convexnlptest(solver)
         MathProgBase.optimize!(m)
         stat = MathProgBase.status(m)
         @test stat == :Optimal
-        if method_exists(MathProgBase.freemodel!, Tuple{typeof(m)})
+        if hasmethod(MathProgBase.freemodel!, Tuple{typeof(m)})
             MathProgBase.freemodel!(m)
         end
     end
@@ -333,7 +334,7 @@ function rosenbrocktest(solver)
         MathProgBase.optimize!(m)
         stat = MathProgBase.status(m)
         @test stat == :Optimal
-        if method_exists(MathProgBase.freemodel!, Tuple{typeof(m)})
+        if hasmethod(MathProgBase.freemodel!, Tuple{typeof(m)})
             MathProgBase.freemodel!(m)
         end
     end

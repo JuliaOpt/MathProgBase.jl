@@ -188,8 +188,8 @@ function jac_structure(d::LPQPEvaluator)
         jac_nnz += 2*length(d.Qconstr[i].quadrowidx)
     end
 
-    I = Vector{Int}(jac_nnz)
-    J = Vector{Int}(jac_nnz)
+    I = Vector{Int}(undef, jac_nnz)
+    J = Vector{Int}(undef, jac_nnz)
     idx = 1
     for col = 1:size(d.A,2)
         for pos = d.A.colptr[col]:(d.A.colptr[col+1]-1)
@@ -244,8 +244,8 @@ function hesslag_structure(d::LPQPEvaluator)
         hess_nnz += length(d.Qconstr[i].quadrowidx)
     end
 
-    I = Vector{Int}(hess_nnz)
-    J = Vector{Int}(hess_nnz)
+    I = Vector{Int}(undef, hess_nnz)
+    J = Vector{Int}(undef, hess_nnz)
 
     for k in 1:length(d.Qi)
         I[k] = d.Qi[k]
