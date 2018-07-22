@@ -13,7 +13,7 @@ function quadprogtest(solver)
             m = MathProgBase.LinearQuadraticModel(solver)
             MathProgBase.loadproblem!(m, [1. 2. 3.; 1. 1. 0.],[-Inf,-Inf,-Inf],[Inf,Inf,Inf],[0.,0.,0.],[4., 1.],[Inf,Inf], :Min)
 
-            MathProgBase.setquadobj!(m,diagm([10.0,10.0,10.0]))
+            MathProgBase.setquadobj!(m,diagm(0 => [10.0,10.0,10.0]))
             rows = [1, 2, 2, 2, 3, 3, 3]
             cols = [1, 1, 1, 2, 2, 3, 3]
             vals = Float64[2, 0.5, 0.5, 2, 1, 1, 1]
@@ -44,7 +44,7 @@ function qpdualtest(solver)
         # s.t. x^2 <= 2
         @testset "QP1" begin
             m = MathProgBase.LinearQuadraticModel(solver)
-            MathProgBase.loadproblem!(m, Array{Float64}(0,1), [-Inf], [Inf], [1.0], Float64[], Float64[], :Max)
+            MathProgBase.loadproblem!(m, zeros(0,1), [-Inf], [Inf], [1.0], Float64[], Float64[], :Max)
             MathProgBase.addquadconstr!(m, [], [], [1], [1], [1.0], '<', 2.0)
             MathProgBase.optimize!(m)
             stat = MathProgBase.status(m)
@@ -62,7 +62,7 @@ function qpdualtest(solver)
         # s.t. x^2 <= 2
         @testset "QP2" begin
             m = MathProgBase.LinearQuadraticModel(solver)
-            MathProgBase.loadproblem!(m, Array{Float64}(0,1), [-Inf], [Inf], [-1.0], Float64[], Float64[], :Min)
+            MathProgBase.loadproblem!(m, zeros(0,1), [-Inf], [Inf], [-1.0], Float64[], Float64[], :Min)
             MathProgBase.addquadconstr!(m, [], [], [1], [1], [1.0], '<', 2.0)
             MathProgBase.optimize!(m)
             stat = MathProgBase.status(m)
