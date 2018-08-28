@@ -40,7 +40,7 @@ end
 const notsoc_error = "For conic solvers, only quadratic constraints in second-order cone format (x'x <= y^2) or rotated second-order cone format (x'x <= yz) are supported"
 
 function addquadconstr!(wrap::ConicToLPQPBridge, linearidx, linearval, quadrowidx, quadcolidx, quadval, sense, rhs)
-    if length(linearidx) > 0 || length(linearval) > 0 || sense != '<' || rhs != 0 || mapreduce(v-> (v == 0.0 || v == 1.0), +, 0, quadval) != length(quadval) - 1 || mapreduce(v->v == -1.0, +, 0, quadval) != 1
+    if length(linearidx) > 0 || length(linearval) > 0 || sense != '<' || rhs != 0 || count((quadval .== 0.0) .| (quadval .== 1.0)) != length(quadval) - 1 || count(quadval .== -1.0) != 1
         error(notsoc_error)
     end
     length(quadrowidx) == length(quadcolidx) == length(quadval) || error("Inconsistent dimensions")
