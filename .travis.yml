@@ -5,6 +5,10 @@ os:
 julia:
     - 0.6
     - 0.7
+    - 1.0
+matrix:
+    allow_failures:
+        - julia: 1.0
 notifications:
     email: false
 sudo: false
@@ -14,10 +18,6 @@ addons:
         - liblapack-dev
         - libgmp-dev
         - libglpk-dev
-script:
-    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-    - julia -e 'Pkg.clone(pwd())'
-    - julia -e 'Pkg.test("MathProgBase")'
 after_success:
     - julia -e 'Pkg.add("Documenter")'
     - julia -e 'cd(Pkg.dir("MathProgBase")); include(joinpath("docs", "make.jl"))'
