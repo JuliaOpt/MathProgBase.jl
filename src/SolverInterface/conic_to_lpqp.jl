@@ -259,7 +259,7 @@ function getreducedcosts(wrap::ConicToLPQPBridge)
         redcost[varidx] -= conedual[i]
     end
     if wrap.sense == :Max
-        scale!(redcost,-1.0)
+        Compat.rmul!(redcost, -1.0)
     end
     return redcost
 end
@@ -272,7 +272,7 @@ function getconstrduals(wrap::ConicToLPQPBridge)
         constrduals[i-offset] -= conedual[i]
     end
     if wrap.sense == :Max
-        scale!(constrduals,-1.0)
+        Compat.rmul!(constrduals, -1.0)
     end
     return constrduals
 end
