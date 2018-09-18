@@ -137,7 +137,6 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
         # introduce y = b - Ax, z = c-d^Tx, and say
         # y^Ty <= z^2.
         # Ax + y = b, so we just need to append some identity columns
-        # Alin = [ Alin spzeros(length(linconstr_idx),length(socconstr_idx))
         Alin = [ Alin spzeros(length(linconstr_idx),length(socconstr_idx))
         m.Asoc  sparse(SparseArrays.I, length(socconstr_idx), length(socconstr_idx))]
         lbaux = b[socconstr_idx]
