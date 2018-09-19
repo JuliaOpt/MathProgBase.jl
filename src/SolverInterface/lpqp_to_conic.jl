@@ -158,7 +158,7 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
             diagvec[rsoc_idx] = 1/sqrt(2)
         end
         Alin = [ Alin spzeros(size(Alin,1),length(rsocconstr_idx))
-        [m.Arsoc spzeros(size(m.Arsoc,1),length(socconstr_idx))] SparseArrays.spdiagm(0 => diagvec) ]
+        [m.Arsoc spzeros(size(m.Arsoc,1),length(socconstr_idx))] @compat spdiagm(0 => diagvec) ]
         lbaux = b[rsocconstr_idx]
         ubaux = lbaux
         lb = [lb; lbaux]
