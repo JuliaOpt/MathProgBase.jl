@@ -138,7 +138,7 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
         # y^Ty <= z^2.
         # Ax + y = b, so we just need to append some identity columns
         Alin = [ Alin spzeros(length(linconstr_idx),length(socconstr_idx))
-        m.Asoc speye(length(socconstr_idx)) ]
+        m.Asoc  sparse(SparseArrays.I, length(socconstr_idx), length(socconstr_idx))]
         lbaux = b[socconstr_idx]
         ubaux = lbaux
         lb = [lb; lbaux]
@@ -154,9 +154,9 @@ function loadproblem!(m::LPQPtoConicBridge, c, A, b, constr_cones, var_cones)
         # rsoc has x'x <= 2pq
         # quadratic form is x'x <= pq
         diagvec = ones(length(rsocconstr_idx))
-        diagvec[rsoc_start_idx] = 1/sqrt(2)
+        diagvec[rsoc_start_idx] .= 1/sqrt(2)
         Alin = [ Alin spzeros(size(Alin,1),length(rsocconstr_idx))
-        [m.Arsoc spzeros(size(m.Arsoc,1),length(socconstr_idx))] spdiagm(diagvec) ]
+        [m.Arsoc spzeros(size(m.Arsoc,1),length(socconstr_idx))] SparseArrays.spdiagm(0 => diagvec) ]
         lbaux = b[rsocconstr_idx]
         ubaux = lbaux
         lb = [lb; lbaux]
