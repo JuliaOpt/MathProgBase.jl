@@ -326,7 +326,7 @@ end
 for f in [:cbgetmipsolution,:cbgetlpsolution]
     @eval function ($f)(cb::LPQPWrapperCallbackData,output)
         ($f)(cb.lpqpcb,cb.solvec)
-        copy!(output,1,cb.solvec,1,length(output))
+        copyto!(output,1,cb.solvec,1,length(output))
     end
 end
 
