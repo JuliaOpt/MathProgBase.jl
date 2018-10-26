@@ -16,7 +16,13 @@ getdata(q::QuadConstr) = q.linearidx, q.linearval, q.quadrowidx, q.quadcolidx, q
 
 mutable struct NonlinearToLPQPBridge <: AbstractLinearQuadraticModel
     nlpmodel::AbstractNonlinearModel
-    LPdata
+    A::Union{SparseMatrixCSC{Float64,Int64}, <: AbstractMatrix{Float64}}
+    l::Vector{Float64}
+    u::Vector{Float64}
+    c::Vector{Float64}
+    lb::Vector{Float64}
+    ub::Vector{Float64}
+    sense::Symbol
     Qobj::Tuple{Vector{Int},Vector{Int},Vector{Float64}}
     Qconstr::Vector{QuadConstr}
     numvar::Int
@@ -26,15 +32,232 @@ mutable struct NonlinearToLPQPBridge <: AbstractLinearQuadraticModel
 end
 
 function NonlinearToLPQPBridge(m::AbstractNonlinearModel)
-    return NonlinearToLPQPBridge(m,nothing,(Int[],Int[],Float64[]),QuadConstr[],0,0,Float64[],Symbol[])
+    return NonlinearToLPQPBridge(m,Matrix{Float64}(undef,0,0),Vector{Float64}(),Vector{Float64}(),Vector{Float64}(),Vector{Float64}(),Vector{Float64}(),:Min,(Int[],Int[],Float64[]),QuadConstr[],0,0,Float64[],Symbol[])
 end
 
 export NonlinearToLPQPBridge
 
 function loadproblem!(model::NonlinearToLPQPBridge, A, l, u, c, lb, ub, sense)
-    model.LPdata = (A,l,u,c,lb,ub,sense)
+    model.A = A
+    model.l = l
+    model.u = u
+    model.c = c
+    model.lb = lb
+    model.ub = ub
+    model.sense = sense
     model.numvar = size(A,2)
     model.numconstr = size(A,1)
+end
+
+function getvarLB(model::NonlinearToLPQPBridge)
+    return model.l
+end
+
+function setvarLB!(model::NonlinearToLPQPBridge, l::Vector)
+    if length(l) != model.numvar
+        error("Invalid size of l")
+    end
+    model.l .= l
+    return nothing
+end
+
+function getvarUB(model::NonlinearToLPQPBridge)
+    return model.u
+end
+
+function setvarUB!(model::NonlinearToLPQPBridge, u::Vector)
+    if length(u) != model.numvar
+        error("Invalid size of u")
+    end
+    model.u .= u
+    return nothing
+end
+
+function getconstrLB(model::NonlinearToLPQPBridge)
+    return model.lb
+end
+
+function setconstrLB!(model::NonlinearToLPQPBridge, lb::Vector)
+    if length(lb) != model.numconstr
+        error("Invalid size of lb")
+    end
+    model.lb .= lb
+    return nothing
+end
+
+function getconstrUB(model::NonlinearToLPQPBridge)
+    return model.ub
+end
+
+function setconstrUB!(model::NonlinearToLPQPBridge, ub::Vector)
+    if length(ub) != model.numconstr
+        error("Invalid size of ub")
+    end
+    model.ub .= ub
+    return nothing
+end
+
+function getobj(model::NonlinearToLPQPBridge)
+    return model.c
+end
+
+function setobj!(model::NonlinearToLPQPBridge, c::Vector)
+    if length(c) != model.numvar
+        error("Invalid size of c")
+    end
+    model.c .= c
+    return nothing
+end
+
+function getconstrmatrix(model::NonlinearToLPQPBridge)
+    return model.A
+end
+
+function addvar!(model::NonlinearToLPQPBridge, constridx::Vector, coeffs::Vector, l::Real, u::Real, objcoeff::Real)
+    if length(constridx) != length(coeffs)
+        error("constridx and coeffs have different legths")
+    end
+    model.numvar += 1
+    push!(model.l, l)
+    push!(model.u, u)
+    push!(model.c, objcoeff)
+    _addvar!(model, model.A, constridx, coeffs)
+    return nothing
+end
+
+function _addvar!(model::NonlinearToLPQPBridge, A::SparseMatrixCSC, constridx::Vector, coeffs::Vector)
+    I,J,V = findnz(A)
+    for (idx,coeff) in zip(constridx, coeffs)
+        push!(I, idx)
+        push!(J, model.numvar)
+        push!(V, coeff)
+    end
+    model.A = sparse(I,J,V,model.numconstr,model.numvar)
+    return nothing
+end
+
+function _addvar!(model::NonlinearToLPQPBridge, A::Matrix, constridx::Vector, coeffs::Vector)
+    newcol = zeros(model.numconstr,1)
+    newcol[constridx] = coeffs
+    model.A = hcat(A,newcol)
+    return nothing
+end
+
+function delvars!(model::NonlinearToLPQPBridge, rmidx::Vector)
+    sort!(rmidx)
+    rmidx = unique(rmidx)
+    deleteat!(model.l, rmidx)
+    deleteat!(model.u, rmidx)
+    deleteat!(model.c, rmidx)
+    delvars!(model, model.A, rmidx)
+    return nothing
+end
+
+function delvars!(model::NonlinearToLPQPBridge, A::SparseMatrixCSC, rmidx::Vector)
+    I = Vector{Int}()
+    J = Vector{Int}()
+    V = Vector{Float64}()
+    rows = rowvals(A)
+    vals = nonzeros(A)
+    m, n = size(A)
+    for j = 1:n
+        for r in nzrange(A, j)
+            i = rows[r]
+            v = vals[r]
+            if j ∉ rmidx
+                push!(I, i)
+                push!(J, j)
+                push!(V, v)
+            end
+        end
+    end
+    n -= length(rmidx)
+    model.numvar = n
+    model.A = sparse(I,J,V,m,n)
+    return nothing
+end
+
+function delvars!(model::NonlinearToLPQPBridge, A::Matrix, rmidx::Vector)
+    model.A = A[:, setdiff(1:size(A,2), rmidx)]
+    model.numvar -= length(rmidx)
+    return nothing
+end
+
+function addconstr!(model::NonlinearToLPQPBridge, colidx::Vector, coeffs::Vector, lb::Real, ub::Real)
+    if length(colidx) != length(coeffs)
+        error("colidx and coeffs have different legths")
+    end
+    push!(model.lb, lb)
+    push!(model.ub, ub)
+    model.numconstr += 1
+    addconstr!(model, model.A, colidx, coeffs)
+    return nothing
+end
+
+function addconstr!(model::NonlinearToLPQPBridge, A::SparseMatrixCSC, colidx::Vector, coeffs::Vector)
+    I,J,V = findnz(A)
+    for (idx,coeff) in zip(colidx, coeffs)
+        push!(I, model.numconstr)
+        push!(J, idx)
+        push!(V, coeff)
+    end
+    model.A = sparse(I,J,V,model.numconstr,model.numvar)
+    return nothing
+end
+
+function addconstr!(model::NonlinearToLPQPBridge, A::Matrix, colidx::Vector, coeffs::Vector)
+    isempty(colidx) && return nothing
+    newrow = zeros(model.numvar)
+    newrow[colidx] = coeffs
+    model.A = vcat(A,newrow')
+    return nothing
+end
+
+function delconstrs!(model::NonlinearToLPQPBridge, rmidx::Vector)
+    sort!(rmidx)
+    rmidx = unique(rmidx)
+    deleteat!(model.lb, rmidx)
+    deleteat!(model.ub, rmidx)
+    delconstrs!(model, model.A, rmidx)
+    return nothing
+end
+
+function delconstrs!(model::NonlinearToLPQPBridge, A::SparseMatrixCSC, rmidx::Vector)
+    I = Vector{Int}()
+    J = Vector{Int}()
+    V = Vector{Float64}()
+    m, n = size(A)
+    rows = rowvals(A)
+    vals = nonzeros(A)
+    for j = 1:n
+        for r in nzrange(model.A, j)
+            i = rows[r]
+            v = vals[r]
+            pos = findlast(idx -> i >= idx, rmidx)
+            if pos == nothing
+                push!(I, i)
+            elseif i == rmidx[pos]
+                continue
+            else
+                push!(I, i-pos)
+            end
+            push!(J, j)
+            push!(V, v)
+        end
+    end
+    m -= length(rmidx)
+    model.A = sparse(I,J,V,m,n)
+    model.numconstr = m
+end
+
+function delconstrs!(model::NonlinearToLPQPBridge, A::Matrix, rmidx::Vector)
+    model.A = A[setdiff(1:size(A,1), rmidx), :]
+    model.numconstr -= length(rmidx)
+    return nothing
+end
+
+function setsense!(model::NonlinearToLPQPBridge, sense)
+    model.sense = sense
 end
 
 function setquadobj!(model::NonlinearToLPQPBridge, rowidx, colidx, quadval)
@@ -47,9 +270,8 @@ function addquadconstr!(model::NonlinearToLPQPBridge, linearidx, linearval, quad
 end
 
 function optimize!(model::NonlinearToLPQPBridge)
-    A,l,u,c,lb,ub,sense = model.LPdata
-    lb = copy(lb)
-    ub = copy(ub)
+    lb = copy(model.lb)
+    ub = copy(model.ub)
     for q in model.Qconstr
         if q.sense == '<'
             push!(lb,-Inf)
@@ -64,7 +286,7 @@ function optimize!(model::NonlinearToLPQPBridge)
         end
     end
 
-    loadproblem!(model.nlpmodel, model.numvar, model.numconstr, l, u, lb, ub, sense, LPQPEvaluator(model))
+    loadproblem!(model.nlpmodel, model.numvar, model.numconstr, model.l, model.u, lb, ub, model.sense, LPQPEvaluator(model))
     if any(model.vartypes .!= :Cont)
         setvartype!(model.nlpmodel, model.vartypes)
     end
@@ -78,11 +300,11 @@ for f in [:status, :getsolution, :getobjval, :getobjbound, :getreducedcosts]
     @eval $f(model::NonlinearToLPQPBridge) = $f(model.nlpmodel)
 end
 
-getsense(model::NonlinearToLPQPBridge) = model.LPdata[7]
+getsense(model::NonlinearToLPQPBridge) = model.sense
 numvar(model::NonlinearToLPQPBridge) = model.numvar
 numconstr(model::NonlinearToLPQPBridge) = model.numconstr
 
-numlinconstr(model::NonlinearToLPQPBridge) = size(model.LPdata[1],1)
+numlinconstr(model::NonlinearToLPQPBridge) = size(model.A,1)
 numquadconstr(model::NonlinearToLPQPBridge) = length(model.Qconstr)
 
 setvartype!(model::NonlinearToLPQPBridge,vartypes::Vector{Symbol}) = (model.vartypes = vartypes)
@@ -90,14 +312,12 @@ setwarmstart!(model::NonlinearToLPQPBridge,v) = (model.warmstart = v)
 
 function getconstrsolution(model::NonlinearToLPQPBridge)
     x = getsolution(model)
-    A = model.LPdata[1]
-    return A*x
+    return model.A*x
 end
 
 function getconstrduals(model::NonlinearToLPQPBridge)
     du = getconstrduals(model.nlpmodel)
-    A = model.LPdata[1]
-    return du[1:size(A,1)]
+    return du[1:size(model.A,1)]
 end
 
 function getquadconstrduals(model::NonlinearToLPQPBridge)
@@ -115,8 +335,8 @@ mutable struct LPQPEvaluator <: AbstractNLPEvaluator
 end
 
 function LPQPEvaluator(model::NonlinearToLPQPBridge)
-    A = model.LPdata[1]
-    c = model.LPdata[4]
+    A = model.A
+    c = model.c
     Qi,Qj,Qv = model.Qobj
     return LPQPEvaluator(A,c,Qi,Qj,Qv,model.Qconstr)
 end

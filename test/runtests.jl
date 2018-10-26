@@ -3,7 +3,7 @@ using GLPKMathProgInterface, Ipopt, ECOS
 lp_solver = GLPKSolverLP()
 ip_solver = GLPKSolverMIP()
 conic_solver = ECOSSolver(verbose=false)
-nlp_solver = IpoptSolver(print_level=0)
+nlp_solver = IpoptSolver(print_level=0, fixed_variable_treatment="make_constraint")
 
 include("linprog.jl")
 linprogtest(lp_solver)
@@ -32,3 +32,5 @@ linprogsolvertest(lp_solver)
 linprogsolvertestextra(lp_solver)
 # Test LP fallback for conics
 linprogsolvertest(conic_solver)
+# Test LP fallback for nlp
+linprogsolvertest(nlp_solver, 1e-5)
