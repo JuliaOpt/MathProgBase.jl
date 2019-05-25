@@ -1,6 +1,6 @@
-using Compat.Test
-using Compat.LinearAlgebra
-using Compat.SparseArrays
+using Test
+using LinearAlgebra
+using SparseArrays
 using MathProgBase
 
 function linprogtest(solver; objtol = 1e-7, primaltol = 1e-6)

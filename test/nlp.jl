@@ -1,6 +1,5 @@
 using MathProgBase
-using Compat
-using Compat.Test
+using Test
 
 # Here the type represents the complete instance, but it
 # could also store instance data.
