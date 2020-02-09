@@ -3,18 +3,10 @@ os:
     - linux
     - osx
 julia:
-    - 0.6
-    - 0.7
     - 1.0
+    - 1.3
 notifications:
     email: false
-sudo: false
-addons:
-    apt_packages:
-        - gfortran
-        - liblapack-dev
-        - libgmp-dev
-        - libglpk-dev
 after_success:
     - julia -e 'Pkg.add("Documenter")'
     - julia -e 'cd(Pkg.dir("MathProgBase")); include(joinpath("docs", "make.jl"))'
