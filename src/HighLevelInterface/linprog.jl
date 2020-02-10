@@ -86,7 +86,7 @@ function solvelp(m)
         try
             attrs[:infeasibilityray] = getinfeasibilityray(m)
         catch
-            Compat.@warn("Problem is infeasible, but infeasibility ray (\"Farkas proof\") is unavailable; check that the proper solver options are set.")
+            @warn("Problem is infeasible, but infeasibility ray (\"Farkas proof\") is unavailable; check that the proper solver options are set.")
         end
         return LinprogSolution(stat, nothing, [], attrs)
     elseif stat == :Unbounded
@@ -94,7 +94,7 @@ function solvelp(m)
         try
             attrs[:unboundedray] = getunboundedray(m)
         catch
-            Compat.@warn("Problem is unbounded, but unbounded ray is unavailable; check that the proper solver options are set.")
+            @warn("Problem is unbounded, but unbounded ray is unavailable; check that the proper solver options are set.")
         end
         return LinprogSolution(stat, nothing, [], attrs)
     else
