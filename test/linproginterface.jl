@@ -285,6 +285,30 @@ function linprogsolvertest(solver::AbstractMathProgSolver, eps = Base.rtoldefaul
             end
         end
     end
+
+    # Tests that getsolution is feasible when the problem is unbounded
+    # so that getsolution() + λ getunboundedray() is feasible for any λ >= 0
+    # See https://github.com/JuliaOpt/MathProgBase.jl/pull/144
+
+    # Max x
+    # s.t. x >= 1
+    # x unbounded
+    # y <= -1
+    loadproblem!(m, [1. 0.], [-Inf, -Inf], [Inf, -1], [1., 0.], [1], [Inf], :Max)
+    optimize!(m)
+    @test MathProgBase.status(m) == :Unbounded
+    x = MathProgBase.getsolution(m)
+    @test 1 <= x[1] + eps
+    @test x[2] <= -1 + eps
+
+    # See https://github.com/JuliaOpt/Gurobi.jl/issues/80
+    # Min y
+    # s.t. x >= 1
+    loadproblem!(m, [1. 0.], [-Inf, -Inf], [Inf, Inf], [0., 1.], [1.], [Inf], :Min)
+    optimize!(m)
+    @test MathProgBase.status(m) == :Unbounded
+    x = MathProgBase.getsolution(m)
+    @test 1 <= x[1] + eps
 end
 
 
