@@ -792,8 +792,8 @@ function conicEXPtest(solver::MathProgBase.AbstractMathProgSolver;duals=false, t
             c = [0.0, 0.0, 1.0, 0.0, 0.0]
             A = [-1.0 0.0 0.0 0.0 0.0; 1.0 3.0 1.0 0.0 0.0; 0.0 -1.0 0.0 0.0 0.0; -1.0 0.0 0.0 0.0 0.0; 2.0 3.0 0.0 0.0 0.0; 0.0 0.0 0.0 -1.0 0.0; 0.0 0.0 0.0 1.0 0.0; -2.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 0.0 -1.0; 0.0 0.0 0.0 0.0 0.0; 0.0 0.0 0.0 -1.0 0.0; 0.0 1.0 0.0 0.0 1.0]
             b = [0.0, 0.0, -1.0, 2.0, 30.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 7.0]
-            con_cones = Tuple{Symbol,Array{Int64,1}}[(:NonNeg, [1]), (:Zero, [2]), (:NonNeg, [3]), (:NonNeg, [4]), (:NonNeg, [5]), (:SOC, [6, 7, 8]), (:NonNeg, [9]), (:ExpPrimal, [12, 11, 10]), (:NonNeg, [13])]
-            var_cones = Tuple{Symbol,Array{Int64,1}}[(:Free, [1, 2, 3, 4, 5])]
+            con_cones = Tuple{Symbol,Array{Int,1}}[(:NonNeg, [1]), (:Zero, [2]), (:NonNeg, [3]), (:NonNeg, [4]), (:NonNeg, [5]), (:SOC, [6, 7, 8]), (:NonNeg, [9]), (:ExpPrimal, [12, 11, 10]), (:NonNeg, [13])]
+            var_cones = Tuple{Symbol,Array{Int,1}}[(:Free, [1, 2, 3, 4, 5])]
             MathProgBase.loadproblem!(m, c, A, b, con_cones, var_cones)
             MathProgBase.optimize!(m)
             @test MathProgBase.status(m) == :Optimal
